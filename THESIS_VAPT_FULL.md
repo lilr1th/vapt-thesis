@@ -109,81 +109,22 @@ The official penetration testing report produced at the end of this engagement d
 
 ## 5. Project Scope
 
-### Engaging Organization
+This internship engagement focused on the external attack surface of **neuralsh.com** and its underlying hosting infrastructure, authorized in writing by **Prestige Alliance Co., Ltd.** Testing was conducted using a black-box approach — meaning no credentials, source code, or internal documentation were provided prior to testing. Everything discovered was derived from publicly accessible systems and open-source intelligence, simulating the real-world perspective of an external attacker.
 
-**Prestige Alliance Co., Ltd.** is the authorizing organization for this Vulnerability Assessment and Penetration Testing engagement. Prestige Alliance owns and operates **neuralsh.com**, an AI-powered neural search platform, and has granted explicit written authorization for the assessor to conduct security testing against the platform and its supporting infrastructure for the purposes of this graduation thesis.
+The table below defines the systems that were in scope for this engagement:
 
-### Engagement Type
+| **Asset** | **Type** | **Description** |
+|-----------|----------|-----------------|
+| `neuralsh.com` | Web Application | Primary target — Nuxt.js frontend, protected by Cloudflare WAF |
+| `*.neuralsh.com` | Subdomains | All subdomains discoverable via DNS enumeration or certificate transparency |
+| `mail.neuralsh.com` | Mail Server | Origin server entry point — resolves directly to 103.16.62.217 |
+| `103.16.62.217` | Origin Server | Backend infrastructure hosting the application, database, mail stack, and admin panels |
 
-This engagement is a **black-box external penetration test**, simulating the perspective of an unauthenticated internet-based attacker with no prior knowledge of the target's internal architecture, source code, credentials, or network topology. All findings were derived solely through direct interaction with publicly reachable systems and open-source intelligence gathering.
+*Table 1: Engagement scope — in-scope systems*
 
-### Target Systems
+The following were explicitly **out of scope**: third-party services not owned by the target (including Cloudflare's own infrastructure), physical access testing, social engineering, denial of service attacks, and any IP address not belonging to the target organization.
 
-| **Asset** | **Description** |
-|---|---|
-| `neuralsh.com` | Primary web application — Nuxt.js frontend, Cloudflare-protected |
-| `*.neuralsh.com` | All subdomains discoverable via DNS, certificate transparency, or wildcard resolution |
-| `mail.neuralsh.com` | Mail and backend infrastructure (origin server) |
-| `103.16.62.217` | Origin server hosting the application backend, mail stack, database, and administrative panels |
-
-*Table 1: Target Systems*
-
-### Objectives
-
-The engagement was conducted to:
-
-- Identify exploitable vulnerabilities across the application, network, and infrastructure layers of the neuralsh.com environment
-- Assess the real-world exploitability and business impact of identified vulnerabilities through controlled, non-destructive proof-of-concept exploitation
-- Provide Prestige Alliance Co., Ltd. with a prioritized, actionable remediation roadmap
-- Produce a formal assessment report suitable for academic submission and internal security review
-
-### Methodology
-
-Testing followed the **Penetration Testing Execution Standard (PTES)** lifecycle, supplemented by test cases from the **OWASP Web Security Testing Guide (WSTG) v4.2** and guidance from **NIST SP 800-115**. The engagement progressed through five phases: Reconnaissance, Scanning and Enumeration, Vulnerability Assessment, Exploitation, and Post-Exploitation — each documented with command-level evidence, CVSS v3.1 scoring, and remediation guidance.
-
-### Authorization
-
-Prestige Alliance Co., Ltd. has provided written confirmation that:
-
-- The assessor is authorized to perform the testing activities described in this scope against the listed target systems
-- Testing may proceed during the agreed engagement window without requiring case-by-case approval for each activity within the defined boundaries
-- Findings will be reported directly and exclusively to Prestige Alliance's designated point of contact
-- No third party has been granted visibility into the assessment results without Prestige Alliance's consent
-
-### Engagement Window
-
-**Testing Period:** June 2026  
-**Reporting Deadline:** Aligned with academic thesis submission schedule
-
-### Rules of Engagement — Permitted Activities
-
-- Passive and active reconnaissance (OSINT, DNS enumeration, certificate transparency analysis)
-- Port scanning and service fingerprinting
-- Web application enumeration (directory discovery, parameter analysis, API mapping)
-- Authentication and session management testing
-- Controlled proof-of-concept exploitation of identified vulnerabilities
-- Post-exploitation impact analysis conducted in a read-only, non-destructive manner
-
-### Rules of Engagement — Prohibited Activities
-
-- Denial of Service (DoS/DDoS) attacks against any in-scope or adjacent system
-- Modification, deletion, or exfiltration of production data
-- Social engineering directed at Prestige Alliance employees, contractors, or customers
-- Testing of any system, IP range, or third-party service not explicitly listed as in-scope
-- Persistent access mechanisms, backdoors, or any action extending beyond proof-of-concept validation
-
-### Boundaries and Constraints
-
-To prevent operational disruption, the assessor applied the following self-imposed limits throughout testing:
-
-- Exploitation of rate-limiting controls was capped at 50 requests per test scenario
-- Credential testing against any service was limited to a bounded, pre-defined wordlist
-- No attempt was made to establish persistent access to any system, even where technically feasible
-- Any indicator suggesting an active third-party compromise would be reported immediately and testing in that area would cease
-
-### Confidentiality
-
-All information obtained during this engagement — including but not limited to system configurations, vulnerability details, and any data incidentally observed — is treated as **confidential** and is disclosed only within this report, submitted exclusively to Prestige Alliance Co., Ltd. and the academic institution overseeing the thesis.
+This engagement was authorized by Prestige Alliance Co., Ltd. for the period of **June 2026**, aligned with the academic thesis submission schedule. All findings are treated as confidential and disclosed exclusively to Prestige Alliance Co., Ltd. and the supervising academic institution.
 
 ## 6. Action Plan
 
@@ -251,43 +192,47 @@ CWES is particularly relevant to the neuralsh.com assessment because the target 
 
 ## 3. The Penetration Testing Process
 
-A structured penetration test does not begin with running tools — it begins with planning, and it does not end with finding vulnerabilities — it ends with helping the organization act on them. The process is divided into three broad stages: Pre-Pentesting, During Pentesting, and After Pentesting.
+This internship followed the **Penetration Testing Execution Standard (PTES)** — a six-phase lifecycle that structures the engagement from initial information gathering through final reporting. Unlike an ad-hoc approach where tools are run without direction, PTES ensures that every phase produces evidence that feeds the next, and that nothing is tested without a defined reason. The six phases applied in this engagement are described below.
 
 *[Figure 5: Penetration Testing Process Diagram — PENTEST_DIAGRAM.drawio]*
 
-### 3.1 Pre-Pentesting
+### 3.1 Phase 1 — Reconnaissance
 
-The pre-pentesting stage covers everything that must be in place before any technical activity begins. Skipping this stage is one of the most common mistakes made by inexperienced testers, and it creates both legal and operational risk.
+Reconnaissance was the first and most time-intensive phase of the engagement. The goal was to map the entire publicly accessible attack surface of neuralsh.com before any active probing began. This phase used only passive and semi-passive techniques — primarily querying public records and observing what the target broadcast about itself.
 
-**Scope Definition** is the foundation of a safe engagement. The tester and the client agree in writing on exactly which systems, IP addresses, domains, and functionalities are authorized for testing. Anything outside this scope is off-limits, regardless of what is discovered during testing. For this internship, the scope was defined as neuralsh.com and its origin server infrastructure (103.16.62.217), authorized in writing by Prestige Alliance Co., Ltd.
+Key activities included WHOIS registration lookups, DNS record enumeration (A, MX, TXT, NS, and CNAME records), and SSL certificate transparency log analysis via crt.sh. The most impactful discovery in this phase was the **origin IP address (103.16.62.217)**, obtained by resolving the MX record for the mail server — a record that pointed directly to the backend infrastructure rather than through the Cloudflare proxy. JavaScript bundle analysis of the Nuxt.js frontend also revealed internal API route structures, including the unauthenticated token endpoint that was later exploited in Phase 4.
 
-**Written Authorization** converts an otherwise illegal act into a legitimate professional service. Without it, every scan, every request, and every connection to the target could constitute unauthorized computer access under applicable law. The authorization letter must specify the target, the testing window, the permitted activities, and the identity of the tester.
+### 3.2 Phase 2 — Scanning and Enumeration
 
-**Rules of Engagement (ROE)** define the boundaries of what the tester may do. This includes permitted techniques (port scanning, web fuzzing, exploitation), prohibited techniques (DoS attacks, data exfiltration, persistent access), and escalation procedures — what to do if a critical finding is discovered mid-test, or if an active compromise by a third party is detected.
+With the origin IP identified, active scanning was conducted against 103.16.62.217 to determine which services were reachable from the internet. Nmap was used to perform a full TCP port scan, revealing a large number of open ports that should not have been publicly accessible — including port 2087 (WHM admin panel), port 3306 (MySQL), port 2083 (cPanel), port 8291 (MikroTik Winbox), and port 25 (SMTP).
 
-**Environment Preparation** covers the setup of the testing machine, tools, VPN or proxy configurations, and note-taking systems. Organizing this before testing begins ensures that evidence is captured consistently from the first command, not just from the point where something interesting is found.
+Web application enumeration was performed using Dirb and Nikto against both the Cloudflare-fronted domain and the direct origin IP. This identified accessible admin interfaces, exposed directory listings, and additional administrative endpoints. Service fingerprinting confirmed the specific software versions running on each port, providing the information needed to assess known vulnerabilities in Phase 3.
 
-### 3.2 During Pentesting
+### 3.3 Phase 3 — Vulnerability Assessment
 
-The active testing phase follows a structured lifecycle rather than an ad-hoc approach. Each phase builds on the previous one.
+The vulnerability assessment phase involved manually evaluating each discovered service and web application behavior against known vulnerability classes. Rather than relying solely on automated scanner output, manual analysis was performed on authentication flows, API endpoints, HTTP response headers, CORS configuration, and session token handling.
 
-**Reconnaissance** is the process of gathering information about the target without sending potentially detectable traffic to the target's servers. This includes WHOIS lookups, DNS record analysis, certificate transparency searches, OSINT on registered domains and employees, and review of public code repositories. The goal is to build a complete picture of the target's attack surface before any active scanning begins.
+All findings were mapped to relevant OWASP Top 10 categories and scored using CVSS v3.1. This phase produced the complete findings register — 20 vulnerabilities across four severity bands: 4 Critical, 5 High, 7 Medium, and 4 Low. The most significant findings were the unauthenticated WHM admin panel (CVSS 10.0), the internet-facing MySQL service (CVSS 9.8), and the Cloudflare WAF bypass via origin IP disclosure (CVSS 9.1).
 
-**Scanning and Enumeration** involves sending probes directly to the target to map its infrastructure. Port scanning (using tools such as Nmap) reveals which services are running and on which ports. Web enumeration tools (Dirb, Nikto, ffuf) discover directories, files, and endpoints that are not linked from the main application. Service fingerprinting identifies the specific software and version running on each open port — information that is used to search for known vulnerabilities.
+### 3.4 Phase 4 — Exploitation
 
-**Vulnerability Assessment** is the process of evaluating discovered services and behaviors against known vulnerability classes and misconfigurations. This is not automated scanning alone — it involves manual analysis of application logic, authentication flows, API behavior, and infrastructure configuration to identify weaknesses that automated tools cannot reliably detect. Each finding is assessed for severity using CVSS v3.1 scoring.
+Exploitation was conducted in a controlled, non-destructive manner for findings where proof-of-concept demonstration was feasible without causing service disruption or data modification. Two exploitation chains were confirmed during this phase.
 
-**Exploitation** is the controlled demonstration that a discovered vulnerability is genuinely exploitable — not just theoretically present. For this internship, exploitation was performed only where it could be done without causing service disruption or data modification. Successful exploitation included bypassing authentication rate limiting via HTTP header spoofing and farming unlimited JWT tokens from an unauthenticated API endpoint.
+**Rate Limiting Bypass (N-005):** By injecting a rotating `X-Forwarded-For` header with a unique IP address value on each request, the authentication endpoint's rate limiting was bypassed entirely. A scripted test sent 50 consecutive authentication requests — 0 of which received a rate-limit response. This demonstrated that an attacker could perform unlimited credential brute-force attempts against any neuralsh.com account.
 
-**Post-Exploitation** assesses the consequences of a successful initial compromise. This includes analyzing what an attacker could access from their foothold, what lateral movement paths exist across the infrastructure, and what the maximum realistic business impact would be. In this engagement, post-exploitation analysis revealed that a single origin IP discovery would expose the entire server infrastructure — all administrative panels, the database, and the network router — to an unauthenticated attacker.
+**JWT Token Farming (N-007):** The `/web/v1/init/token` endpoint issued a valid JWT bearer token to any unauthenticated client that sent a correctly structured POST request. This endpoint required no credentials and applied no rate limiting. In testing, 50 tokens were farmed in a single session, confirming that an attacker could generate an unlimited supply of valid session tokens for use in downstream attacks.
 
-### 3.3 After Pentesting
+### 3.5 Phase 5 — Post-Exploitation
 
-**Reporting** is where the value of the engagement is delivered. A penetration test that produces no actionable report provides no security benefit. The report produced for this internship includes an executive summary for non-technical stakeholders, a complete findings table with CVSS scores, detailed finding cards with evidence and reproduction steps, attack chain visualizations, and a prioritized remediation roadmap.
+Post-exploitation analysis assessed the realistic impact of a successful initial compromise. Rather than attempting to establish persistent access — which was explicitly out of scope — this phase focused on tracing what attack paths would be available to an attacker who had reached each foothold.
 
-**Remediation Verification** is the follow-up process where the tester confirms that the organization has successfully addressed the findings. This may involve re-testing specific endpoints or configurations after the development team has applied fixes. This stage closes the loop between finding and fixing.
+The most significant finding was the **shared hosting lateral movement risk (N-015)**. Because neuralsh.com was hosted on a shared server (Cloudways, cprapid.com), a compromise of the WHM administrative panel would grant an attacker access not just to neuralsh.com, but to every other hosted account on the same server. The identification of a co-tenant domain (`onesala.com`, N-020) confirmed that multiple organizations shared the same underlying infrastructure. Attack chain analysis, documented in Chapter 11, mapped four distinct exploitation paths from initial access to full server or network compromise.
 
-**Debrief and Knowledge Transfer** involves walking the technical team through the most significant findings, explaining how each vulnerability was discovered and exploited, and answering questions about the remediation steps. This is particularly valuable for organizations building internal security awareness alongside the immediate fix work.
+### 3.6 Phase 6 — Reporting
+
+The reporting phase produced all deliverables for this engagement. A full professional VAPT report was written documenting every finding with evidence screenshots, CVSS scores, reproduction steps, and recommended remediation. Attack chain diagrams were produced to illustrate how individual findings combined into multi-step compromise paths. This thesis document serves as the academic deliverable, presenting the same engagement findings within a structured research framework.
+
+Reporting is the phase that determines whether a penetration test creates lasting security value. A technically accurate report that cannot be understood or acted upon by the receiving organization accomplishes nothing. Every finding card in this engagement was written with both a technical audience (the development and operations team) and a non-technical audience (management) in mind.
 
 ## 4. OWASP Top 10
 
