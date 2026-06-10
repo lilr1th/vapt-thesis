@@ -309,85 +309,79 @@ In this engagement, the highest CVSS score recorded was **10.0** for finding N-0
 
 # Chapter 3: Penetration Testing Tools and Technologies
 
-In penetration testing, the selection of appropriate tools is essential because the assessor must identify, exploit, and document vulnerabilities across different layers of the target system. This chapter details the tools and technologies used during the VAPT engagement on neuralsh.com at Prestige Alliance Co., Ltd. — covering open-source command-line tools, web-based utilities, and AI-assisted tools that supported both the technical testing and the documentation process.
+No single approach is sufficient to uncover all vulnerabilities in a modern web application. Automated scanners can rapidly map an attack surface but miss logic flaws and context-dependent weaknesses. Manual testing can identify those deeper issues but is too slow to cover every service and endpoint alone. For this reason, the VAPT engagement on neuralsh.com was conducted using a combination of three complementary approaches: automated scanning tools, manual testing tools, and AI-assisted analysis. Together, these three approaches produced the 20 findings documented in this thesis.
 
 *[Figure 9: Testing tool categories diagram — tool_categories.png]*
 
-## 1. Open-Source Tools
+## 1. Automated Testing Tools
 
-Open-source tools are freely available and widely trusted in the cybersecurity community. They form the backbone of any penetration testing toolkit, covering every phase from reconnaissance through to exploitation. The following open-source tools were used during this engagement:
+Automated tools were used to perform broad, repeatable scans against the target infrastructure. These tools do not require constant human input — they send structured probes to the target and return results that the assessor then interprets. In this engagement, automated tools were responsible for the initial discovery of open ports, exposed services, and web server misconfigurations.
 
-| **Tool** | **Usage** |
-|----------|-----------|
-| **Nmap** | Port scanning and service fingerprinting |
-| **Nikto** | Web server misconfiguration scanning |
-| **Dirb** | Web directory and file enumeration |
-| **curl** | HTTP request crafting, header analysis, PoC exploitation |
-| **dig / whois** | DNS enumeration and domain registration analysis |
-| **openssl** | TLS/SSL certificate inspection and infrastructure fingerprinting |
-| **subfinder** | Passive subdomain enumeration via public sources |
-| **hashcat** | JWT secret key brute-forcing against rockyou.txt wordlist |
-| **netcat (nc)** | TCP port connectivity verification |
-| **python3** | Custom proof-of-concept exploitation scripts |
-| **mysql-client** | Direct MySQL connection testing on port 3306 |
-| **Burp Suite Community** | HTTP/S proxy, request interception, Repeater, Decoder |
+| **Tool** | **Type** | **Role in This Engagement** |
+|----------|----------|-----------------------------|
+| **Nmap** | Network scanner | Full TCP port scan on 103.16.62.217 — discovered 23 open ports |
+| **Nikto** | Web scanner | Automated web server scan — flagged missing headers, server version disclosure, directory listing |
+| **Dirb** | Directory fuzzer | Enumerated hidden directories and files on the web application |
+| **subfinder** | Subdomain enumerator | Passive subdomain discovery via certificate transparency and public DNS sources |
+| **mysql-client** | Database connector | Verified MySQL port 3306 accepted unauthenticated connection attempts |
+| **netcat (nc)** | TCP probe | Confirmed TCP connectivity to MikroTik ports 8291 and 8728 |
 
-*Table 5: Open-source tools and their usage*
+*Table 5: Automated testing tools used in this engagement*
 
 *[Figure 10: Nmap logo — nmap_logo.png]*
 
-**Nmap** (Network Mapper) is the industry-standard tool for network discovery and security auditing. During this engagement, Nmap was used to perform full service version scans (`-sV -sC`) against the origin server at 103.16.62.217, revealing 23 open ports across services including MySQL, MikroTik, WHM, cPanel, and mail infrastructure. A follow-up scan on 10 June 2026 identified three previously undetected ports (2078, 2091, and an open port 25), contributing to findings N-018 and N-019.
+**Nmap** (Network Mapper) is the industry-standard open-source tool for network discovery and service fingerprinting. A full TCP scan with service version detection (`nmap -sV -sC -p- 103.16.62.217`) revealed that the origin server had 23 ports open and reachable from the public internet — including administrative interfaces that should never be exposed. This single scan produced the evidence base for Critical findings N-001, N-002, N-013, N-014, and High finding N-016. A follow-up verification scan conducted on 10 June 2026 identified three additional open ports, contributing to findings N-018 and N-019.
 
-*[Figure 11: Burp Suite logo — burpsuite_logo.png]*
+*[Figure 11: Nikto logo — nikto_logo.png]*
 
-**Burp Suite Community Edition** served as the primary web application testing proxy. It was used to intercept and analyze HTTP requests to the neuralsh.com API, inspect JWT token responses from the `/web/v1/init/token` endpoint, and demonstrate the rate-limiting bypass vulnerability (N-005) by sending repeated requests with rotating `X-Forwarded-For` headers.
+**Nikto** is an open-source web server scanner that checks for thousands of known misconfigurations, outdated software versions, and missing security controls. In this engagement, Nikto was run against both the Cloudflare-protected frontend (`neuralsh.com`) and directly against the origin IP (`103.16.62.217`). Results contributed directly to findings N-003 (Missing Security Headers), N-012 (Server Version Disclosure), and N-017 (Directory Listing Enabled).
 
-*[Figure 12: Nikto logo — nikto_logo.png]*
+*[Figure 12: Shodan logo — shodan_logo.png]*
 
-**Nikto** performed automated web server scanning against both the Cloudflare-protected frontend and the direct origin server. It identified missing security headers, server version disclosure, and directory listing configurations that contributed to findings N-003, N-012, and N-017.
+**Shodan** is a passive internet intelligence platform that continuously crawls and indexes publicly reachable services. Rather than scanning the target directly, Shodan was queried to verify that the services discovered by Nmap were also visible to external internet scanners — confirming that these exposures were not local network artifacts. Shodan results provided corroborating evidence for the critical infrastructure exposure findings (N-001, N-002, N-013, N-014), supporting the business impact argument that any attacker could discover these services without conducting an active scan.
 
-## 2. Web-Based Tools
+## 2. Manual Testing Tools
 
-Web-based tools are online utilities accessible through a browser that provide supporting intelligence during reconnaissance and analysis phases. They require no installation and are particularly useful for passive information gathering.
+Manual tools require the assessor to actively craft, send, and interpret requests based on judgment and understanding of the target's behavior. Automated scanners cannot reliably detect logic-layer vulnerabilities — such as authentication bypasses or improperly protected API endpoints — because these require understanding context rather than matching patterns. The most significant confirmed findings in this engagement were discovered through manual testing.
 
-| **Tool** | **Usage** |
-|----------|-----------|
-| **crt.sh** | SSL certificate transparency log search — used to discover origin IP via certificate records |
-| **MXToolbox** | DNS and MX record analysis — confirmed mail.neuralsh.com resolves to 103.16.62.217 |
-| **CyberChef** | JWT token decoding and payload inspection without requiring credentials |
-| **Shodan** | Passive OSINT scan — confirmed publicly visible services on 103.16.62.217 |
-| **VirusTotal** | Domain reputation check for neuralsh.com and associated infrastructure |
-| **CipherSuite.io** | SSL/TLS configuration quality assessment — evaluated cipher suites and protocol versions |
+| **Tool** | **Type** | **Role in This Engagement** |
+|----------|----------|-----------------------------|
+| **Burp Suite Community** | Web proxy | Intercepted HTTP/S traffic, replayed requests, demonstrated rate-limit bypass and JWT farming |
+| **curl** | HTTP client | Crafted raw HTTP requests with custom headers for PoC exploitation |
+| **CyberChef** | Data analysis | Decoded and inspected JWT token payloads without requiring credentials |
+| **dig / whois** | DNS tools | Manual DNS record enumeration — identified origin IP via MX record |
+| **openssl** | TLS inspector | Inspected SSL certificate details — confirmed hostname and infrastructure leakage |
+| **MXToolbox** | DNS web tool | Verified MX record resolution and confirmed mail server IP mapping |
+| **crt.sh** | Certificate search | Certificate transparency log search — corroborated origin IP discovery |
+| **hashcat** | Password cracker | Attempted JWT secret key brute-force against the rockyou.txt wordlist |
 
-*Table 6: Web-based tools and their usage*
+*Table 6: Manual testing tools used in this engagement*
 
-*[Figure 13: CyberChef logo — cyberchef_logo.png]*
+*[Figure 13: Burp Suite logo — burpsuite_logo.png]*
 
-**CyberChef**, developed by GCHQ, was used to decode the JWT tokens issued by the `/web/v1/init/token` endpoint. By decoding the Base64-encoded header and payload, it was possible to inspect the token's algorithm, issued-at time, expiry, and embedded claims — supporting the analysis for finding N-007.
+**Burp Suite Community Edition** served as the primary web application testing proxy throughout the engagement. All HTTP traffic between the testing machine and the neuralsh.com application was routed through Burp Suite's intercepting proxy, allowing every request and response to be inspected, modified, and replayed. The two confirmed exploited findings in this engagement — Rate Limiting Bypass (N-005) and JWT Token Farming (N-007) — were both demonstrated using Burp Suite's Repeater tool. For N-005, requests were sent with rotating `X-Forwarded-For` header values to spoof different source IP addresses on each attempt. For N-007, the unauthenticated token endpoint was called repeatedly, with each response returning a valid JWT bearer token.
 
-*[Figure 14: Shodan logo — shodan_logo.png]*
+*[Figure 14: CyberChef logo — cyberchef_logo.png]*
 
-**Shodan** provided passive confirmation that the services identified through active Nmap scanning were also indexed as publicly visible by external crawlers — strengthening the business impact assessment for the critical infrastructure exposure findings (N-001, N-002, N-013, N-014).
+**CyberChef**, developed by GCHQ, is an open-source web application for data analysis and encoding operations. It was used in this engagement to decode the Base64url-encoded JWT tokens issued by the `/web/v1/init/token` endpoint. By splitting the token into its three components (header, payload, signature) and decoding each, it was possible to inspect the token's signing algorithm, issued-at timestamp, expiry window, and embedded user claims — without needing to crack the secret or authenticate. This analysis supported the severity assessment for finding N-007.
 
-## 3. AI-Assisted Tools
+**Manual DNS and Certificate Analysis** — The most impactful discovery of the entire engagement — the real origin IP address of the server — was made through manual DNS analysis rather than automated scanning. By querying the MX record for `neuralsh.com` using the `dig` command, the mail server hostname `mail.neuralsh.com` was revealed. Resolving this hostname returned `103.16.62.217` — the origin server IP that Cloudflare was designed to conceal. This single discovery bypassed the entire Cloudflare WAF and directly enabled Critical findings N-001, N-002, N-013, N-014, and N-016. The SSL certificate was further inspected using `openssl s_client` to confirm the server hostname and infrastructure details, contributing to finding N-009.
 
-A distinctive aspect of this internship engagement was the integration of artificial intelligence as a direct participant in the security assessment workflow. This represents an emerging practice in modern penetration testing, where AI tools augment the assessor's analytical and documentation capabilities.
+## 3. AI-Assisted Analysis
+
+Artificial intelligence tools represented a supporting layer in this engagement — used to assist with specific technical analysis tasks during the testing process. The use of AI in penetration testing is an emerging practice that improves efficiency and consistency when applied responsibly and within clearly defined boundaries.
 
 *[Figure 15: Claude (Anthropic) logo — claude_logo.png]*
 
-**Claude Code** by Anthropic (claude-sonnet-4-6) was used throughout this engagement in the following capacities:
+**Claude** by Anthropic was used during this engagement in the following technical capacities:
 
-**Proof-of-Concept Script Generation** — Claude Code was used to generate Python scripts that automated the rate-limiting bypass test (N-005) and the JWT token farming demonstration (N-007). The generated scripts handled header rotation, response parsing, and result logging, reducing manual effort while producing reproducible evidence.
+**Proof-of-Concept Script Generation** — Python scripts were generated to automate the rate-limiting bypass demonstration (N-005) and the JWT token farming test (N-007). These scripts handled `X-Forwarded-For` header rotation, request loop control, response status parsing, and result output — producing repeatable, documented evidence that could be re-run at any time to confirm the vulnerability remained present.
 
-**Finding Analysis and CVSS Scoring** — For each of the 20 findings discovered, Claude Code assisted in mapping the vulnerability to the appropriate OWASP Top 10 category, assigning CWE identifiers, and calculating CVSS v3.1 base scores with metric-level justification. This ensured consistency in scoring across all findings.
+**Scan Output Analysis** — Raw Nmap and Nikto output was analyzed with AI assistance to cross-reference open ports against known service vulnerabilities and identify which discovered services represented the highest-risk exposures. This accelerated the triage process during the scanning phase.
 
-**Report and Documentation Generation** — The professional VAPT report (`VAPT_REPORT_neuralsh.html`), attack chain diagrams (`ATTACK_CHAIN_DIAGRAM.html`), and this thesis document were written with direct AI assistance. Claude Code generated structured HTML with professional styling, severity-coded finding cards, and executive summary content suitable for both technical and non-technical audiences.
+**CVSS Scoring Verification** — For each of the 20 findings, AI assistance was used to cross-check CVSS v3.1 metric selections — specifically the Attack Vector, Attack Complexity, Privileges Required, and Impact dimensions — to ensure scoring was consistent and defensible across the full findings register.
 
-**Follow-Up Scan Analysis** — During the verification scan on 10 June 2026, Claude Code analyzed the new nmap output in real time, identified the three previously undetected findings (N-018, N-019, N-020), and automatically updated the thesis and findings register with properly formatted evidence sections.
-
-**Thesis Structure and Writing** — Throughout the internship, Claude Code served as a writing partner — helping to structure each chapter, maintain consistent academic tone (past tense, no contractions, ITC format compliance), and ensure that all technical findings were communicated accurately for an academic audience.
-
-The use of AI tools in this engagement does not replace the assessor's judgment — every finding was validated through direct manual testing, and all AI-generated content was reviewed and verified before inclusion. Rather, AI assistance accelerated documentation, improved consistency, and allowed more time to be spent on the technical aspects of the assessment.
+It is important to note that all findings documented in this thesis were discovered and verified by the assessor through direct, hands-on interaction with the target systems. AI was used as a technical aid during the testing process — not as an author of this thesis. Every result produced with AI assistance was independently reviewed and validated before inclusion.
 
 ## 4. Ethical Constraints
 
