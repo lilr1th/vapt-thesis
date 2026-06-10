@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attack Chain Diagram — neuralsh.com VAPT</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0b1120;
+    --bg2:        #0f172a;
+    --bg3:        #1e293b;
+    --border:     #1e3a5f;
+    --text:       #e2e8f0;
+    --text-muted: #64748b;
+    --red:    #ef4444;
+    --red-d:  #991b1b;
+    --orange: #f97316;
+    --yellow: #eab308;
+    --blue:   #3b82f6;
+    --cyan:   #06b6d4;
+    --purple: #8b5cf6;
+    --green:  #22c55e;
+    --font:   -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono:   'JetBrains Mono','Fira Code','Cascadia Code','Consolas',monospace;
+  }
+
+  html { font-size: 14px; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 32px 64px;
+    min-height: 100vh;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .page-header-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #fca5a5;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .page-header h1 span { color: var(--cyan); }
+
+  .page-header-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* ── Legend ─────────────────────────────── */
+  .legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── Chain Layout ───────────────────────── */
+  .chain-section {
+    margin-bottom: 32px;
+  }
+
+  .chain-wrapper {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .chain-header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chain-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .chain-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .chain-info {}
+  .chain-title { font-size: 15px; font-weight: 700; color: #fff; }
+  .chain-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+  .chain-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .cbadge {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 3px 12px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .cbadge-red    { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; }
+  .cbadge-orange { background: rgba(249,115,22,0.2); border: 1px solid rgba(249,115,22,0.4); color: #fdba74; }
+  .cbadge-purple { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4); color: #c4b5fd; }
+  .cbadge-cyan   { background: rgba(6,182,212,0.2); border: 1px solid rgba(6,182,212,0.4); color: #67e8f9; }
+
+  /* ── Flow Row ───────────────────────────── */
+  .chain-flow {
+    padding: 28px 24px;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  /* ── Node ───────────────────────────────── */
+  .node-wrap {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .node {
+    width: 148px;
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    border: 1px solid transparent;
+    position: relative;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+    cursor: default;
+  }
+
+  .node:hover { transform: translateY(-2px); }
+
+  .node-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+    line-height: 1;
+  }
+
+  .node-phase {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.65;
+  }
+
+  .node-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .node-detail {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.4;
+  }
+
+  .node-finding {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--mono);
+    padding: 2px 8px;
+    border-radius: 4px;
+    opacity: 0.85;
+  }
+
+  /* Node color themes */
+  .n-attacker {
+    background: rgba(30,41,59,0.8);
+    border-color: #334155;
+  }
+  .n-attacker .node-phase { color: #94a3b8; }
+
+  .n-recon {
+    background: rgba(59,130,246,0.12);
+    border-color: rgba(59,130,246,0.35);
+  }
+  .n-recon .node-phase { color: var(--blue); }
+  .n-recon .node-finding { background: rgba(59,130,246,0.15); color: #93c5fd; }
+
+  .n-vuln {
+    background: rgba(249,115,22,0.12);
+    border-color: rgba(249,115,22,0.35);
+  }
+  .n-vuln .node-phase { color: var(--orange); }
+  .n-vuln .node-finding { background: rgba(249,115,22,0.15); color: #fdba74; }
+
+  .n-critical {
+    background: rgba(239,68,68,0.14);
+    border-color: rgba(239,68,68,0.4);
+  }
+  .n-critical .node-phase { color: var(--red); }
+  .n-critical .node-finding { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+  .n-exploit {
+    background: rgba(139,92,246,0.14);
+    border-color: rgba(139,92,246,0.4);
+  }
+  .n-exploit .node-phase { color: var(--purple); }
+  .n-exploit .node-finding { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+
+  .n-impact {
+    background: linear-gradient(135deg, rgba(153,27,27,0.3), rgba(239,68,68,0.2));
+    border-color: rgba(239,68,68,0.5);
+    box-shadow: 0 0 20px rgba(239,68,68,0.12);
+  }
+  .n-impact .node-phase { color: #fca5a5; }
+  .n-impact .node-label { color: #fca5a5; }
+
+  /* ── Arrow ──────────────────────────────── */
+  .arrow-wrap {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .arrow-line {
+    position: relative;
+    height: 2px;
+    width: 32px;
+    border-radius: 1px;
+  }
+
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left: 7px solid;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left-color: inherit;
+  }
+
+  .arrow-blue   { background: var(--blue);   } .arrow-blue::after   { border-left-color: var(--blue); }
+  .arrow-orange { background: var(--orange); } .arrow-orange::after { border-left-color: var(--orange); }
+  .arrow-red    { background: var(--red);    } .arrow-red::after    { border-left-color: var(--red); }
+  .arrow-purple { background: var(--purple); } .arrow-purple::after { border-left-color: var(--purple); }
+  .arrow-gray   { background: #334155;       } .arrow-gray::after   { border-left-color: #334155; }
+
+  /* ── Outcome Bar ────────────────────────── */
+  .chain-outcome {
+    margin: 0 24px 20px;
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .outcome-icon { font-size: 18px; flex-shrink: 0; }
+
+  .outcome-text { flex: 1; }
+  .outcome-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .outcome-value { font-size: 13px; font-weight: 600; color: #fff; }
+
+  .outcome-meta {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .outcome-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .chip-red    { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .chip-orange { background: rgba(249,115,22,0.15); color: #fdba74; }
+  .chip-purple { background: rgba(139,92,246,0.15); color: #c4b5fd; }
+  .chip-blue   { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .chip-green  { background: rgba(34,197,94,0.15); color: #86efac; }
+
+  /* ── Overall Risk summary ───────────────── */
+  .risk-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .risk-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .risk-card-num {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .risk-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── Infrastructure Map ─────────────────── */
+  .infra-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .infra-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .infra-svg-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  /* ── Exploit Badge on confirmed chains ──── */
+  .confirmed-banner {
+    background: linear-gradient(90deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05));
+    border-top: 1px solid rgba(139,92,246,0.2);
+    padding: 8px 24px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #c4b5fd;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .confirmed-result {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: #86efac;
+  }
+
+  /* ── Footer ─────────────────────────────── */
+  .page-footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 20px; }
+    .chain-wrapper { break-inside: avoid; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ PAGE HEADER ══════════════════════════════════════ -->
+<div class="page-header">
+  <div class="page-header-tag">⚡ VAPT — neuralsh.com · June 2026</div>
+  <h1>Attack Chain <span>Diagram</span></h1>
+  <div class="page-header-sub">4 attack scenarios · 2 confirmed exploited · Real IP: 103.16.62.217</div>
+</div>
+
+<!-- ══ LEGEND ═══════════════════════════════════════════ -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Reconnaissance</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Vulnerability</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Critical Exposure</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Exploitation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#991b1b"></div>Impact</div>
+  <div class="legend-item">
+    <div style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.5);border-radius:4px;padding:1px 8px;font-size:10px;font-weight:700;color:#c4b5fd">⚡ EXPLOITED</div>
+    Confirmed in test
+  </div>
+</div>
+
+<!-- ══ RISK OVERVIEW ════════════════════════════════════ -->
+<div class="risk-summary">
+  <div class="risk-card">
+    <div class="risk-card-num" style="color:var(--red)">4</div>
+    <div class="risk-card-label">Critical Findings</div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-card-num" style="color:var(--orange)">4</div>
+    <div class="risk-card-label">High Findings</div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-card-num" style="color:var(--purple)">2</div>
+    <div class="risk-card-label">Chains Exploited</div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-card-num" style="color:#fff">10.0</div>
+    <div class="risk-card-label">Max CVSS Score</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     CHAIN 1 — Full Server Compromise via WHM
+═══════════════════════════════════════════════════════ -->
+<div class="chain-section">
+  <div class="chain-wrapper">
+    <div class="chain-header">
+      <div class="chain-header-left">
+        <div class="chain-num" style="background:rgba(239,68,68,0.2);color:var(--red)">01</div>
+        <div class="chain-info">
+          <div class="chain-title">Full Server Compromise via WHM Root Panel</div>
+          <div class="chain-subtitle">Exploits N-014 (CVSS 10.0) · cPanel exposed admin panels · Shared hosting lateral movement</div>
+        </div>
+      </div>
+      <div class="chain-badges">
+        <span class="cbadge cbadge-red">Critical Path</span>
+        <span class="cbadge cbadge-orange">Root Access</span>
+      </div>
+    </div>
+
+    <div class="chain-flow">
+      <!-- Attacker -->
+      <div class="node-wrap">
+        <div class="node n-attacker">
+          <span class="node-icon">🌐</span>
+          <div class="node-phase">Starting Point</div>
+          <div class="node-label">Attacker</div>
+          <div class="node-detail">Internet-based<br>No credentials<br>No prior access</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-blue"></div></div>
+
+      <!-- Step 1: DNS Recon -->
+      <div class="node-wrap">
+        <div class="node n-recon">
+          <span class="node-icon">🔍</span>
+          <div class="node-phase">Reconnaissance</div>
+          <div class="node-label">DNS &amp; WHOIS Lookup</div>
+          <div class="node-detail">dig MX neuralsh.com<br>Reveals real origin IP<br>103.16.62.217</div>
+          <div class="node-finding">OSINT</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-blue"></div></div>
+
+      <!-- Step 2: Port Scan -->
+      <div class="node-wrap">
+        <div class="node n-recon">
+          <span class="node-icon">📡</span>
+          <div class="node-phase">Scanning</div>
+          <div class="node-label">Full Port Scan</div>
+          <div class="node-detail">nmap 103.16.62.217<br>20 services found<br>Ports 2083/2087 open</div>
+          <div class="node-finding">nmap -sV</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Step 3: WHM Found -->
+      <div class="node-wrap">
+        <div class="node n-critical">
+          <span class="node-icon">🔓</span>
+          <div class="node-phase">Critical Exposure</div>
+          <div class="node-label">WHM Panel Exposed</div>
+          <div class="node-detail">Port 2087 — no IP<br>restriction, no 2FA<br>Login page public</div>
+          <div class="node-finding">N-014 · 10.0</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-orange"></div></div>
+
+      <!-- Step 4: Credential Attack -->
+      <div class="node-wrap">
+        <div class="node n-vuln">
+          <span class="node-icon">🔑</span>
+          <div class="node-phase">Exploitation</div>
+          <div class="node-label">Credential Attack</div>
+          <div class="node-detail">Brute force with<br>large wordlist OR<br>email → /resetpass</div>
+          <div class="node-finding">N-013 · 9.8</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Step 5: Root Shell -->
+      <div class="node-wrap">
+        <div class="node n-exploit">
+          <span class="node-icon">💻</span>
+          <div class="node-phase">Post-Exploitation</div>
+          <div class="node-label">WHM Terminal</div>
+          <div class="node-detail">WHM → Advanced<br>→ Terminal<br>whoami → root</div>
+          <div class="node-finding">Root Shell</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Impact -->
+      <div class="node-wrap">
+        <div class="node n-impact">
+          <span class="node-icon">💥</span>
+          <div class="node-phase">Impact</div>
+          <div class="node-label">Full Compromise</div>
+          <div class="node-detail">All files, DBs,<br>secrets extracted<br>All tenants affected</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chain-outcome">
+      <div class="outcome-icon">⚠️</div>
+      <div class="outcome-text">
+        <div class="outcome-label">Worst-Case Impact</div>
+        <div class="outcome-value">Complete server ownership — all hosted domains, all databases, all email accounts, all co-tenant data compromised via shared hosting lateral movement</div>
+      </div>
+      <div class="outcome-meta">
+        <span class="outcome-chip chip-red">Root RCE</span>
+        <span class="outcome-chip chip-orange">Data Exfiltration</span>
+        <span class="outcome-chip chip-red">Lateral Movement</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     CHAIN 2 — Rate Limit Bypass + Token Farm  ★ CONFIRMED
+═══════════════════════════════════════════════════════ -->
+<div class="chain-section">
+  <div class="chain-wrapper">
+    <div class="chain-header">
+      <div class="chain-header-left">
+        <div class="chain-num" style="background:rgba(139,92,246,0.2);color:var(--purple)">02</div>
+        <div class="chain-info">
+          <div class="chain-title">Unlimited API Abuse via Rate Limit Bypass</div>
+          <div class="chain-subtitle">X-Forwarded-For spoofing · 100% bypass rate confirmed · 50 tokens farmed in 3 seconds</div>
+        </div>
+      </div>
+      <div class="chain-badges">
+        <span class="cbadge cbadge-purple">⚡ Confirmed Exploited</span>
+        <span class="cbadge cbadge-cyan">100% Bypass</span>
+      </div>
+    </div>
+
+    <div class="confirmed-banner">
+      <span>⚡</span> This chain was fully executed during the assessment with confirmed results
+      <span class="confirmed-result">50/50 tokens · 0 rate limit responses · 3 seconds</span>
+    </div>
+
+    <div class="chain-flow">
+      <!-- Attacker -->
+      <div class="node-wrap">
+        <div class="node n-attacker">
+          <span class="node-icon">🌐</span>
+          <div class="node-phase">Starting Point</div>
+          <div class="node-label">Attacker</div>
+          <div class="node-detail">Internet-based<br>No credentials<br>No prior access</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-blue"></div></div>
+
+      <!-- Step 1: JS Bundle -->
+      <div class="node-wrap">
+        <div class="node n-recon">
+          <span class="node-icon">📦</span>
+          <div class="node-phase">Reconnaissance</div>
+          <div class="node-label">JS Bundle Analysis</div>
+          <div class="node-detail">Extracts full API<br>route map from<br>/_nuxt/*.js bundle</div>
+          <div class="node-finding">N-006 · 5.3</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-blue"></div></div>
+
+      <!-- Step 2: Token Endpoint -->
+      <div class="node-wrap">
+        <div class="node n-vuln">
+          <span class="node-icon">🎫</span>
+          <div class="node-phase">Vulnerability</div>
+          <div class="node-label">Unauth Token Endpoint</div>
+          <div class="node-detail">GET /web/v1/init/token<br>Returns HS256 JWT<br>No auth required</div>
+          <div class="node-finding">N-007 · 5.3</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-orange"></div></div>
+
+      <!-- Step 3: Rate Limit Bypass -->
+      <div class="node-wrap">
+        <div class="node n-exploit">
+          <span class="node-icon">⚡</span>
+          <div class="node-phase">Exploitation</div>
+          <div class="node-label">X-Forwarded-For Bypass</div>
+          <div class="node-detail">Spoof random IP<br>per request → server<br>trusts header</div>
+          <div class="node-finding">N-005 · 9.1 ⚡</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-purple"></div></div>
+
+      <!-- Step 4: Farm Tokens -->
+      <div class="node-wrap">
+        <div class="node n-exploit">
+          <span class="node-icon">🏭</span>
+          <div class="node-phase">Confirmed Result</div>
+          <div class="node-label">Token Farm</div>
+          <div class="node-detail">50/50 valid JWTs<br>collected in 3s<br>Perpetually renewable</div>
+          <div class="node-finding">50/50 · 100%</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Impact -->
+      <div class="node-wrap">
+        <div class="node n-impact">
+          <span class="node-icon">🔥</span>
+          <div class="node-phase">Impact</div>
+          <div class="node-label">Unlimited API Access</div>
+          <div class="node-detail">All endpoints<br>accessible at scale<br>No rate limit ever</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chain-outcome">
+      <div class="outcome-icon">✅</div>
+      <div class="outcome-text">
+        <div class="outcome-label">Confirmed Exploitation Result</div>
+        <div class="outcome-value">Rate limiting completely defeated — 50 valid signed JWT tokens collected in 3 seconds. API abuse, credential stuffing, and enumeration attacks can now proceed at unlimited scale.</div>
+      </div>
+      <div class="outcome-meta">
+        <span class="outcome-chip chip-purple">Confirmed 100%</span>
+        <span class="outcome-chip chip-orange">API Enumeration</span>
+        <span class="outcome-chip chip-blue">Token Farming</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     CHAIN 3 — MikroTik Network Takeover
+═══════════════════════════════════════════════════════ -->
+<div class="chain-section">
+  <div class="chain-wrapper">
+    <div class="chain-header">
+      <div class="chain-header-left">
+        <div class="chain-num" style="background:rgba(249,115,22,0.2);color:var(--orange)">03</div>
+        <div class="chain-info">
+          <div class="chain-title">Network Infrastructure Takeover via MikroTik Router</div>
+          <div class="chain-subtitle">Port 9001 publicly exposed · Default credentials admin/(blank) · Full RouterOS access</div>
+        </div>
+      </div>
+      <div class="chain-badges">
+        <span class="cbadge cbadge-red">High Likelihood</span>
+        <span class="cbadge cbadge-orange">Traffic Intercept</span>
+      </div>
+    </div>
+
+    <div class="chain-flow">
+      <!-- Attacker -->
+      <div class="node-wrap">
+        <div class="node n-attacker">
+          <span class="node-icon">🌐</span>
+          <div class="node-phase">Starting Point</div>
+          <div class="node-label">Attacker</div>
+          <div class="node-detail">Internet-based<br>No credentials<br>No prior access</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-blue"></div></div>
+
+      <!-- Step 1: Port Scan -->
+      <div class="node-wrap">
+        <div class="node n-recon">
+          <span class="node-icon">📡</span>
+          <div class="node-phase">Scanning</div>
+          <div class="node-label">Port 9001 Found</div>
+          <div class="node-detail">nmap reveals port<br>9001 open → MikroTik<br>RouterOS WebFig</div>
+          <div class="node-finding">nmap scan</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-orange"></div></div>
+
+      <!-- Step 2: Login Page -->
+      <div class="node-wrap">
+        <div class="node n-critical">
+          <span class="node-icon">🔓</span>
+          <div class="node-phase">Critical Exposure</div>
+          <div class="node-label">Login Page Public</div>
+          <div class="node-detail">HTTP 200 confirmed<br>Login pre-fills<br>username: admin</div>
+          <div class="node-finding">N-002 · 9.1</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-orange"></div></div>
+
+      <!-- Step 3: Default Creds -->
+      <div class="node-wrap">
+        <div class="node n-vuln">
+          <span class="node-icon">🗝️</span>
+          <div class="node-phase">Exploitation</div>
+          <div class="node-label">Default Credentials</div>
+          <div class="node-detail">admin / (blank)<br>MikroTik factory<br>default unchanged</div>
+          <div class="node-finding">Default creds</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Step 4: RouterOS -->
+      <div class="node-wrap">
+        <div class="node n-exploit">
+          <span class="node-icon">🌍</span>
+          <div class="node-phase">Post-Exploitation</div>
+          <div class="node-label">Full RouterOS Access</div>
+          <div class="node-detail">NAT rules, firewall,<br>packet capture,<br>routing tables</div>
+          <div class="node-finding">Network Root</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Impact -->
+      <div class="node-wrap">
+        <div class="node n-impact">
+          <span class="node-icon">📡</span>
+          <div class="node-phase">Impact</div>
+          <div class="node-label">Traffic Interception</div>
+          <div class="node-detail">All HTTP readable<br>HTTPS metadata<br>visible · Redirect</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chain-outcome">
+      <div class="outcome-icon">🔴</div>
+      <div class="outcome-text">
+        <div class="outcome-label">Network-Level Impact</div>
+        <div class="outcome-value">Full control of routing infrastructure — attacker can intercept all traffic, modify NAT rules, extract VPN credentials, create persistent backdoor accounts, and disrupt all hosted services</div>
+      </div>
+      <div class="outcome-meta">
+        <span class="outcome-chip chip-red">Network Control</span>
+        <span class="outcome-chip chip-orange">Packet Capture</span>
+        <span class="outcome-chip chip-blue">Persistence</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     CHAIN 4 — MySQL Brute Force → Data Exfiltration
+═══════════════════════════════════════════════════════ -->
+<div class="chain-section">
+  <div class="chain-wrapper">
+    <div class="chain-header">
+      <div class="chain-header-left">
+        <div class="chain-num" style="background:rgba(59,130,246,0.2);color:var(--blue)">04</div>
+        <div class="chain-info">
+          <div class="chain-title">Database Exfiltration via Exposed MySQL Port</div>
+          <div class="chain-subtitle">Port 3306 publicly accessible · Direct brute force against database layer · Potential RCE via MySQL UDF</div>
+        </div>
+      </div>
+      <div class="chain-badges">
+        <span class="cbadge cbadge-red">Data at Risk</span>
+        <span class="cbadge cbadge-orange">Medium Complexity</span>
+      </div>
+    </div>
+
+    <div class="chain-flow">
+      <!-- Attacker -->
+      <div class="node-wrap">
+        <div class="node n-attacker">
+          <span class="node-icon">🌐</span>
+          <div class="node-phase">Starting Point</div>
+          <div class="node-label">Attacker</div>
+          <div class="node-detail">Internet-based<br>No credentials<br>No prior access</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-blue"></div></div>
+
+      <!-- Step 1: Port Open -->
+      <div class="node-wrap">
+        <div class="node n-critical">
+          <span class="node-icon">🗄️</span>
+          <div class="node-phase">Critical Exposure</div>
+          <div class="node-label">MySQL Port 3306</div>
+          <div class="node-detail">Publicly reachable<br>Full TCP handshake<br>MySQL 8.0.43</div>
+          <div class="node-finding">N-001 · 9.8</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-orange"></div></div>
+
+      <!-- Step 2: Brute Force -->
+      <div class="node-wrap">
+        <div class="node n-vuln">
+          <span class="node-icon">🔐</span>
+          <div class="node-phase">Exploitation</div>
+          <div class="node-label">Credential Brute Force</div>
+          <div class="node-detail">hydra / medusa<br>No IP-level lockout<br>at database layer</div>
+          <div class="node-finding">Direct DB attack</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-orange"></div></div>
+
+      <!-- Step 3: DB Access -->
+      <div class="node-wrap">
+        <div class="node n-exploit">
+          <span class="node-icon">📋</span>
+          <div class="node-phase">Post-Exploitation</div>
+          <div class="node-label">Full DB Access</div>
+          <div class="node-detail">SHOW DATABASES<br>SELECT * FROM users<br>All data readable</div>
+          <div class="node-finding">mysql client</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Step 4: RCE -->
+      <div class="node-wrap">
+        <div class="node n-exploit">
+          <span class="node-icon">🐚</span>
+          <div class="node-phase">Escalation</div>
+          <div class="node-label">MySQL → Web Shell</div>
+          <div class="node-detail">SELECT INTO OUTFILE<br>writes PHP shell if<br>FILE privilege active</div>
+          <div class="node-finding">UDF/OUTFILE RCE</div>
+        </div>
+      </div>
+
+      <div class="arrow-wrap"><div class="arrow-line arrow-red"></div></div>
+
+      <!-- Impact -->
+      <div class="node-wrap">
+        <div class="node n-impact">
+          <span class="node-icon">📤</span>
+          <div class="node-phase">Impact</div>
+          <div class="node-label">Data Exfiltration</div>
+          <div class="node-detail">All user records<br>App secrets, tokens<br>Possible RCE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chain-outcome">
+      <div class="outcome-icon">🗄️</div>
+      <div class="outcome-text">
+        <div class="outcome-label">Data Breach Scenario</div>
+        <div class="outcome-value">All application data accessible if credentials obtained — user records, search history, API keys. With FILE privilege, web shell deployment achieves full server code execution without needing WHM access.</div>
+      </div>
+      <div class="outcome-meta">
+        <span class="outcome-chip chip-red">Data Breach</span>
+        <span class="outcome-chip chip-orange">Possible RCE</span>
+        <span class="outcome-chip chip-blue">No Lockout</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     INFRASTRUCTURE MAP (SVG)
+═══════════════════════════════════════════════════════ -->
+<div class="infra-section">
+  <div class="infra-title">Infrastructure Attack Surface — 103.16.62.217</div>
+  <div class="infra-svg-wrap">
+    <svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:860px;display:block;margin:0 auto">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+        </marker>
+        <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/>
+        </marker>
+        <marker id="arr-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#f97316"/>
+        </marker>
+        <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/>
+        </marker>
+      </defs>
+
+      <!-- Internet / Attacker box -->
+      <rect x="10" y="130" width="90" height="50" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+      <text x="55" y="150" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="system-ui">INTERNET</text>
+      <text x="55" y="165" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">Attacker</text>
+
+      <!-- Arrow to Cloudflare -->
+      <line x1="100" y1="155" x2="148" y2="155" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Cloudflare box -->
+      <rect x="150" y="115" width="100" height="80" rx="8" fill="#1e3a5f" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="200" y="145" text-anchor="middle" fill="#93c5fd" font-size="10" font-weight="800" font-family="system-ui">CLOUDFLARE</text>
+      <text x="200" y="160" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">WAF + CDN</text>
+      <text x="200" y="175" text-anchor="middle" fill="#3b82f6" font-size="9" font-family="system-ui">104.21.91.198</text>
+
+      <!-- Arrow to main app -->
+      <line x1="250" y1="140" x2="298" y2="100" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+
+      <!-- neuralsh.com box -->
+      <rect x="300" y="70" width="120" height="60" rx="8" fill="#0f2942" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="360" y="94" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="700" font-family="system-ui">neuralsh.com</text>
+      <text x="360" y="110" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">Nuxt.js · Protected</text>
+      <text x="360" y="124" text-anchor="middle" fill="#22c55e" font-size="9" font-family="system-ui">✓ WAF Active</text>
+
+      <!-- Arrow direct to backend (bypassing CF) -->
+      <line x1="100" y1="165" x2="148" y2="195" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
+      <text x="115" y="205" fill="#ef4444" font-size="9" font-family="system-ui" font-weight="700">BYPASS</text>
+
+      <!-- Cloudflare to backend -->
+      <line x1="250" y1="170" x2="298" y2="210" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+      <!-- Backend server box (central) -->
+      <rect x="300" y="180" width="140" height="70" rx="8" fill="#1a1a2e" stroke="#ef4444" stroke-width="2"/>
+      <text x="370" y="205" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="800" font-family="system-ui">ORIGIN SERVER</text>
+      <text x="370" y="220" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">103.16.62.217</text>
+      <text x="370" y="235" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">cprapid.com shared hosting</text>
+
+      <!-- Exposed Services — top row -->
+      <!-- MySQL -->
+      <rect x="470" y="30" width="90" height="48" rx="6" fill="#3d1515" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="515" y="52" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="system-ui">MySQL</text>
+      <text x="515" y="67" text-anchor="middle" fill="#ef4444" font-size="9" font-family="system-ui">:3306 · CRITICAL</text>
+      <line x1="440" y1="210" x2="480" y2="60" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-red)"/>
+
+      <!-- MikroTik -->
+      <rect x="580" y="30" width="90" height="48" rx="6" fill="#3d1515" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="625" y="52" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="system-ui">MikroTik</text>
+      <text x="625" y="67" text-anchor="middle" fill="#ef4444" font-size="9" font-family="system-ui">:9001 · CRITICAL</text>
+      <line x1="440" y1="200" x2="588" y2="60" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-red)"/>
+
+      <!-- WHM -->
+      <rect x="690" y="30" width="90" height="48" rx="6" fill="#4a0808" stroke="#ef4444" stroke-width="2.5"/>
+      <text x="735" y="52" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="800" font-family="system-ui">WHM</text>
+      <text x="735" y="67" text-anchor="middle" fill="#ef4444" font-size="9" font-family="system-ui">:2087 · CVSS 10.0</text>
+      <line x1="440" y1="193" x2="696" y2="60" stroke="#ef4444" stroke-width="2" marker-end="url(#arr-red)"/>
+
+      <!-- Exposed Services — middle row -->
+      <!-- cPanel -->
+      <rect x="470" y="108" width="90" height="48" rx="6" fill="#3d1515" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="515" y="130" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="700" font-family="system-ui">cPanel</text>
+      <text x="515" y="145" text-anchor="middle" fill="#ef4444" font-size="9" font-family="system-ui">:2083 · CRITICAL</text>
+      <line x1="440" y1="215" x2="470" y2="140" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arr-red)"/>
+
+      <!-- Webmail -->
+      <rect x="580" y="108" width="90" height="48" rx="6" fill="#3d1f08" stroke="#f97316" stroke-width="1.5"/>
+      <text x="625" y="130" text-anchor="middle" fill="#fdba74" font-size="10" font-weight="700" font-family="system-ui">Webmail</text>
+      <text x="625" y="145" text-anchor="middle" fill="#f97316" font-size="9" font-family="system-ui">:2096 · HIGH</text>
+      <line x1="440" y1="215" x2="580" y2="140" stroke="#f97316" stroke-width="1.5" marker-end="url(#arr-orange)"/>
+
+      <!-- SSH -->
+      <rect x="690" y="108" width="90" height="48" rx="6" fill="#3d1f08" stroke="#f97316" stroke-width="1.5"/>
+      <text x="735" y="130" text-anchor="middle" fill="#fdba74" font-size="10" font-weight="700" font-family="system-ui">SSH</text>
+      <text x="735" y="145" text-anchor="middle" fill="#f97316" font-size="9" font-family="system-ui">:22 · HIGH</text>
+      <line x1="440" y1="210" x2="690" y2="140" stroke="#f97316" stroke-width="1.5" marker-end="url(#arr-orange)"/>
+
+      <!-- Exposed Services — bottom row -->
+      <!-- SMTP/Mail -->
+      <rect x="470" y="190" width="90" height="48" rx="6" fill="#1e2a3d" stroke="#3b82f6" stroke-width="1"/>
+      <text x="515" y="212" text-anchor="middle" fill="#93c5fd" font-size="10" font-weight="700" font-family="system-ui">Mail Stack</text>
+      <text x="515" y="227" text-anchor="middle" fill="#3b82f6" font-size="9" font-family="system-ui">:25/465/587/993</text>
+      <line x1="440" y1="225" x2="470" y2="218" stroke="#3b82f6" stroke-width="1" marker-end="url(#arr-blue)"/>
+
+      <!-- DNS/Other -->
+      <rect x="580" y="190" width="90" height="48" rx="6" fill="#1e2a3d" stroke="#475569" stroke-width="1"/>
+      <text x="625" y="212" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700" font-family="system-ui">PowerDNS</text>
+      <text x="625" y="227" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">:53 · Info</text>
+      <line x1="440" y1="230" x2="580" y2="220" stroke="#475569" stroke-width="1" marker-end="url(#arr)"/>
+
+      <!-- Label for attack surface arrows -->
+      <text x="452" y="285" fill="#ef4444" font-size="9" font-weight="700" font-family="system-ui">20 TCP services exposed · No firewall restriction</text>
+
+      <!-- Legend micro -->
+      <rect x="10" y="280" width="10" height="10" rx="2" fill="#ef4444"/>
+      <text x="25" y="290" fill="#94a3b8" font-size="9" font-family="system-ui">Critical</text>
+      <rect x="80" y="280" width="10" height="10" rx="2" fill="#f97316"/>
+      <text x="95" y="290" fill="#94a3b8" font-size="9" font-family="system-ui">High</text>
+      <rect x="130" y="280" width="10" height="10" rx="2" fill="#3b82f6"/>
+      <text x="145" y="290" fill="#94a3b8" font-size="9" font-family="system-ui">Medium</text>
+    </svg>
+  </div>
+</div>
+
+
+<!-- ══ FOOTER ════════════════════════════════════════════ -->
+<div class="page-footer">
+  VAPT Report — neuralsh.com &nbsp;·&nbsp; June 2026 &nbsp;·&nbsp; Attack Chain Diagram v1.0
+  &nbsp;·&nbsp; <span style="color:#c4b5fd">Confidential</span>
+</div>
+
+</body>
+</html>

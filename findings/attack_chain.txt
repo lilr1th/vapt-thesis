@@ -1,0 +1,68 @@
+================================================================
+NEURALSH.COM — ATTACK CHAIN ANALYSIS
+================================================================
+
+CHAIN 1: Full Server Compromise via Admin Panels
+-------------------------------------------------
+Step 1: Discover cPanel (2083), WHM (2087) via port scan
+         → nmap -sV -p- 103.16.62.217
+         → Ports 2083, 2087, 2096 open — no IP restriction
+
+Step 2: Brute force WHM (root panel) credentials
+         → hydra / custom wordlist targeting port 2087
+         → WHM uses system root/admin credentials
+
+Step 3: WHM access = root server control
+         → Access all cPanel accounts on server
+         → Open Terminal in WHM = root shell
+         → Access all databases across all hosted domains
+         → Full server compromise
+
+CHAIN 2: Token Farming + API Abuse
+-----------------------------------
+Step 1: Extract API routes from public JS bundle
+         → /_nuxt/Bpuv52g-.js reveals /web/v1/* routes
+
+Step 2: Obtain unlimited guest JWT tokens via rate limit bypass
+         → X-Forwarded-For: <random_ip> header spoofing
+         → 50/50 tokens obtained bypassing all rate limits
+
+Step 3: Use tokens to hammer authenticated endpoints at scale
+         → Automate /web/v1/category, /web/v1/text/search etc.
+         → Enumerate all user data if auth is bypassed
+
+CHAIN 3: Database Access via Exposed MySQL
+------------------------------------------
+Step 1: Confirm MySQL 3306 publicly accessible
+         → mysql -h 103.16.62.217 -P 3306 -u root
+
+Step 2: Obtain credentials via:
+         a) cPanel file manager → read config files
+         b) phpMyAdmin (if installed)
+         c) Brute force with larger wordlist
+
+Step 3: Full database dump
+         → User PII, hashed passwords, application data
+         → Use hashes for offline cracking
+         → Credential reuse against SSH, cPanel, webmail
+
+CHAIN 4: Network Compromise via MikroTik
+-----------------------------------------
+Step 1: Discover MikroTik panel on port 9001
+         → Accessible from internet, no IP restriction
+
+Step 2: Login with default credentials (admin / blank)
+         → Requires browser (JS-based auth)
+
+Step 3: Network-level control
+         → Intercept all network traffic
+         → Modify routing tables
+         → Create backdoor VPN accounts
+         → Disrupt all services
+
+================================================================
+RISK RATING: CRITICAL
+The combination of exposed admin panels (WHM/cPanel), database
+server, router panel, and bypassed rate limiting represents a
+complete compromise scenario requiring immediate remediation.
+================================================================

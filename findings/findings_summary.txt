@@ -1,0 +1,50 @@
+================================================================
+NEURALSH.COM — VAPT FINDINGS SUMMARY
+================================================================
+Date: 2026-06-06 | Tester: [Your Name] | Method: Black Box
+================================================================
+
+CRITICAL (4)
+------------
+N-001  MySQL port 3306 exposed to internet           CVSS 9.8
+N-002  MikroTik router admin panel on port 9001      CVSS 9.1
+N-013  cPanel admin panel exposed on port 2083        CVSS 9.8
+N-014  WHM root panel exposed on port 2087            CVSS 10.0
+
+HIGH (4)
+--------
+N-003  SSH port 22 open with password authentication CVSS 7.5
+N-004  WordPress on same shared server               CVSS 7.2
+N-005  Rate limiting bypass via X-Forwarded-For      CVSS 7.5 (EXPLOITED)
+N-015  Webmail interface exposed on port 2096         CVSS 7.5
+
+MEDIUM (6)
+----------
+N-006  API endpoints exposed in client-side JS       CVSS 5.3
+N-007  Unauthenticated JWT token issuance            CVSS 5.3 (EXPLOITED)
+N-008  SSL certificate mismatch on backend server    CVSS 5.9
+N-009  CSP allows unsafe-inline scripts              CVSS 5.4
+N-010  Wildcard DNS configured                       CVSS 4.3
+N-016  Directory listing enabled on Apache           CVSS 5.3
+
+LOW (3)
+-------
+N-011  Verbose API error messages                    CVSS 3.7
+N-012  SPF softfail / DMARC quarantine              CVSS 3.1
+N-017  cPanel version disclosure                     CVSS 3.1
+
+EXPLOITED FINDINGS
+------------------
+EXPLOIT-001  Rate limit bypass → 50/50 tokens via X-Forwarded-For spoofing
+EXPLOIT-002  Unauthenticated JWT issuance → unlimited guest tokens obtained
+EXPLOIT-003  MikroTik panel confirmed accessible (browser demo pending)
+EXPLOIT-004  MySQL confirmed publicly accessible (creds not found)
+
+TOOLS USED
+----------
+nmap, nikto, dirb, ffuf, sqlmap, hydra, curl, dig, whois,
+python3, hashcat, nc, subfinder, sslscan
+
+TOTAL FINDINGS: 17
+Critical: 4 | High: 4 | Medium: 6 | Low: 3
+================================================================

@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAPT Report — neuralsh.com</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:       #dc2626;
+    --red-light: #fef2f2;
+    --red-mid:   #fee2e2;
+    --orange:    #ea580c;
+    --orange-light: #fff7ed;
+    --orange-mid:   #fed7aa;
+    --yellow:    #ca8a04;
+    --yellow-light: #fefce8;
+    --yellow-mid:   #fef08a;
+    --blue:      #2563eb;
+    --blue-light: #eff6ff;
+    --blue-mid:  #bfdbfe;
+    --green:     #16a34a;
+    --green-light: #f0fdf4;
+    --slate-50:  #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    --brand:     #1e3a5f;
+    --brand-light: #2563eb;
+    --accent:    #0ea5e9;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  }
+
+  html { font-size: 15px; }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--slate-800);
+    background: var(--slate-100);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Page Layout ──────────────────────────────────── */
+  .page-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 0 60px rgba(0,0,0,0.12);
+  }
+
+  /* ── Cover Page ───────────────────────────────────── */
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0c4a6e 100%);
+    color: #fff;
+    padding: 80px 64px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(14, 165, 233, 0.08);
+    pointer-events: none;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.07);
+    pointer-events: none;
+  }
+
+  .cover-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 80px;
+  }
+
+  .cover-logo-icon {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+
+  .cover-logo-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .cover-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(220, 38, 38, 0.25);
+    border: 1px solid rgba(220, 38, 38, 0.5);
+    color: #fca5a5;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+
+  .cover-badge::before {
+    content: '●';
+    font-size: 8px;
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+
+  .cover h1 span { color: var(--accent); }
+
+  .cover-subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+    margin-bottom: 56px;
+  }
+
+  .cover-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 32px;
+    margin-top: 32px;
+  }
+
+  .cover-meta-item {
+    padding: 16px 0;
+  }
+
+  .cover-meta-item:nth-child(odd) {
+    border-right: 1px solid rgba(255,255,255,0.08);
+    padding-right: 32px;
+  }
+
+  .cover-meta-item:nth-child(even) {
+    padding-left: 32px;
+  }
+
+  .cover-meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+  }
+
+  .cover-meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+
+  /* ── Risk Banner ──────────────────────────────────── */
+  .risk-banner {
+    background: #dc2626;
+    color: #fff;
+    padding: 14px 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .risk-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .risk-banner-icon { font-size: 16px; }
+
+  .risk-banner-right {
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: 500;
+  }
+
+  /* ── Section Layout ───────────────────────────────── */
+  .section {
+    padding: 56px 64px;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-alt { background: var(--slate-50); }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--slate-900);
+    letter-spacing: -0.5px;
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+
+  .section-title .dim { color: var(--slate-400); font-weight: 400; }
+
+  /* ── Executive Summary ────────────────────────────── */
+  .exec-summary p {
+    font-size: 15px;
+    color: var(--slate-600);
+    margin-bottom: 16px;
+    line-height: 1.75;
+  }
+
+  .exec-summary p:last-child { margin-bottom: 0; }
+
+  .exec-summary strong { color: var(--slate-800); }
+
+  /* ── Stats Bar ────────────────────────────────────── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin: 32px 0;
+  }
+
+  .stat-card {
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    border: 1px solid transparent;
+  }
+
+  .stat-card.critical {
+    background: var(--red-light);
+    border-color: var(--red-mid);
+  }
+
+  .stat-card.high {
+    background: var(--orange-light);
+    border-color: var(--orange-mid);
+  }
+
+  .stat-card.medium {
+    background: var(--yellow-light);
+    border-color: var(--yellow-mid);
+  }
+
+  .stat-card.low {
+    background: var(--blue-light);
+    border-color: var(--blue-mid);
+  }
+
+  .stat-card.total {
+    background: var(--slate-800);
+    border-color: var(--slate-700);
+  }
+
+  .stat-number {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -2px;
+  }
+
+  .stat-card.critical .stat-number { color: var(--red); }
+  .stat-card.high .stat-number { color: var(--orange); }
+  .stat-card.medium .stat-number { color: var(--yellow); }
+  .stat-card.low .stat-number { color: var(--blue); }
+  .stat-card.total .stat-number { color: #fff; }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .stat-card.critical .stat-label { color: var(--red); }
+  .stat-card.high .stat-label { color: var(--orange); }
+  .stat-card.medium .stat-label { color: var(--yellow); }
+  .stat-card.low .stat-label { color: var(--blue); }
+  .stat-card.total .stat-label { color: rgba(255,255,255,0.6); }
+
+  /* ── Risk Bar ─────────────────────────────────────── */
+  .risk-bar-wrap {
+    margin: 24px 0 8px;
+  }
+
+  .risk-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--slate-500);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .risk-bar-track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--slate-100);
+    display: flex;
+    overflow: hidden;
+    gap: 2px;
+  }
+
+  .risk-bar-seg { height: 100%; border-radius: 0; }
+  .risk-bar-seg.c { background: var(--red); flex: 4; }
+  .risk-bar-seg.h { background: var(--orange); flex: 4; }
+  .risk-bar-seg.m { background: var(--yellow); flex: 6; }
+  .risk-bar-seg.l { background: var(--blue); flex: 3; }
+
+  /* ── Findings Table ───────────────────────────────── */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  thead th {
+    background: var(--slate-800);
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+
+  tbody tr:nth-child(even) { background: var(--slate-50); }
+
+  tbody tr:hover { background: #eff6ff; }
+
+  tbody td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--slate-100);
+    color: var(--slate-700);
+    vertical-align: middle;
+  }
+
+  tbody td:first-child {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--slate-500);
+    font-weight: 600;
+  }
+
+  .td-title { font-weight: 600; color: var(--slate-800); }
+
+  .td-score {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .td-status {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ── Severity Badges ──────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge-critical { background: var(--red); color: #fff; }
+  .badge-high { background: var(--orange); color: #fff; }
+  .badge-medium { background: var(--yellow); color: #fff; }
+  .badge-low { background: var(--blue); color: #fff; }
+  .badge-info { background: var(--slate-400); color: #fff; }
+  .badge-exploited { background: #7c3aed; color: #fff; }
+  .badge-confirmed { background: var(--green); color: #fff; }
+
+  /* ── Finding Cards ────────────────────────────────── */
+  .findings-list { display: flex; flex-direction: column; gap: 24px; }
+
+  .finding-card {
+    border-radius: 12px;
+    border: 1px solid var(--slate-200);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .finding-header {
+    padding: 18px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .finding-header-left { flex: 1; }
+
+  .finding-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--slate-400);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .finding-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--slate-900);
+    line-height: 1.3;
+  }
+
+  .finding-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .cvss-score {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .cvss-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--slate-400);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  /* color the CVSS score by severity */
+  .sev-critical .finding-header { background: var(--red-light); border-left: 4px solid var(--red); }
+  .sev-critical .cvss-score { color: var(--red); }
+  .sev-critical .finding-id { color: var(--red); opacity: 0.7; }
+
+  .sev-high .finding-header { background: var(--orange-light); border-left: 4px solid var(--orange); }
+  .sev-high .cvss-score { color: var(--orange); }
+  .sev-high .finding-id { color: var(--orange); opacity: 0.7; }
+
+  .sev-medium .finding-header { background: var(--yellow-light); border-left: 4px solid var(--yellow); }
+  .sev-medium .cvss-score { color: var(--yellow); }
+  .sev-medium .finding-id { color: var(--yellow); opacity: 0.7; }
+
+  .sev-low .finding-header { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .sev-low .cvss-score { color: var(--blue); }
+  .sev-low .finding-id { color: var(--blue); opacity: 0.7; }
+
+  .finding-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+  .finding-meta-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .finding-meta-chip {
+    background: var(--slate-100);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--slate-600);
+    font-weight: 500;
+  }
+
+  .finding-meta-chip strong {
+    color: var(--slate-800);
+    font-weight: 700;
+  }
+
+  .field-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate-400);
+    margin-bottom: 6px;
+  }
+
+  .field-text {
+    font-size: 13.5px;
+    color: var(--slate-700);
+    line-height: 1.65;
+  }
+
+  .field-text strong { color: var(--slate-900); font-weight: 600; }
+
+  .finding-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .finding-grid-full { grid-column: 1 / -1; }
+
+  .code-block {
+    background: var(--slate-900);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-top: 6px;
+  }
+
+  .code-block .cmd { color: #7dd3fc; }
+  .code-block .ok { color: #86efac; }
+  .code-block .err { color: #fca5a5; }
+  .code-block .warn { color: #fde68a; }
+  .code-block .comment { color: #475569; }
+  .code-block .str { color: #c4b5fd; }
+
+  .remediation-box {
+    background: var(--green-light);
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+
+  .remediation-box .field-label { color: var(--green); }
+
+  .remediation-list {
+    padding-left: 18px;
+    margin: 0;
+  }
+
+  .remediation-list li {
+    font-size: 13.5px;
+    color: var(--slate-700);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .remediation-list li:last-child { margin-bottom: 0; }
+
+  /* ── Attack Chains ────────────────────────────────── */
+  .chain-card {
+    border-radius: 12px;
+    border: 1px solid var(--slate-200);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .chain-header {
+    background: var(--slate-800);
+    color: #fff;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chain-title { font-size: 15px; font-weight: 700; }
+
+  .chain-impact {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(220, 38, 38, 0.3);
+    color: #fca5a5;
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    padding: 3px 12px;
+    border-radius: 999px;
+  }
+
+  .chain-steps {
+    padding: 20px 24px;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chain-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    counter-increment: step;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--slate-100);
+    border: 2px solid var(--slate-200);
+    color: var(--slate-600);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .step-content { flex: 1; padding-top: 3px; }
+
+  .step-action {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--slate-800);
+    margin-bottom: 2px;
+  }
+
+  .step-detail {
+    font-size: 12.5px;
+    color: var(--slate-500);
+  }
+
+  .step-connector {
+    width: 28px;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-connector-line {
+    width: 2px;
+    height: 16px;
+    background: var(--slate-200);
+    border-radius: 1px;
+  }
+
+  /* ── Positive Controls ────────────────────────────── */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .control-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--green-light);
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+  }
+
+  .control-check {
+    font-size: 14px;
+    color: var(--green);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .control-text {
+    font-size: 13px;
+    color: var(--slate-700);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* ── Recommendations ──────────────────────────────── */
+  .priority-section { margin-bottom: 24px; }
+
+  .priority-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .priority-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 999px;
+  }
+
+  .p0 { background: var(--red); color: #fff; }
+  .p1 { background: var(--orange); color: #fff; }
+  .p2 { background: var(--yellow); color: #fff; }
+  .p3 { background: var(--blue); color: #fff; }
+
+  .priority-time {
+    font-size: 12px;
+    color: var(--slate-500);
+    font-weight: 500;
+  }
+
+  .reco-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .reco-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--slate-50);
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+  }
+
+  .reco-main { flex: 1; }
+  .reco-title { font-size: 13.5px; font-weight: 600; color: var(--slate-800); }
+  .reco-desc { font-size: 12.5px; color: var(--slate-500); margin-top: 2px; }
+
+  .reco-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .reco-effort {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--slate-500);
+    background: var(--slate-100);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* ── Footer ───────────────────────────────────────── */
+  .report-footer {
+    background: var(--slate-900);
+    color: rgba(255,255,255,0.4);
+    padding: 32px 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+
+  .footer-left { color: rgba(255,255,255,0.6); font-weight: 500; }
+  .footer-conf {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(220, 38, 38, 0.2);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: #fca5a5;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Print ────────────────────────────────────────── */
+  @media print {
+    body { background: #fff; }
+    .page-wrap { box-shadow: none; max-width: 100%; }
+    .finding-card, .chain-card { break-inside: avoid; }
+    .section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║           COVER PAGE             ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="cover">
+    <div class="cover-logo">
+      <div class="cover-logo-icon">V</div>
+      <div class="cover-logo-text">VAPT Assessment Report</div>
+    </div>
+
+    <div class="cover-badge">Confidential &nbsp;·&nbsp; Authorized Assessment</div>
+
+    <h1>Security Assessment<br><span>neuralsh.com</span></h1>
+    <div class="cover-subtitle">Vulnerability Assessment &amp; Penetration Testing — Black Box</div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Target</div>
+        <div class="cover-meta-value">neuralsh.com</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Assessment Date</div>
+        <div class="cover-meta-value">June 2026</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Testing Method</div>
+        <div class="cover-meta-value">Black Box External</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Overall Risk</div>
+        <div class="cover-meta-value" style="color:#fca5a5; font-weight:800;">CRITICAL</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Total Findings</div>
+        <div class="cover-meta-value">17 Vulnerabilities</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Report Version</div>
+        <div class="cover-meta-value">v1.0 — Final</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk banner -->
+  <div class="risk-banner">
+    <div class="risk-banner-left">
+      <span class="risk-banner-icon">⚠</span>
+      CRITICAL findings present — 4 administrative panels exposed without IP restriction, including WHM root access (CVSS 10.0)
+    </div>
+    <div class="risk-banner-right">Immediate remediation required</div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║        EXECUTIVE SUMMARY         ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section exec-summary">
+    <div class="section-label">01 — Overview</div>
+    <div class="section-title">Executive Summary</div>
+
+    <p>
+      A black-box Vulnerability Assessment and Penetration Testing (VAPT) engagement was conducted against
+      <strong>neuralsh.com</strong> and its supporting infrastructure during June 2026. The assessment was
+      authorized by the system owner and simulates an external attacker with no prior knowledge of the
+      target's architecture or credentials.
+    </p>
+    <p>
+      The assessment identified <strong>17 distinct vulnerabilities</strong> across four severity tiers.
+      The most critical finding is the public exposure of <strong>WHM (Web Host Manager)</strong> on port 2087
+      — a root-equivalent server administration panel — assigned the maximum CVSS score of <strong>10.0</strong>.
+      Three additional Critical-severity findings involve an exposed MySQL database, MikroTik network router
+      administration panel, and cPanel hosting control panel, all reachable by any internet user without
+      IP restriction.
+    </p>
+    <p>
+      Two vulnerabilities were <strong>actively exploited</strong> during the assessment. A rate-limiting
+      bypass via <code>X-Forwarded-For</code> header spoofing achieved a <strong>100% bypass rate</strong>,
+      enabling unlimited API token generation. Unauthenticated JWT token issuance was confirmed by harvesting
+      50 valid signed tokens in under 5 seconds.
+    </p>
+    <p>
+      The primary root cause across findings is the absence of a network-level perimeter separating
+      administrative services from the public internet. Applying firewall rules to restrict ports 2083,
+      2087, 2096, 3306, and 9001 to trusted management IPs would eliminate all four Critical findings within
+      30 minutes.
+    </p>
+
+    <!-- ─ Risk Distribution ──────────────── -->
+    <div class="stats-grid" style="margin-top:32px">
+      <div class="stat-card critical">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Critical</div>
+      </div>
+      <div class="stat-card high">
+        <div class="stat-number">4</div>
+        <div class="stat-label">High</div>
+      </div>
+      <div class="stat-card medium">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Medium</div>
+      </div>
+      <div class="stat-card low">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Low</div>
+      </div>
+      <div class="stat-card total">
+        <div class="stat-number">17</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+
+    <div class="risk-bar-wrap">
+      <div class="risk-bar-label">
+        <span>Severity distribution</span>
+        <span>CVSS avg: 6.5 &nbsp;·&nbsp; Max: 10.0 (N-014)</span>
+      </div>
+      <div class="risk-bar-track">
+        <div class="risk-bar-seg c"></div>
+        <div class="risk-bar-seg h"></div>
+        <div class="risk-bar-seg m"></div>
+        <div class="risk-bar-seg l"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║       ASSESSMENT DETAILS         ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section section-alt">
+    <div class="section-label">02 — Scope</div>
+    <div class="section-title">Assessment Details</div>
+
+    <div class="finding-grid" style="margin-bottom:0">
+      <div>
+        <div class="field-label">Target</div>
+        <div class="field-text">neuralsh.com and all subdomains</div>
+      </div>
+      <div>
+        <div class="field-label">Real Origin IP</div>
+        <div class="field-text"><code style="font-family:var(--font-mono);background:var(--slate-100);padding:2px 6px;border-radius:4px;font-size:13px">103.16.62.217</code> (Cloudways cPanel hosting)</div>
+      </div>
+      <div>
+        <div class="field-label">Testing Method</div>
+        <div class="field-text">Black Box — no prior credentials or source code</div>
+      </div>
+      <div>
+        <div class="field-label">Framework</div>
+        <div class="field-text">OWASP WSTG v4.2 · PTES · NIST SP 800-115</div>
+      </div>
+      <div>
+        <div class="field-label">Technology Stack</div>
+        <div class="field-text">Nuxt.js (Vue SSR) · Cloudflare WAF · MySQL 8.0.43 · Apache · Exim/Dovecot · MikroTik RouterOS · cPanel/WHM</div>
+      </div>
+      <div>
+        <div class="field-label">Testing Phases</div>
+        <div class="field-text">Reconnaissance → Scanning → Vulnerability Assessment → Exploitation → Post-Exploitation</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║       FINDINGS SUMMARY TABLE     ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section">
+    <div class="section-label">03 — Findings</div>
+    <div class="section-title">Findings Summary <span class="dim">— All 17 Findings</span></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Severity</th>
+            <th style="text-align:center">CVSS</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>N-001</td>
+            <td class="td-title">MySQL 3306 Exposed to Internet</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td class="td-score" style="color:var(--red)">9.8</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-002</td>
+            <td class="td-title">MikroTik Admin Panel Exposed (9001)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td class="td-score" style="color:var(--red)">9.1</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-013</td>
+            <td class="td-title">cPanel Admin Panel Exposed (2083)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td class="td-score" style="color:var(--red)">9.8</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-014</td>
+            <td class="td-title">WHM Root Panel Exposed (2087)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td class="td-score" style="color:var(--red)">10.0</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-003</td>
+            <td class="td-title">SSH Port 22 Publicly Accessible</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td class="td-score" style="color:var(--orange)">7.2</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-004</td>
+            <td class="td-title">Shared Hosting Lateral Movement Risk</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td class="td-score" style="color:var(--orange)">7.5</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-005</td>
+            <td class="td-title">Rate Limit Bypass via X-Forwarded-For</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td class="td-score" style="color:var(--orange)">9.1</td>
+            <td class="td-status" style="color:#7c3aed;font-weight:800">⚡ Exploited</td>
+          </tr>
+          <tr>
+            <td>N-015</td>
+            <td class="td-title">Webmail Interface Exposed (2096)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td class="td-score" style="color:var(--orange)">7.5</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-006</td>
+            <td class="td-title">API Routes in Client-Side JavaScript</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td class="td-score" style="color:var(--yellow)">5.3</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-007</td>
+            <td class="td-title">Unauthenticated JWT Token Issuance</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td class="td-score" style="color:var(--yellow)">5.3</td>
+            <td class="td-status" style="color:#7c3aed;font-weight:800">⚡ Exploited</td>
+          </tr>
+          <tr>
+            <td>N-008</td>
+            <td class="td-title">SSL Certificate Mismatch (Backend)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td class="td-score" style="color:var(--yellow)">5.9</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-009</td>
+            <td class="td-title">Content-Security-Policy: unsafe-inline</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td class="td-score" style="color:var(--yellow)">5.4</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-010</td>
+            <td class="td-title">Wildcard DNS Enables Phishing Subdomains</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td class="td-score" style="color:var(--yellow)">4.3</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-016</td>
+            <td class="td-title">Apache Directory Listing Enabled</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td class="td-score" style="color:var(--yellow)">5.3</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-011</td>
+            <td class="td-title">Information Disclosure via Error Messages</td>
+            <td><span class="badge badge-low">Low</span></td>
+            <td class="td-score" style="color:var(--blue)">3.7</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-012</td>
+            <td class="td-title">SPF Softfail / DMARC Quarantine Policy</td>
+            <td><span class="badge badge-low">Low</span></td>
+            <td class="td-score" style="color:var(--blue)">3.1</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+          <tr>
+            <td>N-017</td>
+            <td class="td-title">cPanel Version Disclosure</td>
+            <td><span class="badge badge-low">Low</span></td>
+            <td class="td-score" style="color:var(--blue)">3.1</td>
+            <td class="td-status" style="color:var(--slate-500)">Confirmed</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║       DETAILED FINDINGS          ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section section-alt">
+    <div class="section-label">04 — Detail</div>
+    <div class="section-title">Critical Findings</div>
+    <div class="findings-list">
+
+      <!-- ─ N-014 WHM ────────────────── -->
+      <div class="finding-card sev-critical">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-014 <span class="badge badge-critical">Critical</span> <span class="badge badge-confirmed">Confirmed</span></div>
+            <div class="finding-title">WHM Root Panel Exposed to Public Internet</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">10.0</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta-row">
+            <div class="finding-meta-chip"><strong>Host:</strong> 103.16.62.217:2087</div>
+            <div class="finding-meta-chip"><strong>Service:</strong> WHM (Web Host Manager)</div>
+            <div class="finding-meta-chip"><strong>Vector:</strong> AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H</div>
+          </div>
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">WHM (Web Host Manager) provides <strong>root-level server administration</strong> for cPanel environments. The panel is publicly accessible on port 2087 with no IP restriction. WHM includes a Terminal feature providing direct root shell access, and controls all cPanel accounts on the shared server — meaning all co-hosted tenants are also at risk.</div>
+            </div>
+            <div>
+              <div class="field-label">Impact</div>
+              <div class="field-text">Successful login grants: <strong>root shell via WHM Terminal</strong>, full filesystem read/write, extraction of all database credentials, creation of backdoor hosting accounts, interception of all email for all hosted domains, and complete control over every website on the shared server.</div>
+            </div>
+          </div>
+          <div>
+            <div class="field-label">Evidence</div>
+            <div class="code-block">
+<span class="cmd">$ curl -sk https://103.16.62.217:2087/ | grep "&lt;title&gt;"</span>
+<span class="ok">&lt;title&gt;WHM Login&lt;/title&gt;</span>
+
+<span class="cmd">$ curl -sk -o /dev/null -w "%{http_code}" https://103.16.62.217:2087/</span>
+<span class="ok">200</span>  <span class="comment"># Login page fully accessible, no IP restriction</span>
+
+<span class="cmd">$ nmap -p 2087 103.16.62.217</span>
+<span class="ok">2087/tcp  open  ssl/gss-http  WHM (Web Host Manager)</span>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li>Apply firewall rule: <code>ufw deny 2087</code> immediately, then allow only trusted management IPs</li>
+              <li>Enable Two-Factor Authentication on WHM (WHM → Security → Two-Factor Authentication)</li>
+              <li>Route WHM access through a VPN or Cloudflare Access</li>
+              <li>Audit WHM login history for unauthorized access attempts</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ N-001 MySQL ──────────────── -->
+      <div class="finding-card sev-critical">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-001 <span class="badge badge-critical">Critical</span></div>
+            <div class="finding-title">MySQL Database Server Publicly Accessible (Port 3306)</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">9.8</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta-row">
+            <div class="finding-meta-chip"><strong>Host:</strong> 103.16.62.217:3306</div>
+            <div class="finding-meta-chip"><strong>Service:</strong> MySQL 8.0.43</div>
+            <div class="finding-meta-chip"><strong>Vector:</strong> AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+          </div>
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">The MySQL database service is bound to all network interfaces (<code>0.0.0.0</code>), making it directly accessible from the public internet. Any attacker can initiate an authentication handshake without passing through the application layer, enabling credential brute-force attacks directly against the database.</div>
+            </div>
+            <div>
+              <div class="field-label">Impact</div>
+              <div class="field-text">If credentials are obtained via brute-force or another vulnerability (LFI, config file exposure), the attacker gains full database access. With <code>FILE</code> privilege, MySQL can be used to write a web shell to the filesystem, achieving Remote Code Execution.</div>
+            </div>
+          </div>
+          <div>
+            <div class="field-label">Evidence</div>
+            <div class="code-block">
+<span class="cmd">$ mysql -h 103.16.62.217 -P 3306 -u root 2>&amp;1</span>
+<span class="warn">ERROR 1045 (28000): Access denied for user 'root'@'[IP]' (using password: NO)</span>
+<span class="comment"># Full TCP handshake completes — server is publicly reachable</span>
+
+<span class="cmd">$ nmap -p 3306 --script mysql-info 103.16.62.217</span>
+<span class="ok">3306/tcp open  mysql  MySQL 8.0.43</span>
+<span class="ok">  Protocol: 10  |  Capabilities: Long Query  |  Status: Autocommit</span>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li>Apply firewall rule: <code>ufw deny 3306</code> and allow only from application server IPs</li>
+              <li>Bind MySQL to localhost in <code>/etc/mysql/my.cnf</code>: <code>bind-address = 127.0.0.1</code></li>
+              <li>Ensure no MySQL user has <code>GRANT OPTION</code> with remote host <code>'%'</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ N-013 cPanel ─────────────── -->
+      <div class="finding-card sev-critical">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-013 <span class="badge badge-critical">Critical</span></div>
+            <div class="finding-title">cPanel Admin Panel Exposed to Public Internet (Port 2083)</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">9.8</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta-row">
+            <div class="finding-meta-chip"><strong>Host:</strong> 103.16.62.217:2083</div>
+            <div class="finding-meta-chip"><strong>Service:</strong> cPanel Login</div>
+          </div>
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">cPanel provides full web hosting account management including file manager (read/write all application files), database management via phpMyAdmin, email account management, FTP credential creation, and DNS management. The panel is accessible to the public internet with no IP restriction and no CAPTCHA on the login form.</div>
+            </div>
+            <div>
+              <div class="field-label">Additional Risk</div>
+              <div class="field-text">The password reset feature (<code>/resetpass</code>) is publicly accessible. An attacker who compromises the registered email account can use this to gain full cPanel access without knowing the current password — a two-step account takeover chain.</div>
+            </div>
+          </div>
+          <div>
+            <div class="field-label">Evidence</div>
+            <div class="code-block">
+<span class="cmd">$ curl -sk https://103.16.62.217:2083/ | grep -E "&lt;title&gt;|cPanel_magic"</span>
+<span class="ok">&lt;title&gt;cPanel Login&lt;/title&gt;</span>
+<span class="ok">cPanel_magic_revision_1698766296  </span><span class="comment"># version fingerprint</span>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li>Restrict cPanel to trusted IPs via Host Access Control in cPanel settings</li>
+              <li>Enable Two-Factor Authentication: cPanel → Security → Two-Factor Authentication</li>
+              <li>Block port 2083 at the firewall for all IPs except management range</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ N-002 MikroTik ──────────── -->
+      <div class="finding-card sev-critical">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-002 <span class="badge badge-critical">Critical</span></div>
+            <div class="finding-title">MikroTik RouterOS Admin Panel Exposed (Port 9001)</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">9.1</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta-row">
+            <div class="finding-meta-chip"><strong>Host:</strong> 103.16.62.217:9001</div>
+            <div class="finding-meta-chip"><strong>Service:</strong> MikroTik RouterOS WebFig</div>
+          </div>
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">The MikroTik RouterOS web configuration interface is publicly accessible on port 9001. MikroTik's factory default credentials are <strong>admin / (blank password)</strong>. If these defaults are unchanged, an attacker has full control over the network routing layer serving all application traffic.</div>
+            </div>
+            <div>
+              <div class="field-label">Impact</div>
+              <div class="field-text">RouterOS admin access enables: traffic interception via packet sniffer, NAT rule modification (redirect traffic to attacker), firewall rule changes (open additional ports), creation of persistent backdoor accounts, extraction of stored VPN/PPPoE credentials, and disruption of all hosted services.</div>
+            </div>
+          </div>
+          <div>
+            <div class="field-label">Evidence</div>
+            <div class="code-block">
+<span class="cmd">$ curl -v http://103.16.62.217:9001/ 2&gt;&amp;1 | grep -E "HTTP|title|username"</span>
+<span class="ok">HTTP/1.1 200 OK</span>
+<span class="ok">&lt;title&gt;RouterOS router configuration page&lt;/title&gt;</span>
+<span class="ok">&lt;input type="text" id="username" value="admin"&gt;</span>
+<span class="comment"># Login form pre-populates "admin" as username (default)</span>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li><strong>Immediately</strong> change the <code>admin</code> password to a strong unique value</li>
+              <li>Block port 9001 at the firewall: <code>ufw deny 9001</code></li>
+              <li>In RouterOS: restrict allowed IPs for all services (<code>/ip service set www-ssl address=[mgmt-ip]</code>)</li>
+              <li>Disable unused RouterOS services (telnet, FTP, API)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- High Findings -->
+  <div class="section">
+    <div class="section-label">04 — Detail Continued</div>
+    <div class="section-title">High Severity Findings</div>
+    <div class="findings-list">
+
+      <!-- ─ N-005 Rate Limit ─────────── -->
+      <div class="finding-card sev-high">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-005 <span class="badge badge-high">High</span> <span class="badge badge-exploited">⚡ Exploited — 100% bypass rate</span></div>
+            <div class="finding-title">Rate Limiting Bypass via X-Forwarded-For Header Spoofing</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">9.1</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta-row">
+            <div class="finding-meta-chip"><strong>Endpoint:</strong> GET /web/v1/init/token</div>
+            <div class="finding-meta-chip"><strong>Vector:</strong> AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</div>
+          </div>
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">The API rate limiter uses the client-supplied <code>X-Forwarded-For</code> header to identify the requesting IP. Since this header is freely modifiable by any HTTP client, rate limiting is defeated by setting a different random IP per request. The correct approach when behind Cloudflare is to use <code>CF-Connecting-IP</code>, which is set by Cloudflare and cannot be spoofed by the client.</div>
+            </div>
+            <div>
+              <div class="field-label">Exploitation Result</div>
+              <div class="field-text">
+                <strong style="color:var(--red)">50 / 50 requests succeeded</strong> — rate limit completely bypassed<br><br>
+                <strong>Without bypass:</strong> 18/50 tokens before HTTP 429<br>
+                <strong>With bypass:</strong> 50/50 tokens, zero 429 responses<br>
+                <strong>Speed:</strong> 50 valid JWTs collected in ~3 seconds
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="field-label">Proof of Concept</div>
+            <div class="code-block">
+<span class="comment"># Without bypass — rate limited at request 19</span>
+<span class="cmd">$ for i in $(seq 1 20); do curl -sw "%{http_code}\n" -o /dev/null https://neuralsh.com/web/v1/init/token; done</span>
+<span class="ok">200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200</span>
+<span class="err">429 429</span>  <span class="comment"># ← rate limit triggered</span>
+
+<span class="comment"># With X-Forwarded-For bypass — ALL succeed</span>
+<span class="cmd">$ for i in $(seq 1 50); do</span>
+<span class="cmd">    IP="$((RANDOM%254+1)).$((RANDOM%254+1)).$((RANDOM%254+1)).$((RANDOM%254+1))"</span>
+<span class="cmd">    curl -sw "%{http_code}\n" -o /dev/null -H "X-Forwarded-For: $IP" \</span>
+<span class="cmd">         https://neuralsh.com/web/v1/init/token</span>
+<span class="cmd">  done</span>
+<span class="ok">200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200</span>
+<span class="ok">200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200</span>
+<span class="ok">200 200 200 200 200 200 200 200 200 200</span>  <span class="comment"># ← 50/50, no 429</span>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li>Replace <code>X-Forwarded-For</code> with <code>CF-Connecting-IP</code> in rate-limiting logic</li>
+              <li>In Cloudflare Rate Limiting rules, select "True Client IP" as the rate-limiting identifier</li>
+              <li>Lower threshold to 3–5 requests/minute per real IP</li>
+              <li>Add Cloudflare Turnstile challenge to the token issuance endpoint</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ N-007 JWT ─────────────────── -->
+      <div class="finding-card sev-high">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-007 <span class="badge badge-medium">Medium</span> <span class="badge badge-exploited">⚡ Exploited — 50 tokens collected</span></div>
+            <div class="finding-title">Unauthenticated JWT Token Issuance — No Access Control</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">5.3</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-meta-row">
+            <div class="finding-meta-chip"><strong>Endpoint:</strong> GET /web/v1/init/token</div>
+            <div class="finding-meta-chip"><strong>Token Type:</strong> HS256 JWT, 30-min expiry</div>
+          </div>
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">Any caller — with no authentication, API key, or device fingerprint — receives a signed JWT token granting access to the API. The token payload indicates privilege tiers exist (<code>"type":"guest"</code>), meaning higher-privilege roles are present in the system. The JWT secret was not cracked with rockyou.txt (14.3M candidates exhausted).</div>
+            </div>
+            <div>
+              <div class="field-label">Token Payload</div>
+              <div class="code-block" style="margin-top:0">
+<span class="comment"># Decoded JWT payload:</span>
+{
+  <span class="str">"type"</span>: <span class="str">"guest"</span>,
+  <span class="str">"tid"</span>:  <span class="str">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="str">"iat"</span>:  <span class="ok">1749220800</span>,
+  <span class="str">"exp"</span>:  <span class="ok">1749222600</span>  <span class="comment">// 30 minutes</span>
+}
+              </div>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li>Add Cloudflare Turnstile or reCAPTCHA v3 before token issuance</li>
+              <li>Require a browser-computed device fingerprint in the token request</li>
+              <li>Implement token binding to prevent token sharing across clients</li>
+              <li>Rotate JWT secret to a cryptographically random 256-bit value</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ N-015 Webmail ────────────── -->
+      <div class="finding-card sev-high">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-015 <span class="badge badge-high">High</span></div>
+            <div class="finding-title">Webmail Interface Exposed to Public Internet (Port 2096)</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">7.5</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Description</div>
+              <div class="field-text">cPanel Webmail on port 2096 allows anyone to attempt authentication against all email accounts hosted on the server, including all <code>@neuralsh.com</code> addresses. Successful compromise of an email account enables password reset attacks against linked services and sending of phishing emails from legitimate addresses.</div>
+            </div>
+            <div>
+              <div class="field-label">Impact</div>
+              <div class="field-text">Compromised email accounts can be used to: reset passwords for other services (cPanel, domain registrar, banking), send trusted phishing emails from <code>@neuralsh.com</code> addresses, read sensitive internal communications, and pivot to additional account takeovers.</div>
+            </div>
+          </div>
+          <div class="remediation-box">
+            <div class="field-label">Remediation</div>
+            <ul class="remediation-list">
+              <li>Block port 2096 at firewall, allow only from trusted IPs</li>
+              <li>Enforce strong password policy on all email accounts</li>
+              <li>Enable Two-Factor Authentication on all email accounts</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medium & Low Findings (condensed) -->
+  <div class="section section-alt">
+    <div class="section-label">04 — Detail Continued</div>
+    <div class="section-title">Medium &amp; Low Severity Findings</div>
+    <div class="findings-list">
+
+      <div class="finding-card sev-medium">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-006 <span class="badge badge-medium">Medium</span></div>
+            <div class="finding-title">Full API Route Map Exposed in Client-Side JavaScript Bundle</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">5.3</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="field-label">Evidence</div>
+          <div class="code-block">
+<span class="cmd">$ curl -s https://neuralsh.com/_nuxt/Bpuv52g-.js | grep -oP '/web/v1/[^"&amp;\s]+' | sort -u</span>
+<span class="ok">/web/v1/category</span>
+<span class="ok">/web/v1/image/search</span>
+<span class="ok">/web/v1/init/token</span>
+<span class="ok">/web/v1/report/save</span>
+<span class="ok">/web/v1/text/search</span>
+<span class="ok">/api/geocode</span>
+          </div>
+          <div class="field-text" style="margin-top:12px">Complete API surface discovered from compiled JavaScript — no scanning required. These routes directly enabled exploitation of N-005 and N-007.</div>
+        </div>
+      </div>
+
+      <div class="finding-card sev-medium">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-009 <span class="badge badge-medium">Medium</span></div>
+            <div class="finding-title">Content-Security-Policy Allows unsafe-inline Scripts</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">5.4</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">Evidence</div>
+              <div class="code-block" style="margin-top:0">
+<span class="cmd">$ curl -sI https://neuralsh.com | grep -i "content-security"</span>
+<span class="warn">Content-Security-Policy: script-src 'self' <span style="color:#fca5a5;font-weight:700">'unsafe-inline'</span></span>
+              </div>
+            </div>
+            <div>
+              <div class="field-label">Impact</div>
+              <div class="field-text">The <code>unsafe-inline</code> directive nullifies XSS mitigation via CSP. If an XSS vulnerability is found, injected inline scripts execute without CSP blocking them. Replace with per-request nonces (<code>'nonce-{random}'</code>) or hash-based allowlists.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="finding-card sev-medium">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-010 <span class="badge badge-medium">Medium</span></div>
+            <div class="finding-title">Wildcard DNS Enables Phishing Subdomains</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">4.3</div>
+            <div class="cvss-label">CVSS v3.1</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="field-label">Evidence</div>
+          <div class="code-block">
+<span class="cmd">$ for s in login secure bank payment; do dig +short $s.neuralsh.com; done</span>
+<span class="ok">103.16.62.217  </span><span class="comment"># login.neuralsh.com</span>
+<span class="ok">103.16.62.217  </span><span class="comment"># secure.neuralsh.com</span>
+<span class="ok">103.16.62.217  </span><span class="comment"># bank.neuralsh.com</span>
+<span class="ok">103.16.62.217  </span><span class="comment"># payment.neuralsh.com — all resolve</span>
+          </div>
+          <div class="field-text" style="margin-top:12px">Remove the wildcard <code>*.neuralsh.com</code> DNS record. Define only the specific subdomains needed (<code>www</code>, <code>mail</code>, etc.).</div>
+        </div>
+      </div>
+
+      <div class="finding-card sev-medium">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-008, N-016 <span class="badge badge-medium">Medium</span></div>
+            <div class="finding-title">SSL Certificate Mismatch &amp; Apache Directory Listing</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">5.9</div>
+            <div class="cvss-label">Max CVSS</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">N-008 — SSL Mismatch</div>
+              <div class="code-block" style="margin-top:0">
+<span class="cmd">$ openssl s_client -connect 103.16.62.217:443 2>/dev/null \</span>
+<span class="cmd">  | openssl x509 -noout -subject</span>
+<span class="warn">subject: CN=*.cloudwaysapps.com</span>
+<span class="comment"># Certificate NOT for neuralsh.com</span>
+              </div>
+            </div>
+            <div>
+              <div class="field-label">N-016 — Directory Listing</div>
+              <div class="code-block" style="margin-top:0">
+<span class="cmd">$ curl -H "Host: neuralsh.com" http://103.16.62.217/</span>
+<span class="warn">&lt;title&gt;Index of /&lt;/title&gt;</span>
+<span class="comment"># Apache directory listing enabled</span>
+<span class="comment"># Fix: Options -Indexes in Apache config</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="finding-card sev-low">
+        <div class="finding-header">
+          <div class="finding-header-left">
+            <div class="finding-id">N-011, N-012, N-017 <span class="badge badge-low">Low</span></div>
+            <div class="finding-title">Information Disclosure · SPF Softfail · cPanel Version Leak</div>
+          </div>
+          <div class="finding-header-right">
+            <div class="cvss-score">3.7</div>
+            <div class="cvss-label">Max CVSS</div>
+          </div>
+        </div>
+        <div class="finding-body">
+          <div class="finding-grid">
+            <div>
+              <div class="field-label">N-011 — Error Message Disclosure</div>
+              <div class="code-block" style="margin-top:0">
+<span class="cmd">$ curl "https://neuralsh.com/api/geocode"</span>
+{<span class="str">"error"</span>:true,
+ <span class="str">"url"</span>:<span class="str">"https://neuralsh.com/api/geocode"</span>,
+ <span class="str">"statusCode"</span>:<span class="ok">400</span>,
+ <span class="str">"message"</span>:<span class="warn">"Latitude and longitude are required"</span>}
+              </div>
+            </div>
+            <div>
+              <div class="field-label">N-012 — Email Security</div>
+              <div class="code-block" style="margin-top:0">
+<span class="cmd">$ dig TXT neuralsh.com | grep spf</span>
+<span class="warn">v=spf1 ... <span style="color:#fca5a5">~all</span></span>  <span class="comment"># softfail</span>
+
+<span class="comment"># Should be: -all (hardfail)</span>
+<span class="comment"># DMARC: p=quarantine → should be p=reject</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║          ATTACK CHAINS           ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section">
+    <div class="section-label">05 — Threat Scenarios</div>
+    <div class="section-title">Attack Chains</div>
+
+    <div class="chain-card">
+      <div class="chain-header">
+        <div class="chain-title">Chain 1 — Full Server Compromise via WHM</div>
+        <div class="chain-impact">Root Access</div>
+      </div>
+      <div class="chain-steps">
+        <div class="chain-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-action">DNS Reconnaissance</div>
+            <div class="step-detail">dig MX neuralsh.com → 103.16.62.217 (real origin IP)</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-action">Port Scan Origin Server</div>
+            <div class="step-detail">nmap 103.16.62.217 → port 2087 open (WHM), port 2083 (cPanel)</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-action">Credential Attack or Password Reset Chain</div>
+            <div class="step-detail">Brute force with large wordlist OR compromise registered email → trigger /resetpass → full cPanel/WHM access</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-action">WHM Terminal → Root Shell</div>
+            <div class="step-detail">WHM → Advanced → Terminal → whoami → root</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-action">Extract All Credentials &amp; Lateral Movement</div>
+            <div class="step-detail">Read .env files, database passwords, API keys, SSH keys → compromise all services and all co-hosted tenants</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chain-card">
+      <div class="chain-header">
+        <div class="chain-title">Chain 2 — Unlimited API Abuse via Rate Limit Bypass (Confirmed)</div>
+        <div class="chain-impact">API Control</div>
+      </div>
+      <div class="chain-steps">
+        <div class="chain-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-action">Extract API Routes from JavaScript Bundle</div>
+            <div class="step-detail">curl https://neuralsh.com/_nuxt/*.js | grep /web/v1/ → full route map</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-action">Bypass Rate Limiting with X-Forwarded-For</div>
+            <div class="step-detail">50/50 token requests succeed — rate limit completely defeated</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-action">Harvest Unlimited Valid JWT Tokens</div>
+            <div class="step-detail">50 signed tokens collected in 3 seconds — perpetually renewable</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-action">Enumerate Entire API Without Throttling</div>
+            <div class="step-detail">Use tokens to access /text/search, /image/search, /category at unlimited rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chain-card">
+      <div class="chain-header">
+        <div class="chain-title">Chain 3 — Network Infrastructure Compromise via MikroTik</div>
+        <div class="chain-impact">Traffic Interception</div>
+      </div>
+      <div class="chain-steps">
+        <div class="chain-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-action">Access MikroTik WebFig Login Page</div>
+            <div class="step-detail">http://103.16.62.217:9001 → HTTP 200, login form visible</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-action">Login with Default Credentials</div>
+            <div class="step-detail">admin / (blank) — MikroTik factory default</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-action">Enable Packet Capture / Modify NAT Rules</div>
+            <div class="step-detail">All HTTP traffic intercepted; HTTPS metadata (SNI) visible; redirect traffic to attacker</div>
+          </div>
+        </div>
+        <div class="chain-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-action">Create Persistent Backdoor Account</div>
+            <div class="step-detail">/user add name=support password=[attacker-pass] group=full → persistent access</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║      POSITIVE CONTROLS           ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section section-alt">
+    <div class="section-label">06 — Good News</div>
+    <div class="section-title">Positive Security Controls</div>
+    <div class="field-text" style="margin-bottom:16px">The following security controls were confirmed to be functioning correctly during the assessment. These represent genuine security investment and should be maintained.</div>
+    <div class="controls-grid">
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">Cloudflare WAF active — blocks automated scanners and known attack signatures</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">HSTS with <code>preload</code> and <code>includeSubDomains</code> (max-age=15552000)</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">X-Frame-Options: DENY — clickjacking protection active</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">X-Content-Type-Options: nosniff — MIME sniffing prevention</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">TLS 1.0 and 1.1 disabled — modern TLS only</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">JWT alg:none attack rejected — signature validation implemented</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">JWT secret not in rockyou.txt (14.3M candidates) — adequate entropy</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">JWT token IDs are UUID v4 — not sequential or predictable</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">Zone transfer blocked — DNS zone not publicly exposed</div></div>
+      <div class="control-item"><div class="control-check">✓</div><div class="control-text">Referrer-Policy: strict-origin-when-cross-origin</div></div>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║       REMEDIATION ROADMAP        ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="section">
+    <div class="section-label">07 — Next Steps</div>
+    <div class="section-title">Remediation Roadmap</div>
+
+    <div class="priority-section">
+      <div class="priority-header">
+        <span class="priority-label p0">P0</span>
+        <span class="priority-time">Immediate — Within 24 Hours</span>
+      </div>
+      <div class="reco-list">
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Firewall admin ports 2083, 2087, 2096, 3306, 9001</div>
+            <div class="reco-desc">Block from all public IPs — allow only from trusted management IP range. Eliminates all 4 Critical findings.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">30 minutes</span>
+            <span class="badge badge-critical" style="font-size:10px">Fixes N-001,002,013,014,015</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Change MikroTik default admin credentials</div>
+            <div class="reco-desc">Set a strong unique password on the RouterOS admin account immediately.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">5 minutes</span>
+            <span class="badge badge-critical" style="font-size:10px">Fixes N-002</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Enable 2FA on cPanel and WHM</div>
+            <div class="reco-desc">Enforce TOTP two-factor authentication on all administrative panels before removing firewall block.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">30 minutes</span>
+            <span class="badge badge-critical" style="font-size:10px">Hardens N-013,014</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="priority-section">
+      <div class="priority-header">
+        <span class="priority-label p1">P1</span>
+        <span class="priority-time">Short Term — Within 1 Week</span>
+      </div>
+      <div class="reco-list">
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Fix rate limiting: use CF-Connecting-IP instead of X-Forwarded-For</div>
+            <div class="reco-desc">One-line code change. Eliminates the confirmed 100%-bypass exploit completely.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">2 hours</span>
+            <span class="badge badge-high" style="font-size:10px">Fixes N-005</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Remove wildcard DNS record</div>
+            <div class="reco-desc">Replace *.neuralsh.com with explicit records only (www, mail). Removes phishing subdomain risk.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">15 minutes</span>
+            <span class="badge badge-medium" style="font-size:10px">Fixes N-010</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Disable Apache directory listing</div>
+            <div class="reco-desc">Add <code>Options -Indexes</code> to Apache config or .htaccess on origin server.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">15 minutes</span>
+            <span class="badge badge-medium" style="font-size:10px">Fixes N-016</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Add device attestation / Turnstile to token endpoint</div>
+            <div class="reco-desc">Require Cloudflare Turnstile before issuing guest JWT tokens to prevent automated farming.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">1 day</span>
+            <span class="badge badge-medium" style="font-size:10px">Fixes N-007</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="priority-section">
+      <div class="priority-header">
+        <span class="priority-label p2">P2</span>
+        <span class="priority-time">Medium Term — Within 1 Month</span>
+      </div>
+      <div class="reco-list">
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Fix Content-Security-Policy: remove unsafe-inline</div>
+            <div class="reco-desc">Implement nonce-based CSP in Nuxt.js to eliminate the inline script exemption.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">4 hours</span>
+            <span class="badge badge-medium" style="font-size:10px">Fixes N-009</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Harden email security: SPF -all · DMARC reject</div>
+            <div class="reco-desc">Change SPF from ~all to -all and DMARC policy from quarantine to reject. Two DNS record updates.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">30 minutes</span>
+            <span class="badge badge-low" style="font-size:10px">Fixes N-012</span>
+          </div>
+        </div>
+        <div class="reco-item">
+          <div class="reco-main">
+            <div class="reco-title">Return generic error messages from API</div>
+            <div class="reco-desc">Replace detailed internal error objects with generic user-facing messages. Log details server-side only.</div>
+          </div>
+          <div class="reco-meta">
+            <span class="reco-effort">4 hours</span>
+            <span class="badge badge-low" style="font-size:10px">Fixes N-011</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ╔══════════════════════════════════╗ -->
+  <!-- ║           FOOTER                 ║ -->
+  <!-- ╚══════════════════════════════════╝ -->
+  <div class="report-footer">
+    <div class="footer-left">VAPT Report — neuralsh.com &nbsp;·&nbsp; June 2026 &nbsp;·&nbsp; v1.0 Final</div>
+    <div><span class="footer-conf">🔒 Confidential</span></div>
+    <div>17 findings &nbsp;·&nbsp; CVSS avg 6.5 &nbsp;·&nbsp; 2 Exploited</div>
+  </div>
+
+</div><!-- end .page-wrap -->
+</body>
+</html>

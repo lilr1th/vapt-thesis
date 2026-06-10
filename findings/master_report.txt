@@ -1,0 +1,599 @@
+================================================================
+VAPT REPORT — neuralsh.com
+================================================================
+Date       : 2026-06-06
+Tester     : [Your Name]
+Target     : https://neuralsh.com
+Method     : Black Box
+Auth       : Authorized (Full Stack Developer)
+================================================================
+
+INFRASTRUCTURE OVERVIEW
+-----------------------
+Main Site  : neuralsh.com → 104.21.91.198 (Cloudflare CDN/WAF)
+Mail Server: mail.neuralsh.com → 103.16.62.217 (Shared cPanel hosting)
+Framework  : Nuxt.js (Vue.js SSR)
+Registrar  : GoDaddy (registered 2025-07-03)
+DNS        : Cloudflare nameservers + Wildcard DNS
+
+================================================================
+FINDINGS
+================================================================
+
+[N-001] CRITICAL — MySQL Port 3306 Exposed to Internet
+-------------------------------------------------------
+Host     : 103.16.62.217:3306
+Service  : MySQL 8.0.43
+CVSS     : 9.8 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+Status   : Confirmed
+
+Description:
+  MySQL database server is directly accessible from the internet
+  on port 3306. Any attacker can attempt authentication directly
+  against the database without going through the application layer.
+  Default credentials were tested and rejected, but the exposure
+  allows brute force attacks.
+
+Impact:
+  If credentials are obtained, full database access is possible
+  including user data, application data, and potential RCE via
+  MySQL User Defined Functions (UDFs).
+
+Evidence:
+  nmap output: 3306/tcp open mysql MySQL 8.0.43
+  mysql -h 103.16.62.217 -P 3306 -u root → Access denied (auth required)
+
+Remediation:
+  Restrict port 3306 to localhost or VPN only via firewall rules.
+  Never expose database ports to the public internet.
+
+---------------------------------------------------------------
+
+[N-002] CRITICAL — MikroTik Router Admin Panel Exposed (Port 9001)
+-------------------------------------------------------------------
+Host     : 103.16.62.217:9001
+Service  : MikroTik RouterOS Web Config
+CVSS     : 9.1 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+Status   : Confirmed — Login page accessible
+
+Description:
+  The MikroTik RouterOS web configuration interface is publicly
+  accessible. Default credentials for MikroTik are admin/blank.
+  Browser-based authentication required for full exploitation.
+
+Impact:
+  Full network infrastructure control. An attacker with access
+  could intercept all network traffic, modify routing, create
+  backdoor accounts, or disrupt all services.
+
+Evidence:
+  curl http://103.16.62.217:9001 → HTTP 200 OK
+  Page title: "RouterOS router configuration page"
+  Login form visible with admin username pre-filled.
+
+Remediation:
+  Restrict port 9001 to trusted IPs only.
+  Change default admin credentials immediately.
+  Enable IP binding to management interfaces only.
+
+---------------------------------------------------------------
+
+[N-003] HIGH — SSH Port 22 Open With Password Authentication
+------------------------------------------------------------
+Host     : 103.16.62.217:22
+Service  : OpenSSH 8.2p1 Ubuntu
+CVSS     : 7.5 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N)
+Status   : Confirmed
+
+Description:
+  SSH is publicly accessible and accepts password authentication.
+  Verified: "Authentications that can continue: publickey,password"
+  This allows brute force attacks against SSH credentials.
+
+Impact:
+  Successful brute force leads to full server shell access.
+  On cPanel/Cloudways servers the primary user typically has
+  sudo privileges, making this a direct path to root.
+
+Evidence:
+  ssh -v master@103.16.62.217
+  debug1: Authentications that can continue: publickey,password
+
+Remediation:
+  Disable password authentication (PasswordAuthentication no).
+  Use SSH key-based authentication only.
+  Restrict SSH access to VPN/trusted IPs via firewall.
+  Implement fail2ban with aggressive thresholds.
+
+---------------------------------------------------------------
+
+[N-004] HIGH — WordPress Installation on Shared Server
+------------------------------------------------------
+Host     : 103.16.62.217 → endoncambodia.com
+CVSS     : 7.2 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+Status   : Confirmed
+
+Description:
+  A WordPress installation exists on the same physical server
+  (endoncambodia.com). Shared hosting means a compromise of
+  this WordPress site could pivot to the neuralsh.com application.
+  SSL cert for 443 is issued to endoncambodia.com.
+  robots.txt confirms /wp-admin/ exists.
+
+Impact:
+  WordPress vulnerabilities (plugins, themes, xmlrpc.php) on the
+  shared server could lead to lateral movement and access to
+  neuralsh.com application files and database.
+
+Evidence:
+  nmap: 443/tcp → X-Redirect-By: WordPress → endoncambodia.com
+  SSL cert: commonName=www.endoncambodia.com
+  robots.txt: Disallow: /wp-admin/
+
+Remediation:
+  Host neuralsh.com on isolated infrastructure.
+  Never share production servers with other applications.
+
+---------------------------------------------------------------
+
+[N-005] HIGH — No Rate Limiting on JWT Token Endpoint
+------------------------------------------------------
+URL      : https://neuralsh.com/web/v1/init/token
+CVSS     : 7.5 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N)
+Status   : Confirmed — rate limited kicks in around request 19
+
+Description:
+  The token issuance endpoint /web/v1/init/token issues valid
+  JWT tokens to any unauthenticated request with no input required.
+  18 tokens were successfully obtained before rate limiting at
+  request 19. Rate limiting threshold is too high for a sensitive
+  endpoint.
+
+Impact:
+  Attackers can farm valid session tokens in bulk. If token IDs
+  are predictable, enumeration of other users' sessions is possible.
+
+Evidence:
+  50 rapid requests sent → 18 successful (200) before 429 triggered
+  Each response contains a valid signed JWT:
+  {"type":"guest","tid":"<uuid>","iat":...,"exp":...}
+
+Remediation:
+  Lower rate limit threshold significantly (max 3-5/minute per IP).
+  Require CAPTCHA for token issuance.
+  Make token IDs cryptographically random (already using UUID — good).
+
+---------------------------------------------------------------
+
+[N-006] MEDIUM — API Endpoints Exposed in Client-Side JavaScript
+----------------------------------------------------------------
+URL      : https://neuralsh.com/_nuxt/Bpuv52g-.js
+CVSS     : 5.3 (AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N)
+Status   : Confirmed
+
+Description:
+  Internal API route structure is fully disclosed in the
+  client-side JavaScript bundle, including:
+    /web/v1/init/token
+    /web/v1/category
+    /web/v1/text/search
+    /web/v1/image/search
+    /web/v1/report/save
+    /api/geocode
+
+Impact:
+  Attackers can map the entire API surface without any scanning,
+  accelerating targeted attacks.
+
+Remediation:
+  This is partially unavoidable with SPAs. Minimize route exposure.
+  Implement API gateway with strict allowlisting.
+
+---------------------------------------------------------------
+
+[N-007] MEDIUM — Unauthenticated JWT Token Issuance
+----------------------------------------------------
+URL      : GET https://neuralsh.com/web/v1/init/token
+CVSS     : 5.3 (AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N)
+Status   : Confirmed + Exploited
+
+Description:
+  Any unauthenticated request to /web/v1/init/token returns
+  a signed JWT token with type "guest". No authentication,
+  API key, or identifying information is required.
+  Token lifespan: 30 minutes.
+
+  Token decoded:
+  Header:  {"alg":"HS256","typ":"JWT"}
+  Payload: {"type":"guest","tid":"<uuid>","iat":<time>,"exp":<time+1800>}
+
+Impact:
+  The guest token grants access to the API base. Privilege levels
+  exist (guest vs higher roles). If JWT secret is weak, tokens
+  can be forged with elevated privileges (e.g. type:"admin").
+  JWT secret cracking was attempted — not cracked with common wordlist.
+
+Remediation:
+  Require device fingerprint or app attestation before issuing tokens.
+  Implement token binding to prevent token reuse across clients.
+  Use a strong random JWT secret (32+ bytes).
+
+---------------------------------------------------------------
+
+[N-008] MEDIUM — SSL Certificate Mismatch (cdn/mail server)
+-----------------------------------------------------------
+Host     : 103.16.62.217:443
+CVSS     : 5.9 (AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N)
+Status   : Confirmed
+
+Description:
+  The SSL certificate on the backend server is issued for
+  *.onesala.com and *.cloudwaysapps.com — not for neuralsh.com.
+  Browsers connecting directly to this IP would receive cert errors.
+
+Impact:
+  Users connecting to backend directly see certificate warnings.
+  Indicates poor SSL management and shared hosting risks.
+
+Remediation:
+  Issue a proper SSL certificate for all domains/subdomains.
+  Use Let's Encrypt or a dedicated cert per domain.
+
+---------------------------------------------------------------
+
+[N-009] MEDIUM — Content-Security-Policy Allows unsafe-inline Scripts
+----------------------------------------------------------------------
+URL      : https://neuralsh.com
+CVSS     : 5.4 (AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N)
+Status   : Confirmed
+
+Description:
+  The CSP header contains 'unsafe-inline' in script-src:
+  "script-src 'self' 'unsafe-inline'"
+  This weakens XSS protection significantly as inline scripts
+  are not blocked by the CSP.
+
+Impact:
+  If an XSS vulnerability exists, the CSP would not prevent
+  execution of injected inline scripts.
+
+Remediation:
+  Replace 'unsafe-inline' with nonces or hashes.
+  Use a strict CSP that blocks inline scripts entirely.
+
+---------------------------------------------------------------
+
+[N-010] MEDIUM — Wildcard DNS Configured
+-----------------------------------------
+Domain   : *.neuralsh.com
+CVSS     : 4.3
+Status   : Confirmed
+
+Description:
+  Any subdomain of neuralsh.com resolves (wildcard DNS).
+  dig randomxyz123.neuralsh.com returns an IP address.
+
+Impact:
+  Potential subdomain takeover. Phishing via subdomains
+  (e.g. login.neuralsh.com, secure.neuralsh.com).
+  User confusion about legitimate vs fake subdomains.
+
+Remediation:
+  Remove wildcard DNS. Only define records for legitimate subdomains.
+
+---------------------------------------------------------------
+
+[N-011] LOW — Information Disclosure via Error Messages
+-------------------------------------------------------
+URL      : https://neuralsh.com/api/*, /web/v1/*
+CVSS     : 3.7
+Status   : Confirmed
+
+Description:
+  API error responses disclose internal details:
+  - Full URL of the failed request
+  - Internal statusMessage values
+  - Parameter names expected by the API
+  - Backend framework (Nuxt.js/Node.js confirmed by error format)
+
+  Example: {"error":true,"url":"https://neuralsh.com/api/geocode",
+  "statusCode":400,"statusMessage":"Server Error",
+  "message":"Latitude and longitude are required"}
+
+Remediation:
+  Return generic error messages to clients.
+  Log detailed errors server-side only.
+
+---------------------------------------------------------------
+
+[N-012] LOW — SPF Softfail (Email Spoofing Risk)
+-------------------------------------------------
+Domain   : neuralsh.com
+Record   : v=spf1 +mx +a +ip4:103.16.62.217 ~all
+CVSS     : 3.1
+Status   : Confirmed
+
+Description:
+  SPF uses ~all (softfail) instead of -all (hardfail).
+  DMARC is set to p=quarantine (not reject).
+  Emails from unauthorized servers are softfailed, not rejected.
+
+Impact:
+  Phishing emails spoofing @neuralsh.com addresses may be
+  delivered to some mail servers that don't enforce SPF/DMARC.
+
+Remediation:
+  Change SPF to "-all" (hardfail).
+  Change DMARC policy to "p=reject".
+
+---------------------------------------------------------------
+
+POSITIVE SECURITY CONTROLS
+---------------------------
+✓ Cloudflare WAF active (main site protected)
+✓ HSTS with includeSubDomains and preload (max-age=15552000)
+✓ X-Frame-Options: DENY (clickjacking protection)
+✓ X-Content-Type-Options: nosniff
+✓ X-XSS-Protection: 1; mode=block
+✓ Referrer-Policy: strict-origin-when-cross-origin
+✓ TLS 1.0 and 1.1 disabled
+✓ Heartbleed not vulnerable
+✓ Zone transfer blocked
+✓ HTTPS enforced with valid cert on main domain
+✓ Some rate limiting on token endpoint (429 after ~18 req)
+✓ JWT tokens use UUID for tid (not sequential/predictable)
+✓ alg:none JWT attack blocked
+
+================================================================
+SEVERITY SUMMARY
+================================================================
+Critical : 2 (N-001 MySQL exposed, N-002 MikroTik exposed)
+High     : 3 (N-003 SSH open, N-004 WordPress shared, N-005 Rate limit)
+Medium   : 5 (N-006 API in JS, N-007 Unauth JWT, N-008 SSL mismatch,
+               N-009 CSP unsafe-inline, N-010 Wildcard DNS)
+Low      : 2 (N-011 Info disclosure, N-012 SPF softfail)
+Info     : Positive controls documented above
+
+================================================================
+ATTACK CHAIN (HIGHEST RISK PATH)
+================================================================
+Step 1: Enumerate API from public JS bundle (N-006)
+Step 2: Obtain unlimited guest JWT tokens (N-007)
+Step 3: Brute force MySQL on port 3306 (N-001)
+         OR brute force SSH on port 22 (N-003)
+Step 4: Extract credentials from database
+Step 5: Use credentials to access MikroTik panel (N-002)
+Step 6: Full network and server compromise
+
+================================================================
+
+================================================================
+EXPLOITATION RESULTS
+================================================================
+
+[EXPLOIT-001] CRITICAL — Rate Limit Bypass via X-Forwarded-For Header
+-----------------------------------------------------------------------
+Finding  : N-005 (upgraded to Critical after exploitation)
+Endpoint : GET /web/v1/init/token
+CVSS     : 9.1 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+
+Proof of Concept:
+  Without bypass: ~18 tokens before 429 rate limit triggered
+  With bypass   : 50/50 tokens collected without any 429 response
+
+  Command:
+  curl -H "X-Forwarded-For: <random_ip>" \
+       -H "X-Real-IP: <random_ip>" \
+       https://neuralsh.com/web/v1/init/token
+
+  Result: Rate limiting is based on X-Forwarded-For header value,
+  not actual client IP. By spoofing a different IP per request,
+  an attacker can generate unlimited valid JWT tokens.
+
+Impact:
+  - Unlimited token farming enables large-scale API abuse
+  - Can be combined with automated brute force of authenticated endpoints
+  - Bypasses all rate limiting protections on any endpoint
+    that relies on the same IP-tracking mechanism
+  - Enables credential stuffing and enumeration attacks at scale
+
+Remediation:
+  Use real client IP (behind Cloudflare: CF-Connecting-IP header)
+  NOT X-Forwarded-For which is attacker-controlled.
+  In Cloudflare: use CF-Connecting-IP for rate limiting.
+
+---------------------------------------------------------------
+
+[EXPLOIT-002] HIGH — JWT Token Issued Without Authentication
+------------------------------------------------------------
+Finding  : N-007
+Endpoint : GET /web/v1/init/token
+Status   : JWT secret NOT cracked (rockyou.txt exhausted)
+
+Result:
+  - 50 valid JWT tokens obtained in seconds via EXPLOIT-001
+  - JWT secret could not be cracked with rockyou.txt (14M passwords)
+  - alg:none attack rejected by server — JWT validation is present
+  - Token type "guest" confirmed — elevated privilege levels exist
+  - Token lifespan: 30 minutes, renewable indefinitely via bypass
+
+---------------------------------------------------------------
+
+[EXPLOIT-003] CONFIRMED — MikroTik Admin Panel Accessible
+----------------------------------------------------------
+Finding  : N-002
+Host     : http://103.16.62.217:9001
+Status   : Login page fully accessible, browser exploitation required
+
+Result:
+  - HTTP 200 confirmed on login page via curl
+  - Login form pre-fills "admin" as username
+  - MikroTik default credentials: admin / (blank)
+  - Full exploitation requires browser (JS-based auth flow)
+  - winbox API ports (8728/8729) are closed
+  - Port 8291 (Winbox binary) filtered/blocked
+  - Recommend testing via browser in video demo
+
+---------------------------------------------------------------
+
+[EXPLOIT-004] CONFIRMED — MySQL Exposed, Credentials Not Found
+--------------------------------------------------------------
+Finding  : N-001
+Host     : 103.16.62.217:3306
+Status   : Publicly accessible, credentials not cracked in this session
+
+Result:
+  - Port 3306 confirmed open and accepting connections
+  - 30+ credential combinations tested — all rejected
+  - Cloudways typically uses auto-generated strong passwords
+  - Remaining attack path: obtain credentials via web app vuln
+    or source code review (whitebox phase)
+
+================================================================
+
+================================================================
+POST-EXPLOITATION FINDINGS
+================================================================
+
+[N-013] CRITICAL — cPanel Admin Panel Exposed (Port 2083)
+---------------------------------------------------------
+Host     : https://103.16.62.217:2083
+Service  : cPanel Login
+CVSS     : 9.8 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+Status   : Confirmed — Login page fully accessible
+
+Description:
+  The cPanel web hosting control panel is publicly accessible
+  on port 2083. cPanel gives full control over web hosting
+  accounts including file manager, databases, email, and FTP.
+  Password reset functionality is available.
+
+Impact:
+  Successful login grants full control over the hosting account:
+  - File manager access (read/write all web files)
+  - Database management (phpMyAdmin access)
+  - Email account management
+  - FTP credential creation
+  - Subdomain and DNS management
+  Brute force or credential stuffing attacks are possible.
+
+Evidence:
+  curl -sk https://103.16.62.217:2083/ → HTTP 200
+  Page title: "cPanel Login"
+  Password reset page accessible at /resetpass
+
+Remediation:
+  Restrict cPanel access to trusted IPs via cPanel's "Host Access
+  Control" feature.
+  Enable two-factor authentication on cPanel.
+  Use Cloudflare Access or VPN to gate admin panels.
+
+---------------------------------------------------------------
+
+[N-014] CRITICAL — WHM Root Panel Exposed (Port 2087)
+------------------------------------------------------
+Host     : https://103.16.62.217:2087
+Service  : WHM (Web Host Manager) Login
+CVSS     : 10.0 (AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H)
+Status   : Confirmed — Login page fully accessible
+
+Description:
+  WHM (Web Host Manager) is the root-level server administration
+  panel for cPanel servers. It provides complete server control
+  including creating/managing hosting accounts, server
+  configuration, and root-level access.
+
+Impact:
+  WHM access = complete server compromise. An attacker with
+  WHM access can:
+  - Create new cPanel accounts with arbitrary permissions
+  - Access ALL hosted domains on the server
+  - Modify server-level configurations
+  - Access root shell via Terminal feature
+  - Extract all databases across all accounts
+  This is equivalent to root shell access.
+
+Evidence:
+  curl -sk https://103.16.62.217:2087/ → HTTP 200
+  Page title: "WHM Login"
+  No IP restriction, no 2FA prompt
+
+Remediation:
+  IMMEDIATELY restrict WHM to trusted IPs only.
+  Enable two-factor authentication.
+  WHM should never be accessible from the public internet.
+
+---------------------------------------------------------------
+
+[N-015] HIGH — Webmail Interface Exposed (Port 2096)
+----------------------------------------------------
+Host     : https://103.16.62.217:2096
+Service  : cPanel Webmail Login
+CVSS     : 7.5
+Status   : Confirmed — Login page accessible
+
+Description:
+  cPanel Webmail is exposed on port 2096 allowing anyone
+  to attempt login to email accounts hosted on the server.
+  Enables brute force attacks against all email accounts
+  on the server including @neuralsh.com accounts.
+
+Impact:
+  Compromised email accounts can be used for:
+  - Password reset attacks on other services
+  - Phishing using legitimate @neuralsh.com addresses
+  - Access to sensitive internal communications
+
+Remediation:
+  Restrict webmail to known IPs or implement CAPTCHA.
+  Enforce strong password policy on all email accounts.
+
+---------------------------------------------------------------
+
+[N-016] MEDIUM — Directory Listing Enabled on Apache
+----------------------------------------------------
+Host     : http://103.16.62.217 (Host: neuralsh.com)
+CVSS     : 5.3
+Status   : Confirmed
+
+Description:
+  Apache directory listing is enabled at the document root
+  for the neuralsh.com virtual host. The directory is currently
+  empty but if files are deployed, their names and metadata
+  will be exposed publicly.
+
+Evidence:
+  curl -H "Host: neuralsh.com" http://103.16.62.217/
+  Response: "Index of /" with Apache directory listing
+
+Remediation:
+  Add "Options -Indexes" to Apache configuration or .htaccess
+
+---------------------------------------------------------------
+
+[N-017] LOW — cPanel Version Disclosure
+---------------------------------------
+Host     : https://103.16.62.217:2083
+CVSS     : 3.1
+Status   : Confirmed
+
+Description:
+  cPanel version information leaked via magic revision numbers
+  in static asset paths:
+  cPanel_magic_revision_1698766296
+  This can be used to identify the exact cPanel version and
+  target known CVEs.
+
+Remediation:
+  Update cPanel to latest version.
+  Configure cPanel to suppress version information.
+
+================================================================
+UPDATED SEVERITY SUMMARY (FULL)
+================================================================
+Critical : 4 (MySQL, MikroTik, cPanel, WHM)
+High     : 5 (SSH, WordPress shared, Rate limit, Webmail, Apache dir)
+Medium   : 6 (API in JS, Unauth JWT, SSL mismatch, CSP unsafe-inline,
+               Wildcard DNS, Directory listing)
+Low      : 3 (Info disclosure, SPF softfail, cPanel version)
+================================================================

@@ -1,0 +1,111 @@
+# Nmap 7.94SVN scan initiated Sat Jun  6 15:02:20 2026 as: nmap -sV -sC --top-ports 1000 -oN nmap_mail_neuralsh_full.txt 103.16.62.217
+Nmap scan report for 103.16.62.217
+Host is up (0.029s latency).
+Not shown: 977 closed tcp ports (conn-refused)
+PORT     STATE    SERVICE      VERSION
+22/tcp   open     ssh          OpenSSH 8.2p1 Ubuntu 4ubuntu0.13 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 e4:cc:ae:f5:3a:71:39:8a:04:01:f1:56:f8:c6:70:1d (RSA)
+|   256 33:26:cd:2c:a0:3c:f5:24:0e:71:c9:ea:d9:44:83:e4 (ECDSA)
+|_  256 24:1f:a0:82:1f:57:a4:91:62:87:94:db:b0:85:d1:57 (ED25519)
+23/tcp   filtered telnet
+25/tcp   filtered smtp
+53/tcp   open     domain       PowerDNS Authoritative Server 4.9.2
+| dns-nsid: 
+|   NSID: 163-47-172-131.cprapid.com (3136332d34372d3137322d3133312e637072617069642e636f6d)
+|   id.server: 163-47-172-131.cprapid.com
+|_  bind.version: PowerDNS Authoritative Server 4.9.2 (built Dec 16 2024 23:00:00 by pbuilder@bh-ubuntu-20.dev.cpanel.net)
+80/tcp   open     http         Apache httpd
+|_http-title: Site doesn't have a title (text/html).
+|_http-server-header: Apache
+110/tcp  open     pop3         Dovecot pop3d
+|_ssl-date: TLS randomness does not represent time
+|_pop3-capabilities: CAPA USER RESP-CODES SASL(PLAIN LOGIN) UIDL PIPELINING STLS TOP AUTH-RESP-CODE
+| ssl-cert: Subject: commonName=*.onesala.com
+| Subject Alternative Name: DNS:*.onesala.com, DNS:onesala.com
+| Not valid before: 2025-09-07T00:00:00
+|_Not valid after:  2026-10-07T23:59:59
+111/tcp  open     rpcbind      2-4 (RPC #100000)
+| rpcinfo: 
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|_  100000  3,4          111/udp6  rpcbind
+135/tcp  filtered msrpc
+139/tcp  filtered netbios-ssn
+143/tcp  open     imap         Dovecot imapd
+| ssl-cert: Subject: commonName=*.onesala.com
+| Subject Alternative Name: DNS:*.onesala.com, DNS:onesala.com
+| Not valid before: 2025-09-07T00:00:00
+|_Not valid after:  2026-10-07T23:59:59
+|_imap-capabilities: LITERAL+ IMAP4rev1 post-login AUTH=PLAIN more ENABLE IDLE have ID SASL-IR STARTTLS LOGIN-REFERRALS NAMESPACE capabilities OK listed Pre-login AUTH=LOGINA0001
+|_ssl-date: TLS randomness does not represent time
+443/tcp  open     ssl/http     Apache httpd
+| ssl-cert: Subject: commonName=www.endoncambodia.com
+| Subject Alternative Name: DNS:cpanel.endoncambodia.com, DNS:endoncambodia.com, DNS:mail.endoncambodia.com, DNS:webmail.endoncambodia.com, DNS:www.endoncambodia.com
+| Not valid before: 2024-11-05T19:24:11
+|_Not valid after:  2025-02-03T19:24:10
+|_http-server-header: Apache
+|_ssl-date: TLS randomness does not represent time
+| http-robots.txt: 1 disallowed entry 
+|_/wp-admin/
+|_http-title: Did not follow redirect to https://endoncambodia.com/
+445/tcp  filtered microsoft-ds
+465/tcp  open     ssl/smtp     Exim smtpd 4.99.2
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=*.onesala.com
+| Subject Alternative Name: DNS:*.onesala.com, DNS:onesala.com
+| Not valid before: 2025-09-07T00:00:00
+|_Not valid after:  2026-10-07T23:59:59
+| smtp-commands: 163-47-172-131.cprapid.com Hello nmap.scanme.org [136.228.159.49], SIZE 52428800, LIMITS MAILMAX=1000 RCPTMAX=50000, 8BITMIME, PIPELINING, PIPECONNECT, AUTH PLAIN LOGIN, HELP
+|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP
+587/tcp  open     smtp         Exim smtpd 4.99.2
+| smtp-commands: 163-47-172-131.cprapid.com Hello nmap.scanme.org [136.228.159.49], SIZE 52428800, LIMITS MAILMAX=1000 RCPTMAX=50000, 8BITMIME, PIPELINING, PIPECONNECT, STARTTLS, HELP
+|_ Commands supported: AUTH STARTTLS HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP
+| ssl-cert: Subject: commonName=*.onesala.com
+| Subject Alternative Name: DNS:*.onesala.com, DNS:onesala.com
+| Not valid before: 2025-09-07T00:00:00
+|_Not valid after:  2026-10-07T23:59:59
+|_ssl-date: TLS randomness does not represent time
+646/tcp  filtered ldp
+993/tcp  open     imaps?
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=*.onesala.com
+| Subject Alternative Name: DNS:*.onesala.com, DNS:onesala.com
+| Not valid before: 2025-09-07T00:00:00
+|_Not valid after:  2026-10-07T23:59:59
+|_imap-capabilities: LITERAL+ NAMESPACE post-login AUTH=PLAIN more ENABLE IDLE LOGIN-REFERRALS have SASL-IR ID IMAP4rev1 capabilities OK listed Pre-login AUTH=LOGINA0001
+995/tcp  open     pop3s?
+|_pop3-capabilities: CAPA RESP-CODES SASL(PLAIN LOGIN) UIDL USER PIPELINING TOP AUTH-RESP-CODE
+| ssl-cert: Subject: commonName=*.onesala.com
+| Subject Alternative Name: DNS:*.onesala.com, DNS:onesala.com
+| Not valid before: 2025-09-07T00:00:00
+|_Not valid after:  2026-10-07T23:59:59
+|_ssl-date: TLS randomness does not represent time
+2000/tcp open     cisco-sccp?
+3306/tcp open     mysql        MySQL 8.0.43
+| mysql-info: 
+|   Protocol: 10
+|   Version: 8.0.43
+|   Thread ID: 1414534
+|   Capabilities flags: 65535
+|   Some Capabilities: InteractiveClient, LongPassword, ConnectWithDatabase, FoundRows, Support41Auth, Speaks41ProtocolOld, LongColumnFlag, DontAllowDatabaseTableColumn, SupportsCompression, SupportsLoadDataLocal, ODBCClient, SwitchToSSLAfterHandshake, Speaks41ProtocolNew, IgnoreSigpipes, SupportsTransactions, IgnoreSpaceBeforeParenthesis, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults
+|   Status: Autocommit
+|   Salt: VM\x08\x7FJ\x18c45\x08\x07%\x02)e\x18TU\x05\x02
+|_  Auth Plugin Name: mysql_native_password
+| ssl-cert: Subject: commonName=MySQL_Server_8.0.35_Auto_Generated_Server_Certificate
+| Not valid before: 2023-11-05T17:28:55
+|_Not valid after:  2033-11-02T17:28:55
+|_ssl-date: TLS randomness does not represent time
+5060/tcp open     tcpwrapped
+5678/tcp filtered rrac
+8899/tcp open     ospf-lite?
+9001/tcp open     http         MikroTik router config httpd
+|_http-title: RouterOS router configuration page
+| http-robots.txt: 1 disallowed entry 
+|_/
+Service Info: Host: 163-47-172-131.cprapid.com; OSs: Linux, RouterOS; Device: router; CPE: cpe:/o:linux:linux_kernel, cpe:/o:mikrotik:routeros
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Jun  6 15:05:36 2026 -- 1 IP address (1 host up) scanned in 195.79 seconds

@@ -1,0 +1,28 @@
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+OUTPUT_FILE: /home/rith/thesis/dirb_neuralsh.txt
+START_TIME: Sat Jun  6 15:15:31 2026
+URL_BASE: https://neuralsh.com/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+OPTION: Silent Mode
+
+-----------------
+
+GENERATED WORDS: 4612
+
+---- Scanning URL: https://neuralsh.com/ ----
++ https://neuralsh.com/about (CODE:200|SIZE:21392)
++ https://neuralsh.com/About (CODE:200|SIZE:21392)
++ https://neuralsh.com/favicon.ico (CODE:200|SIZE:3401)
++ https://neuralsh.com/privacy (CODE:200|SIZE:28049)
++ https://neuralsh.com/Privacy (CODE:200|SIZE:28049)
++ https://neuralsh.com/publication (CODE:200|SIZE:14790)
++ https://neuralsh.com/robots.txt (CODE:200|SIZE:1762)
+
+-----------------
+END_TIME: Sat Jun  6 15:29:31 2026
+DOWNLOADED: 4612 - FOUND: 7
