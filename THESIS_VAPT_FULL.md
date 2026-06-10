@@ -28,7 +28,7 @@ This thesis presents a comprehensive Vulnerability Assessment and Penetration Te
 
 The assessment followed the complete penetration testing lifecycle: reconnaissance, scanning, enumeration, exploitation, post-exploitation, and reporting. A black-box methodology was applied as the primary testing approach, simulating an external attacker with no prior knowledge of the target system.
 
-The findings reveal significant and immediate security risks across the platform. Seventeen (17) distinct vulnerabilities were discovered: **4 Critical, 4 High, 6 Medium, and 3 Low** severity findings. Critical findings include publicly exposed MySQL database, MikroTik network router administration panel, cPanel hosting control panel, and WHM root server administration panel — all accessible from the public internet without IP restriction. A rate-limiting control was successfully bypassed via HTTP header spoofing, enabling unlimited API token generation.
+The findings reveal significant and immediate security risks across the platform. Twenty (20) distinct vulnerabilities were discovered: **4 Critical, 5 High, 7 Medium, and 4 Low** severity findings. Critical findings include publicly exposed MySQL database, MikroTik network router administration panel, cPanel hosting control panel, and WHM root server administration panel — all accessible from the public internet without IP restriction. A rate-limiting control was successfully bypassed via HTTP header spoofing, enabling unlimited API token generation. A follow-up verification scan conducted on 10 June 2026 confirmed all original findings remained unpatched and identified three additional findings: newly exposed cPanel service ports (2078, 2091), SMTP port 25 transitioning from filtered to open, and confirmed identification of a named co-tenant (onesala.com) sharing the same physical server infrastructure.
 
 This thesis documents the complete methodology, evidence, exploitation results, risk analysis using CVSS v3.1 scoring, and a full remediation roadmap.
 
@@ -66,7 +66,7 @@ To begin this internship, it is important to lay out the foundation of the proje
 
 This internship project focused on enhancing the security posture of a live web application by conducting a structured Vulnerability Assessment and Penetration Testing (VAPT) engagement on **neuralsh.com**, an AI-powered neural search platform. The assessment was carried out under the supervision of **Prestige Alliance Co., Ltd.**, which authorized and oversaw all testing activities in accordance with ethical hacking standards.
 
-The project involved scanning the target's external IP infrastructure, analyzing identified weaknesses, performing manual and automated testing across the application and network layers, and producing a formal security report detailing all findings, their severity, and recommended remediation steps. A total of **17 vulnerabilities** were discovered — including 4 Critical, 4 High, 6 Medium, and 3 Low severity findings — with two attack chains successfully exploited under controlled conditions.
+The project involved scanning the target's external IP infrastructure, analyzing identified weaknesses, performing manual and automated testing across the application and network layers, and producing a formal security report detailing all findings, their severity, and recommended remediation steps. A total of **20 vulnerabilities** were discovered — including 4 Critical, 5 High, 7 Medium, and 4 Low severity findings — with two attack chains successfully exploited under controlled conditions. A follow-up verification scan on 10 June 2026 confirmed all original findings remained unpatched and uncovered three additional findings.
 
 This work reflects the real-world responsibilities of a security intern: not only finding vulnerabilities, but understanding their impact, communicating risk clearly, and helping the organization take meaningful steps toward a stronger security posture.
 
@@ -300,7 +300,7 @@ The OWASP Top 10 serves two purposes in penetration testing: as a checklist of v
 
 *Table 4: OWASP Top 10 (2021 — Current Reference)*
 
-Several findings from the neuralsh.com engagement map directly to this list. Security Misconfiguration (A05) accounts for the majority of the 17 findings, including the exposed WHM, cPanel, MikroTik, and MySQL interfaces. Identification and Authentication Failures (A07) covers the rate-limiting bypass and JWT token farming vulnerabilities. The overlap between the OWASP Top 10 and the findings in this engagement illustrates how these well-documented risk classes continue to appear in real production systems.
+Several findings from the neuralsh.com engagement map directly to this list. Security Misconfiguration (A05) accounts for the majority of the 20 findings, including the exposed WHM, cPanel, MikroTik, and MySQL interfaces. Identification and Authentication Failures (A07) covers the rate-limiting bypass and JWT token farming vulnerabilities. The overlap between the OWASP Top 10 and the findings in this engagement illustrates how these well-documented risk classes continue to appear in real production systems.
 
 ## 5. NIST SP 800-115
 
@@ -328,7 +328,7 @@ The **Common Weakness Enumeration (CWE)** is a community-developed list of softw
 
 CWE identifiers appear throughout security tooling, vulnerability databases (NVD), and CVE records to precisely classify the root cause of a security issue. For example, a finding of "MySQL exposed to the internet" maps to **CWE-284: Improper Access Control**, while "missing rate limiting on authentication endpoint" maps to **CWE-307: Improper Restriction of Excessive Authentication Attempts**.
 
-In this internship, CWE identifiers were assigned to each of the 17 findings to provide a precise root-cause classification alongside the OWASP Top 10 category and CVSS severity score. This combination — OWASP category for communication, CVSS for risk prioritization, and CWE for root cause — is the standard approach used in professional VAPT reporting.
+In this internship, CWE identifiers were assigned to each of the 20 findings to provide a precise root-cause classification alongside the OWASP Top 10 category and CVSS severity score. This combination — OWASP category for communication, CVSS for risk prioritization, and CWE for root cause — is the standard approach used in professional VAPT reporting.
 
 ---
 
@@ -1242,16 +1242,21 @@ curl -H "Host: onesala.com" http://103.16.62.217/ | grep -i "wordpress\|wp-conte
 | N-011 | Information Disclosure via Error Messages | Low | 3.7 | Confirmed |
 | N-012 | SPF Softfail / DMARC Quarantine | Low | 3.1 | Confirmed |
 | N-017 | cPanel Version Disclosure | Low | 3.1 | Confirmed |
+| N-018 | Additional cPanel Interfaces Exposed (2078, 2091) | High | 7.5 | Confirmed |
+| N-019 | SMTP Port 25 Now Open (was Filtered) | Low | 3.5 | Confirmed |
+| N-020 | Shared Hosting Co-Tenant Identified: onesala.com | Medium | 6.1 | Confirmed |
+
+> *N-018, N-019, N-020 discovered during follow-up verification scan on 10 June 2026.*
 
 ## 10.2 Severity Distribution
 
 | Severity | Count | Percentage |
 |----------|-------|-----------|
-| Critical | 4 | 23.5% |
-| High | 4 | 23.5% |
-| Medium | 6 | 35.3% |
-| Low | 3 | 17.6% |
-| **Total** | **17** | 100% |
+| Critical | 4 | 20.0% |
+| High | 5 | 25.0% |
+| Medium | 7 | 35.0% |
+| Low | 4 | 20.0% |
+| **Total** | **20** | 100% |
 
 ## 10.3 CVSS Score Distribution
 
@@ -1259,17 +1264,19 @@ curl -H "Host: onesala.com" http://103.16.62.217/ | grep -i "wordpress\|wp-conte
 10.0 — N-014 (WHM Root Panel)
 9.8  — N-001 (MySQL), N-013 (cPanel)
 9.1  — N-002 (MikroTik), N-005 (Rate Limit Bypass)
-7.5  — N-004 (Shared Hosting), N-015 (Webmail)
+7.5  — N-004 (Shared Hosting), N-015 (Webmail), N-018 (cPanel 2078/2091)
 7.2  — N-003 (SSH)
+6.1  — N-020 (Co-Tenant onesala.com)
 5.9  — N-008 (SSL Mismatch)
 5.4  — N-009 (CSP unsafe-inline)
 5.3  — N-006 (API in JS), N-007 (JWT), N-016 (Directory Listing)
 4.3  — N-010 (Wildcard DNS)
 3.7  — N-011 (Info Disclosure)
+3.5  — N-019 (SMTP Port 25)
 3.1  — N-012 (SPF), N-017 (cPanel Version)
 ```
 
-**Average CVSS Score:** 6.5 (High-Medium boundary)  
+**Average CVSS Score:** 6.6 (High-Medium boundary)  
 **Highest Score:** 10.0 (WHM Root Panel — CVSS Maximum)
 
 ## 10.4 Positive Security Controls Identified
@@ -1306,6 +1313,84 @@ The combination of unauthenticated token issuance (N-007) and rate limit bypass 
 ### 10.5.3 Information Disclosure (3 Medium-Low findings)
 
 API routes in JavaScript (N-006), error message disclosure (N-011), and cPanel version disclosure (N-017) collectively map the attack surface without requiring any brute force. An attacker uses these findings for targeted exploitation rather than broad scanning.
+
+### 10.5.4 New Findings from Follow-Up Verification Scan (10 June 2026)
+
+A follow-up verification scan conducted four days after the initial assessment confirmed that all 17 original findings remained unpatched. The scan also uncovered three previously undetected findings.
+
+---
+
+### N-018 — Additional cPanel Service Interfaces Exposed (Ports 2078, 2091)
+
+**Severity:** High | **CVSS:** 7.5 | **Status:** Confirmed
+
+**Description:** Ports 2078 and 2091 were not present in the original June 6 scan but were found open during the June 10 follow-up. Both ports respond with HTTP 401 and `WWW-Authenticate: Basic realm="Restricted Area"` — identifying them as cPanel management services protected only by HTTP Basic Authentication. These ports represent additional credential brute-force attack surface beyond the already-exposed cPanel (2083) and WHM (2087) panels.
+
+**Evidence:**
+```
+curl -sk -I https://103.16.62.217:2078/
+HTTP/1.1 401 Unauthorized
+Server: cPanel
+WWW-Authenticate: Basic realm="Restricted Area"
+
+curl -sk -I https://103.16.62.217:2091/
+HTTP/1.1 401 Unauthorized
+Server: cPanel
+WWW-Authenticate: Basic realm="Restricted Area"
+```
+
+**Business Impact:** An attacker with access to any valid cPanel credential set can attempt authentication against these interfaces. The appearance of new open ports also suggests ongoing infrastructure changes that are not being security-reviewed before deployment.
+
+**Remediation:** Restrict ports 2078 and 2091 to management IP addresses via firewall rules. Conduct a full audit of all open ports on 103.16.62.217 and close any that do not have a documented business purpose.
+
+---
+
+### N-019 — SMTP Port 25 Transitioned from Filtered to Open
+
+**Severity:** Low | **CVSS:** 3.5 | **Status:** Confirmed
+
+**Description:** In the June 6 baseline scan, port 25 (SMTP) was listed as `filtered` — meaning connection attempts were blocked by a firewall rule. In the June 10 follow-up scan, port 25 is `open` and accepts TCP connections. SMTP command responses were unavailable at the application layer, suggesting a partial misconfiguration where the firewall rule was removed but the service is not fully responding. This change was not reflected in any disclosed infrastructure update.
+
+**Evidence:**
+```
+# June 6 baseline scan result:
+25/tcp   filtered smtp
+
+# June 10 follow-up scan result:
+25/tcp   open  smtp?
+
+nc -zv 103.16.62.217 25
+Connection to 103.16.62.217 25 port [tcp/smtp] succeeded!
+```
+
+**Business Impact:** An open SMTP port enables direct mail relay testing, SMTP user enumeration, and potential spam relay abuse if the service is misconfigured. The unexplained change from filtered to open also suggests that firewall rules on this server are being modified without a security review process.
+
+**Remediation:** Investigate why port 25 firewall rule was removed. If the port is not required for direct SMTP delivery (Exim on port 587 handles submission), restore the firewall block on port 25 from public internet sources.
+
+---
+
+### N-020 — Shared Hosting Co-Tenant Identified: onesala.com
+
+**Severity:** Medium | **CVSS:** 6.1 | **Status:** Confirmed
+
+**Description:** During the follow-up scan, HTTP redirects from ports 2077 and 2082 on 103.16.62.217 were observed redirecting to `www.onesala.com:2078` and `www.onesala.com:2083`. This confirms that `onesala.com` is an active co-tenant hosted on the same physical server as neuralsh.com. The SSL certificate for mail services on this server is issued to `*.onesala.com`, further confirming this is a shared infrastructure environment. This finding directly strengthens N-004 (Shared Hosting Lateral Movement Risk) with named, verifiable evidence.
+
+**Evidence:**
+```
+curl -sk -L http://103.16.62.217:2077/
+→ Redirects to: https://www.onesala.com:2078/
+
+curl -sk -L http://103.16.62.217:2082/
+→ Redirects to: https://www.onesala.com:2083/
+
+SSL certificate on port 110/143/465/587/993/995:
+Subject: CN = *.onesala.com
+Valid: Sep 7 2025 – Oct 7 2026
+```
+
+**Business Impact:** A successful compromise of WHM (N-001/N-014) or cPanel (N-013/N-018) would expose `onesala.com`'s hosting account, files, databases, and email alongside neuralsh.com's data. This bilateral risk means a breach of neuralsh.com's infrastructure could constitute a data breach affecting a third party with no involvement in or knowledge of the neuralsh.com security posture.
+
+**Remediation:** No direct fix is available at the application level — this is a consequence of the shared hosting model. The long-term remediation is migration to a dedicated server or cloud infrastructure with proper network isolation. Short-term: ensure WHM/cPanel are firewalled immediately to prevent exploitation of the co-tenancy risk.
 
 ---
 

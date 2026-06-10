@@ -48,3 +48,11 @@ python3, hashcat, nc, subfinder, sslscan
 TOTAL FINDINGS: 17
 Critical: 4 | High: 4 | Medium: 6 | Low: 3
 ================================================================
+
+--- FOLLOW-UP SCAN: 10 JUNE 2026 ---
+N-018  Additional cPanel Interfaces Exposed (2078, 2091)   CVSS 7.5 HIGH     Confirmed
+N-019  SMTP Port 25 Transitioned from Filtered to Open     CVSS 3.5 LOW      Confirmed
+N-020  Shared Hosting Co-Tenant Identified: onesala.com    CVSS 6.1 MEDIUM   Confirmed
+
+TOTAL FINDINGS: 20 (4 Critical, 5 High, 7 Medium, 4 Low)
+All 17 original findings UNPATCHED as of 10 June 2026 verification scan.
