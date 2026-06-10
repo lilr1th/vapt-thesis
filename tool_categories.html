@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tool Categories</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+  }
+
+  .wrapper {
+    width: 780px;
+  }
+
+  /* Outer grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr;
+    grid-template-rows: 50px 1fr 1fr;
+    border: 2px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  /* Top-left empty corner */
+  .corner {
+    background: #fff;
+    border-right: 2px solid #333;
+    border-bottom: 2px solid #333;
+  }
+
+  /* Column headers */
+  .col-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #333;
+  }
+  .col-header.automation { background: #2d6be4; border-right: 2px solid #333; }
+  .col-header.manual     { background: #e07b2a; }
+
+  /* Row headers */
+  .row-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    border-right: 2px solid #333;
+  }
+  .row-header.opensource  { background: #4a90d9; border-bottom: 2px solid #333; }
+  .row-header.commercial  { background: #e07b2a; }
+
+  /* Cells */
+  .cell {
+    padding: 18px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+  .cell.tl { background: #e8f0fc; border-right: 2px solid #333; border-bottom: 2px solid #333; }
+  .cell.tr { background: #e8f0fc; border-bottom: 2px solid #333; }
+  .cell.bl { background: #fde8d4; border-right: 2px solid #333; }
+  .cell.br { background: #fde8d4; }
+
+  /* Tool item */
+  .tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 80px;
+  }
+  .tool img {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+  }
+  .tool span {
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    color: #222;
+  }
+
+  /* Fallback badge when image missing */
+  .badge {
+    height: 42px;
+    width: 64px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .badge.blue   { background: #2d6be4; }
+  .badge.green  { background: #2e7d32; }
+  .badge.red    { background: #c62828; }
+  .badge.purple { background: #6a1b9a; }
+  .badge.teal   { background: #00695c; }
+  .badge.orange { background: #e65100; }
+  .badge.dark   { background: #263238; }
+  .badge.navy   { background: #1a237e; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="grid">
+
+    <!-- Top-left corner -->
+    <div class="corner"></div>
+
+    <!-- Column headers -->
+    <div class="col-header automation">Automation</div>
+    <div class="col-header manual">Manual</div>
+
+    <!-- Row: Open-Source -->
+    <div class="row-header opensource">Open-Source</div>
+
+    <!-- Automation + Open-Source -->
+    <div class="cell tl">
+      <div class="tool">
+        <img src="image/nmap_logo.png" alt="Nmap" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge blue" style="display:none">Nmap</div>
+        <span>Nmap</span>
+      </div>
+      <div class="tool">
+        <img src="image/nikto_logo.png" alt="Nikto" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge green" style="display:none">Nikto</div>
+        <span>Nikto</span>
+      </div>
+      <div class="tool">
+        <img src="image/shodan_logo.png" alt="Shodan" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge navy" style="display:none">Shodan</div>
+        <span>Shodan</span>
+      </div>
+      <div class="tool">
+        <img src="image/cyberchef_logo.png" alt="CyberChef" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge teal" style="display:none">Cyber Chef</div>
+        <span>CyberChef</span>
+      </div>
+    </div>
+
+    <!-- Manual + Open-Source -->
+    <div class="cell tr">
+      <div class="tool">
+        <img src="image/burpsuite_logo.png" alt="Burp Suite" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge orange" style="display:none">Burp Suite</div>
+        <span>Burp Suite</span>
+      </div>
+      <div class="tool">
+        <div class="badge dark">curl</div>
+        <span>curl</span>
+      </div>
+      <div class="tool">
+        <div class="badge blue">Nmap</div>
+        <span>Nmap CLI</span>
+      </div>
+      <div class="tool">
+        <div class="badge green">Dirb</div>
+        <span>Dirb</span>
+      </div>
+      <div class="tool">
+        <div class="badge purple">hashcat</div>
+        <span>Hashcat</span>
+      </div>
+    </div>
+
+    <!-- Row: Commercial -->
+    <div class="row-header commercial">Commercial</div>
+
+    <!-- Automation + Commercial -->
+    <div class="cell bl">
+      <div class="tool">
+        <img src="image/claude_logo.png" alt="Claude AI" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge purple" style="display:none">Claude AI</div>
+        <span>Claude AI</span>
+      </div>
+    </div>
+
+    <!-- Manual + Commercial -->
+    <div class="cell br">
+      <div class="tool">
+        <img src="image/burpsuite_logo.png" alt="Burp Suite Pro" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+        <div class="badge orange" style="display:none">Burp Pro</div>
+        <span>Burp Suite Pro</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
