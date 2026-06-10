@@ -213,96 +213,122 @@ As a cybersecurity-oriented firm, Prestige Alliance recognizes the importance of
 
 ---
 
-# Chapter 2: Literature Review
+# Chapter 2: Concepts of Pentesting
 
-## 2.1 Overview of Web Application Security
+This chapter establishes the theoretical and practical foundation for the penetration testing work carried out in this internship. It covers what penetration testing is and why it matters, how practical skills were built using platforms such as Hack The Box, the structured process followed during an engagement — from pre-testing planning all the way through to post-engagement reporting — and the key industry frameworks and vulnerability classification systems that guided this work.
 
-Web application security is a discipline concerned with the protection of web-based systems from unauthorized access, data manipulation, denial of service, and related threats. Unlike network security, which focuses on protecting the infrastructure layer (routers, firewalls, switches), web application security targets the application logic layer — the code, configuration, and data flows that define how an application operates.
+## 1. Introduction to Penetration Testing
 
-The field gained academic and industry prominence in the early 2000s as e-commerce and banking applications became primary vectors for financial fraud. Early works by Stuttard and Pinto (2011) in *The Web Application Hacker's Handbook* established foundational testing frameworks that remain relevant today. Subsequent contributions by the OWASP Foundation standardized terminology and testing procedures across the industry.
+Penetration testing, commonly referred to as "pentesting," is the practice of simulating a real-world cyberattack against a system, application, or network with explicit authorization from the owner. Unlike passive security audits that rely on configuration reviews and interviews, penetration testing produces tangible evidence of what an attacker could actually do — which vulnerabilities can be exploited, how far an attacker can move once inside, and what the realistic business impact would be.
 
-## 2.2 Penetration Testing Frameworks
+The discipline draws a clear line between authorized security testing and unauthorized computer access. A penetration tester operates under a defined scope and rules of engagement, documenting every step in a way that allows the organization to reproduce, verify, and remediate the findings. This makes penetration testing one of the most direct and credible inputs to an organization's risk management process.
 
-Several frameworks govern how penetration testing engagements are structured:
+Modern penetration testing spans several domains: web application testing, network testing, cloud infrastructure testing, physical security, and social engineering. This internship focused on **external web application and infrastructure penetration testing** — the domain most directly relevant to organizations that expose services to the public internet.
 
-### 2.2.1 OWASP Testing Guide
+## 2. Learning Penetration Testing via Hack The Box
 
-The OWASP Web Security Testing Guide (WSTG) is the most widely referenced framework for web application penetration testing. Version 4.2, released in 2021, organizes testing into twelve categories covering information gathering, configuration management, authentication testing, authorization testing, session management, input validation, error handling, cryptography, business logic, client-side testing, and API testing (OWASP Foundation, 2021).
+*[Figure 3: Hack The Box logo — htb_logo.png]*
 
-### 2.2.2 Penetration Testing Execution Standard (PTES)
+Practical penetration testing skills cannot be developed from theory alone. Before engaging real-world targets, testers must build hands-on experience in controlled environments. **Hack The Box (HTB)** is one of the most widely recognized platforms for this purpose. It provides a constantly updated library of deliberately vulnerable machines, web applications, and challenge scenarios that simulate real vulnerabilities found in production environments.
 
-The Penetration Testing Execution Standard (PTES) defines seven phases for a complete engagement: Pre-engagement Interactions, Intelligence Gathering, Threat Modeling, Vulnerability Analysis, Exploitation, Post-Exploitation, and Reporting. This framework was used as the structural basis for the present assessment.
+*[Figure 4: Hack The Box CPTS certification logo — cpts_logo.png]*
 
-### 2.2.3 NIST SP 800-115
+HTB's **Certified Penetration Testing Specialist (CPTS)** pathway covers the full engagement lifecycle — from information gathering and reconnaissance through network enumeration, web application attacks, privilege escalation, Active Directory exploitation, and professional reporting. The curriculum is designed around the methodology used in real engagements rather than abstract theory, making it directly applicable to the kind of work carried out in this internship.
 
-The National Institute of Standards and Technology's SP 800-115 (*Technical Guide to Information Security Testing and Assessment*) provides a government-aligned methodology emphasizing documentation, scope control, and risk minimization during testing activities.
+Working through HTB machines as part of internship preparation provided direct exposure to the tools, techniques, and problem-solving approaches used during the neuralsh.com engagement. Skills developed on the platform — including DNS enumeration, port scanning interpretation, web application fuzzing, and authentication bypass — were applied directly during the live assessment.
 
-## 2.3 Common Vulnerability Classes
+## 3. The Penetration Testing Process
 
-### 2.3.1 Injection Flaws
+A structured penetration test does not begin with running tools — it begins with planning, and it does not end with finding vulnerabilities — it ends with helping the organization act on them. The process is divided into three broad stages: Pre-Pentesting, During Pentesting, and After Pentesting.
 
-Injection vulnerabilities occur when untrusted data is sent to an interpreter as part of a command or query. SQL injection (SQLi) allows attackers to manipulate database queries; command injection allows execution of arbitrary OS commands. OWASP ranks injection as consistently among the top critical web application risks (OWASP, 2021).
+*[Figure 5: Penetration Testing Process Diagram — PENTEST_DIAGRAM.drawio]*
 
-### 2.3.2 Broken Authentication and Session Management
+### 3.1 Pre-Pentesting
 
-Authentication flaws encompass weak credential policies, insecure session token generation, missing rate limiting, and improper JWT validation. JSON Web Tokens (JWTs), increasingly used in modern API-driven architectures, introduce specific risks including algorithm confusion attacks (the "alg:none" attack), weak secret keys susceptible to offline brute forcing, and missing signature validation (Sheffer et al., 2020).
+The pre-pentesting stage covers everything that must be in place before any technical activity begins. Skipping this stage is one of the most common mistakes made by inexperienced testers, and it creates both legal and operational risk.
 
-### 2.3.3 Security Misconfiguration
+**Scope Definition** is the foundation of a safe engagement. The tester and the client agree in writing on exactly which systems, IP addresses, domains, and functionalities are authorized for testing. Anything outside this scope is off-limits, regardless of what is discovered during testing. For this internship, the scope was defined as neuralsh.com and its origin server infrastructure (103.16.62.217), authorized in writing by Prestige Alliance Co., Ltd.
 
-Security misconfiguration is the broadest vulnerability category, encompassing default credentials, unnecessary open ports, exposed administration panels, verbose error messages, and missing security headers. A 2023 study by Bishop Fox found that 58% of externally-tested organizations had at least one critical finding attributable to security misconfiguration (Bishop Fox, 2023).
+**Written Authorization** converts an otherwise illegal act into a legitimate professional service. Without it, every scan, every request, and every connection to the target could constitute unauthorized computer access under applicable law. The authorization letter must specify the target, the testing window, the permitted activities, and the identity of the tester.
 
-### 2.3.4 Rate Limiting and API Abuse
+**Rules of Engagement (ROE)** define the boundaries of what the tester may do. This includes permitted techniques (port scanning, web fuzzing, exploitation), prohibited techniques (DoS attacks, data exfiltration, persistent access), and escalation procedures — what to do if a critical finding is discovered mid-test, or if an active compromise by a third party is detected.
 
-Rate limiting is a defensive control intended to prevent automated abuse of web APIs. Common bypass techniques include header spoofing (using X-Forwarded-For or X-Real-IP), IP rotation, and distributed request patterns. Systems that use client-supplied headers rather than the actual source IP for rate limiting are trivially bypassed (Van den Berg, 2019).
+**Environment Preparation** covers the setup of the testing machine, tools, VPN or proxy configurations, and note-taking systems. Organizing this before testing begins ensures that evidence is captured consistently from the first command, not just from the point where something interesting is found.
 
-When applications are deployed behind a reverse proxy or CDN such as Cloudflare, the real client IP is passed via the `CF-Connecting-IP` header, which cannot be spoofed by the client. Using the client-controllable `X-Forwarded-For` header for security decisions such as rate limiting is a well-documented anti-pattern.
+### 3.2 During Pentesting
 
-### 2.3.5 Exposed Administration Panels
+The active testing phase follows a structured lifecycle rather than an ad-hoc approach. Each phase builds on the previous one.
 
-Web-based administration panels (cPanel, WHM, phpMyAdmin, router configuration interfaces) represent high-value targets when exposed to the public internet. These panels provide privileged access to hosting infrastructure, databases, and network equipment. Best practice mandates restricting such panels to management networks or VPN endpoints (CIS Controls, 2021).
+**Reconnaissance** is the process of gathering information about the target without sending potentially detectable traffic to the target's servers. This includes WHOIS lookups, DNS record analysis, certificate transparency searches, OSINT on registered domains and employees, and review of public code repositories. The goal is to build a complete picture of the target's attack surface before any active scanning begins.
 
-### 2.3.6 Exposed Database Services
+**Scanning and Enumeration** involves sending probes directly to the target to map its infrastructure. Port scanning (using tools such as Nmap) reveals which services are running and on which ports. Web enumeration tools (Dirb, Nikto, ffuf) discover directories, files, and endpoints that are not linked from the main application. Service fingerprinting identifies the specific software and version running on each open port — information that is used to search for known vulnerabilities.
 
-Database management systems such as MySQL are frequently misconfigured to listen on all network interfaces (`0.0.0.0`), making them accessible from the public internet. While authentication is required, the exposure enables brute-force credential attacks directly against the database layer, bypassing application-level security controls. OWASP CWE-284 (Improper Access Control) covers this class of issue.
+**Vulnerability Assessment** is the process of evaluating discovered services and behaviors against known vulnerability classes and misconfigurations. This is not automated scanning alone — it involves manual analysis of application logic, authentication flows, API behavior, and infrastructure configuration to identify weaknesses that automated tools cannot reliably detect. Each finding is assessed for severity using CVSS v3.1 scoring.
 
-### 2.3.7 JWT Security
+**Exploitation** is the controlled demonstration that a discovered vulnerability is genuinely exploitable — not just theoretically present. For this internship, exploitation was performed only where it could be done without causing service disruption or data modification. Successful exploitation included bypassing authentication rate limiting via HTTP header spoofing and farming unlimited JWT tokens from an unauthenticated API endpoint.
 
-JSON Web Tokens are stateless authentication tokens signed with a secret key (HMAC) or asymmetric key pair (RSA/ECDSA). Common attack vectors include:
-- **Algorithm Confusion (alg:none):** Removing the signature and setting algorithm to "none"
-- **Weak Secret Brute Force:** Using wordlists to recover the HMAC secret
-- **Token Farming:** Abusing unauthenticated token issuance endpoints at scale
+**Post-Exploitation** assesses the consequences of a successful initial compromise. This includes analyzing what an attacker could access from their foothold, what lateral movement paths exist across the infrastructure, and what the maximum realistic business impact would be. In this engagement, post-exploitation analysis revealed that a single origin IP discovery would expose the entire server infrastructure — all administrative panels, the database, and the network router — to an unauthenticated attacker.
 
-Kaur and Singh (2021) found that 23% of tested APIs used weak or predictable secrets crackable within 24 hours using common wordlists.
+### 3.3 After Pentesting
 
-### 2.3.8 DNS Wildcards and Subdomain Takeover
+**Reporting** is where the value of the engagement is delivered. A penetration test that produces no actionable report provides no security benefit. The report produced for this internship includes an executive summary for non-technical stakeholders, a complete findings table with CVSS scores, detailed finding cards with evidence and reproduction steps, attack chain visualizations, and a prioritized remediation roadmap.
 
-Wildcard DNS configurations (`*.example.com`) resolve any subdomain to a specified IP regardless of whether a service exists for that subdomain. This enables phishing via plausible-looking subdomains (e.g., `login.example.com`, `secure.example.com`). In shared hosting environments, wildcard DNS combined with unclaimed subdomain records can lead to subdomain takeover, where an attacker can host content under a legitimate domain (Bugcrowd, 2021).
+**Remediation Verification** is the follow-up process where the tester confirms that the organization has successfully addressed the findings. This may involve re-testing specific endpoints or configurations after the development team has applied fixes. This stage closes the loop between finding and fixing.
 
-### 2.3.9 Email Security Standards
+**Debrief and Knowledge Transfer** involves walking the technical team through the most significant findings, explaining how each vulnerability was discovered and exploited, and answering questions about the remediation steps. This is particularly valuable for organizations building internal security awareness alongside the immediate fix work.
 
-SPF (Sender Policy Framework) and DMARC (Domain-based Message Authentication, Reporting, and Conformance) are DNS-based email authentication standards. SPF with `~all` (softfail) allows unauthorized senders to deliver mail without immediate rejection; `-all` (hardfail) is the recommended strict setting. DMARC `p=quarantine` moves suspicious mail to spam folders, while `p=reject` blocks delivery entirely (RFC 7489, 2015).
+## 4. OWASP Top 10
 
-## 2.4 CVSS Scoring
+*[Figure 6: OWASP logo — owasp_logo.png]*
 
-The Common Vulnerability Scoring System (CVSS) version 3.1 provides a standardized framework for communicating the characteristics and severity of software vulnerabilities. Scores range from 0 to 10 with the following qualitative severity designations:
+The **Open Web Application Security Project (OWASP)** is a nonprofit foundation dedicated to improving software security. Its most widely referenced publication is the **OWASP Top 10** — a consensus-based list of the ten most critical web application security risks, updated periodically based on data collected from hundreds of organizations and thousands of applications worldwide.
 
-| Score Range | Severity |
-|-------------|----------|
-| 0.0         | None     |
-| 0.1 – 3.9   | Low      |
-| 4.0 – 6.9   | Medium   |
-| 7.0 – 8.9   | High     |
-| 9.0 – 10.0  | Critical |
+The OWASP Top 10 serves two purposes in penetration testing: as a checklist of vulnerability classes to test for, and as a communication framework that allows findings to be mapped to a universally understood risk taxonomy. The table below presents the current OWASP Top 10 list as referenced throughout this internship.
 
-CVSS v3.1 Base Metrics include the Attack Vector (AV), Attack Complexity (AC), Privileges Required (PR), User Interaction (UI), Scope (S), and three impact metrics: Confidentiality (C), Integrity (I), and Availability (A). This scoring system was applied to all findings in this assessment.
+| **Rank** | **Category** | **Description** |
+|------|----------|-------------|
+| A01 | Broken Access Control | Failures in enforcing restrictions on what authenticated users are allowed to do — allowing unauthorized access to data, functions, or accounts |
+| A02 | Cryptographic Failures | Weaknesses in how data is protected in transit or at rest — including use of weak algorithms, missing encryption, or improper key management |
+| A03 | Injection | Untrusted data sent to an interpreter as part of a command or query — including SQL, NoSQL, OS command, and LDAP injection |
+| A04 | Insecure Design | Architectural flaws where security was not considered during the design phase — cannot be fixed by implementation patches alone |
+| A05 | Security Misconfiguration | Improperly configured permissions, unnecessary features enabled, default credentials, exposed error messages, or missing security hardening |
+| A06 | Vulnerable and Outdated Components | Use of components (libraries, frameworks, software) with known vulnerabilities that have not been patched or updated |
+| A07 | Identification and Authentication Failures | Weaknesses in authentication — including missing rate limiting, weak session management, insecure token handling, and credential stuffing exposure |
+| A08 | Software and Data Integrity Failures | Code and infrastructure that does not verify the integrity of software updates, CI/CD pipelines, or serialized data |
+| A09 | Security Logging and Monitoring Failures | Insufficient logging, alerting, and monitoring — allowing attacks to proceed undetected and making post-incident investigation impossible |
+| A10 | Server-Side Request Forgery (SSRF) | The application fetches a remote resource based on user-supplied input without validating the URL — allowing attackers to reach internal services |
 
-## 2.5 Related Work
+*Table 4: OWASP Top 10 (2021 — Current Reference)*
 
-Fernandez et al. (2022) conducted a comparative VAPT study across ten Southeast Asian technology platforms and found that 80% had at least one critical vulnerability, with exposed administration panels and weak authentication being the most prevalent finding classes. Their work highlighted the gap between development velocity and security practice in the region.
+Several findings from the neuralsh.com engagement map directly to this list. Security Misconfiguration (A05) accounts for the majority of the 17 findings, including the exposed WHM, cPanel, MikroTik, and MySQL interfaces. Identification and Authentication Failures (A07) covers the rate-limiting bypass and JWT token farming vulnerabilities. The overlap between the OWASP Top 10 and the findings in this engagement illustrates how these well-documented risk classes continue to appear in real production systems.
 
-Kaur and Singh (2021) evaluated JWT security in production APIs and found that 23% of tested APIs used weak or predictable secrets crackable within 24 hours using common wordlists. Their recommendations align with findings in this thesis regarding JWT token security.
+## 5. NIST SP 800-115
 
-Islam et al. (2023) studied the prevalence of exposed database and infrastructure services across cloud-hosted web applications and found that incorrect firewall configuration was the most common root cause, affecting 61% of their study population.
+*[Figure 7: NIST logo — nist_logo.png]*
+
+The **National Institute of Standards and Technology (NIST)** is a U.S. federal agency that produces technical standards and guidelines used worldwide. In the context of penetration testing, the most directly relevant publication is **NIST Special Publication 800-115: Technical Guide to Information Security Testing and Assessment**.
+
+SP 800-115 provides a government-aligned methodology for security testing that emphasizes documentation, risk minimization, and traceability. It organizes security assessment activities into four phases:
+
+**Planning** covers defining the objectives and scope of the assessment, identifying constraints, and coordinating with the organization to minimize operational risk. It produces the rules of engagement and the assessment plan.
+
+**Discovery** covers the technical information-gathering activities — system identification, network mapping, and service enumeration — that produce the target profile used in subsequent phases. This aligns with the reconnaissance and scanning phases of this internship.
+
+**Attack** covers the active exploitation phase — attempting to exploit discovered vulnerabilities under controlled conditions to validate their severity and demonstrate business impact.
+
+**Reporting** covers the documentation of findings, risk ratings, and recommendations in a format accessible to both technical and non-technical readers.
+
+NIST SP 800-115 was used alongside PTES and OWASP WSTG during this internship to ensure that the assessment approach met both academic rigor requirements and industry-standard practice expectations.
+
+## 6. Common Weakness Enumeration (CWE)
+
+*[Figure 8: CWE logo — cwe_logo.png]*
+
+The **Common Weakness Enumeration (CWE)** is a community-developed list of software and hardware weakness types maintained by MITRE Corporation. While the OWASP Top 10 categorizes risks at a high level, CWE provides a more granular taxonomy — each entry describes a specific type of weakness in code, design, or architecture that can lead to a vulnerability.
+
+CWE identifiers appear throughout security tooling, vulnerability databases (NVD), and CVE records to precisely classify the root cause of a security issue. For example, a finding of "MySQL exposed to the internet" maps to **CWE-284: Improper Access Control**, while "missing rate limiting on authentication endpoint" maps to **CWE-307: Improper Restriction of Excessive Authentication Attempts**.
+
+In this internship, CWE identifiers were assigned to each of the 17 findings to provide a precise root-cause classification alongside the OWASP Top 10 category and CVSS severity score. This combination — OWASP category for communication, CVSS for risk prioritization, and CWE for root cause — is the standard approach used in professional VAPT reporting.
 
 ---
 
