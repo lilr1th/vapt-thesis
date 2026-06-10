@@ -320,15 +320,33 @@ SP 800-115 provides a government-aligned methodology for security testing that e
 
 NIST SP 800-115 was used alongside PTES and OWASP WSTG during this internship to ensure that the assessment approach met both academic rigor requirements and industry-standard practice expectations.
 
-## 6. Common Weakness Enumeration (CWE)
+## 6. Common Vulnerability Scoring System (CVSS)
 
-*[Figure 8: CWE logo — cwe_logo.png]*
+*[Figure 8: CVSS logo — cvss_logo.png]*
 
-The **Common Weakness Enumeration (CWE)** is a community-developed list of software and hardware weakness types maintained by MITRE Corporation. While the OWASP Top 10 categorizes risks at a high level, CWE provides a more granular taxonomy — each entry describes a specific type of weakness in code, design, or architecture that can lead to a vulnerability.
+The **Common Vulnerability Scoring System (CVSS)** is the industry-standard framework for communicating the severity of security vulnerabilities. Maintained by FIRST (Forum of Incident Response and Security Teams), CVSS v3.1 was used throughout this engagement to assign an objective, numeric severity score to each of the 20 findings — providing a consistent, universally understood basis for risk prioritization.
 
-CWE identifiers appear throughout security tooling, vulnerability databases (NVD), and CVE records to precisely classify the root cause of a security issue. For example, a finding of "MySQL exposed to the internet" maps to **CWE-284: Improper Access Control**, while "missing rate limiting on authentication endpoint" maps to **CWE-307: Improper Restriction of Excessive Authentication Attempts**.
+CVSS scores range from 0.0 to 10.0 and map to four qualitative severity levels:
 
-In this internship, CWE identifiers were assigned to each of the 20 findings to provide a precise root-cause classification alongside the OWASP Top 10 category and CVSS severity score. This combination — OWASP category for communication, CVSS for risk prioritization, and CWE for root cause — is the standard approach used in professional VAPT reporting.
+| **Score Range** | **Severity** | **Meaning** |
+|-----------------|--------------|-------------|
+| 9.0 – 10.0 | Critical | Exploitable remotely with no authentication; maximum business impact |
+| 7.0 – 8.9 | High | Significant risk; exploitable with minimal conditions |
+| 4.0 – 6.9 | Medium | Moderate risk; requires specific conditions or limited impact |
+| 0.1 – 3.9 | Low | Minimal direct impact; informational or requires chaining |
+
+*Table 5: CVSS v3.1 severity bands*
+
+A CVSS score is calculated from a set of **Base Metrics** that capture the intrinsic characteristics of the vulnerability:
+
+- **Attack Vector (AV)** — how the vulnerability is exploited: Network, Adjacent, Local, or Physical
+- **Attack Complexity (AC)** — conditions required beyond attacker control: Low or High
+- **Privileges Required (PR)** — level of access needed before exploitation: None, Low, or High
+- **User Interaction (UI)** — whether a victim must take an action: None or Required
+- **Scope (S)** — whether exploitation affects resources beyond the vulnerable component
+- **Confidentiality / Integrity / Availability (C/I/A)** — impact on each security property: None, Low, or High
+
+In this engagement, the highest CVSS score recorded was **10.0** for finding N-014 (WHM Root Administration Panel Publicly Exposed) — reflecting network-accessible exploitation with no privileges required, no user interaction, and complete impact across all three security properties. The average CVSS score across all 20 findings was **6.6**, placing the overall risk posture at the High-Medium boundary.
 
 ---
 
