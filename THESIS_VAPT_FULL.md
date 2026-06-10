@@ -231,11 +231,23 @@ Modern penetration testing spans several domains: web application testing, netwo
 
 Practical penetration testing skills cannot be developed from theory alone. Before engaging real-world targets, testers must build hands-on experience in controlled environments. **Hack The Box (HTB)** is one of the most widely recognized platforms for this purpose. It provides a constantly updated library of deliberately vulnerable machines, web applications, and challenge scenarios that simulate real vulnerabilities found in production environments.
 
-*[Figure 4: Hack The Box CPTS certification logo — cpts_logo.png]*
+HTB offers two certification pathways that were directly relevant to this internship:
 
-HTB's **Certified Penetration Testing Specialist (CPTS)** pathway covers the full engagement lifecycle — from information gathering and reconnaissance through network enumeration, web application attacks, privilege escalation, Active Directory exploitation, and professional reporting. The curriculum is designed around the methodology used in real engagements rather than abstract theory, making it directly applicable to the kind of work carried out in this internship.
+### 2.1 Certified Penetration Testing Specialist (CPTS)
 
-Working through HTB machines as part of internship preparation provided direct exposure to the tools, techniques, and problem-solving approaches used during the neuralsh.com engagement. Skills developed on the platform — including DNS enumeration, port scanning interpretation, web application fuzzing, and authentication bypass — were applied directly during the live assessment.
+*[Figure 4: HTB CPTS certification logo — cpts_logo.png]*
+
+The **Certified Penetration Testing Specialist (CPTS)** pathway covers the full penetration testing engagement lifecycle — from information gathering and reconnaissance through network enumeration, web application attacks, privilege escalation, Active Directory exploitation, and professional reporting. The curriculum is structured around real-world methodology rather than abstract theory, covering every phase of the PTES framework applied in this internship.
+
+Skills developed through CPTS — including DNS enumeration, port scanning interpretation, service fingerprinting, and authentication bypass — were applied directly during the neuralsh.com engagement.
+
+### 2.2 Certified Web Exploitation Specialist (CWES)
+
+*[Figure 5: HTB CWES certification logo — cwes_logo.png]*
+
+The **Certified Web Exploitation Specialist (CWES)** is an HTB certification focused specifically on web application security and exploitation. It covers the full OWASP Top 10 attack categories in depth, including broken access control, authentication failures, injection vulnerabilities, insecure design, and API security testing — all of which appeared as findings in this engagement.
+
+CWES is particularly relevant to the neuralsh.com assessment because the target is a web application with an API-driven architecture. Skills from the CWES pathway — including JWT analysis, rate-limiting bypass techniques, API endpoint enumeration via JavaScript bundle inspection, and authentication flow exploitation — directly informed the discovery and exploitation of findings N-005 (Rate Limit Bypass) and N-007 (JWT Token Farming), both of which were confirmed exploited during this engagement.
 
 ## 3. The Penetration Testing Process
 
