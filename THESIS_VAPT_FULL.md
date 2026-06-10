@@ -84,15 +84,17 @@ This internship directly addressed one such environment. The target system, neur
 
 ## 3. Objectives
 
-The internship set out to accomplish the following:
+The internship objective is guided by the advisor and supervisor at Prestige Alliance Co., Ltd. to identify, analyze, and address system weaknesses and vulnerabilities in neuralsh.com. The process followed the agreement of the penetration tester and stakeholder before performing the penetration testing. For this internship, the following objectives were accomplished:
 
-- Perform a complete black-box external VAPT engagement against the authorized target, neuralsh.com, simulating the perspective of a real-world attacker with no prior knowledge of the system
-- Apply industry-recognized testing methodologies — including the OWASP Web Security Testing Guide (WSTG) v4.2, the Penetration Testing Execution Standard (PTES), and NIST SP 800-115 — to ensure thorough and structured coverage
-- Discover, validate, and classify all identified vulnerabilities using CVSS v3.1 severity scoring
-- Demonstrate practical, controlled exploitation of confirmed vulnerabilities to provide evidence of real-world impact rather than theoretical risk
-- Analyze post-exploitation exposure and lateral movement risk across the shared hosting infrastructure
-- Deliver a professional VAPT report with finding details, evidence, CVSS scores, and prioritized remediation guidance suitable for both technical teams and non-technical stakeholders
-- Build hands-on competency in penetration testing tools, techniques, and professional reporting practices through a structured real-world engagement
+- Perform vulnerability scanning on the external web application neuralsh.com
+- Analyze the vulnerabilities, weaknesses, and propose solutions
+- Set up the testing environment and select the appropriate tools
+- Perform penetration testing on the authorized target system
+- Perform exploitation on misconfigured systems
+- Analyze post-exploitation lateral movement risk
+- Create an official VAPT report for the stakeholder
+- Produce remediation recommendations for all identified vulnerabilities
+- Publish the finalized thesis document for academic submission
 
 ## 4. Solutions
 
@@ -109,7 +111,7 @@ The official penetration testing report produced at the end of this engagement d
 
 ## 5. Project Scope
 
-This internship engagement focused on the external attack surface of **neuralsh.com** and its underlying hosting infrastructure, authorized in writing by **Prestige Alliance Co., Ltd.** Testing was conducted using a black-box approach — meaning no credentials, source code, or internal documentation were provided prior to testing. Everything discovered was derived from publicly accessible systems and open-source intelligence, simulating the real-world perspective of an external attacker.
+This internship engagement focused on the external attack surface of neuralsh.com and its underlying hosting infrastructure, authorized in writing by Prestige Alliance Co., Ltd. Testing was conducted using a black-box approach — meaning no credentials, source code, or internal documentation were provided prior to testing. Everything discovered was derived from publicly accessible systems and open-source intelligence, simulating the real-world perspective of an external attacker.
 
 The table below defines the systems that were in scope for this engagement:
 
@@ -310,8 +312,6 @@ In this engagement, the highest CVSS score recorded was **10.0** for finding N-0
 # Chapter 3: Penetration Testing Tools and Technologies
 
 No single approach is sufficient to uncover all vulnerabilities in a modern web application. Automated scanners can rapidly map an attack surface but miss logic flaws and context-dependent weaknesses. Manual testing can identify those deeper issues but is too slow to cover every service and endpoint alone. For this reason, the VAPT engagement on neuralsh.com was conducted using a combination of three complementary approaches: automated scanning tools, manual testing tools, and AI-assisted analysis. Together, these three approaches produced the 20 findings documented in this thesis.
-
-*[Figure 9: Testing tool categories diagram — tool_categories.png]*
 
 ## 1. Automated Testing Tools
 
