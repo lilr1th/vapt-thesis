@@ -58,58 +58,102 @@ This thesis documents the complete methodology, evidence, exploitation results, 
 
 ---
 
-# Chapter 1: Introduction
+# Chapter 1: Project Overview and Organizational Context
 
-## 1.1 Background
+To begin this internship, it is important to lay out the foundation of the project — what was worked on, why it matters, and how the work was planned and carried out. This chapter introduces the project description, the problem that motivated it, the objectives set out at the start, the solutions proposed, the project scope, the action plan followed throughout the internship period, and a description of the organization where this internship was completed.
 
-The rapid digitisation of commerce, services, and communications over the past decade has resulted in an exponential increase in internet-facing applications. Businesses of all sizes now rely on web applications to serve customers, manage operations, and process sensitive data. This increasing dependency creates a correspondingly large attack surface for malicious actors.
+## 1. Project Description
 
-According to the Verizon 2024 Data Breach Investigations Report, web application attacks account for over 40% of all recorded data breaches globally. The Open Web Application Security Project (OWASP) maintains a continuously updated list of the ten most critical web application security risks, reflecting the persistent nature of vulnerabilities such as injection flaws, broken authentication, and security misconfiguration.
+This internship project focused on enhancing the security posture of a live web application by conducting a structured Vulnerability Assessment and Penetration Testing (VAPT) engagement on **neuralsh.com**, an AI-powered neural search platform. The assessment was carried out under the supervision of **Prestige Alliance Co., Ltd.**, which authorized and oversaw all testing activities in accordance with ethical hacking standards.
 
-In the Southeast Asian region specifically, cybersecurity awareness and investment have historically lagged behind the rate of digital adoption. Rapid startup growth, small engineering teams, and tight deployment timelines often result in security being treated as an afterthought rather than a fundamental design principle. This creates an environment where critical vulnerabilities — some of them textbook findings described in security literature for over a decade — remain unpatched and undetected in production systems.
+The project involved scanning the target's external IP infrastructure, analyzing identified weaknesses, performing manual and automated testing across the application and network layers, and producing a formal security report detailing all findings, their severity, and recommended remediation steps. A total of **17 vulnerabilities** were discovered — including 4 Critical, 4 High, 6 Medium, and 3 Low severity findings — with two attack chains successfully exploited under controlled conditions.
 
-## 1.2 Problem Statement
+This work reflects the real-world responsibilities of a security intern: not only finding vulnerabilities, but understanding their impact, communicating risk clearly, and helping the organization take meaningful steps toward a stronger security posture.
 
-Web applications frequently contain security vulnerabilities that, if left unaddressed, can result in unauthorized data access, financial loss, reputational damage, and legal liability. Many organizations are unaware of the specific vulnerabilities present in their systems and lack the technical capacity to identify them through internal review alone. Regular, structured penetration testing by qualified assessors provides the evidence base needed to drive security improvements.
+## 2. Problem Statement
 
-This thesis addresses the following research questions:
+Over the past several years, cybercrime has escalated at a pace that has outstripped the security readiness of many organizations worldwide. What was once considered a concern limited to large enterprises has become a daily reality for businesses of every size. The numbers tell a stark story.
 
-1. What classes of vulnerability are present in neuralsh.com, and how do they rank in terms of exploitability and impact?
-2. Can the described vulnerabilities be practically exploited to demonstrate real-world risk?
-3. What concrete remediation steps would eliminate or reduce the identified risks?
-4. What patterns emerge that reflect broader trends in web application security for small technology companies?
+According to the Verizon 2025 Data Breach Investigations Report, web application attacks accounted for over 43% of all recorded data breaches globally — making them the single largest attack vector for the third consecutive year. The average cost of a data breach reached USD 4.88 million in 2024, a figure that continues to climb. Ransomware attacks surged by 37% year-over-year, with Southeast Asian targets increasingly appearing in threat intelligence reports from Mandiant and CrowdStrike.
 
-## 1.3 Objectives
+By 2026, the threat landscape has grown more sophisticated. Attackers are now using artificial intelligence to automate reconnaissance, generate tailored phishing content, and discover misconfigurations at scale — dramatically reducing the time between vulnerability publication and active exploitation. The Cybersecurity and Infrastructure Security Agency (CISA) reported in early 2026 that the average time from vulnerability disclosure to exploitation in the wild had dropped to under 48 hours for critical findings.
 
-The objectives of this thesis are to:
+In the Southeast Asian region, the situation is particularly pressing. Cambodia, along with neighboring countries, has experienced a sharp rise in targeted attacks against small and medium-sized technology companies. Many of these businesses have embraced rapid digital growth without a corresponding investment in security fundamentals. Web applications are deployed with default configurations, administrative panels left exposed on the public internet, and authentication systems built without rate limiting or input validation — the exact conditions that make exploitation trivially easy for even low-skilled attackers.
 
-1. Conduct a complete black-box VAPT engagement on the authorized live web application neuralsh.com.
-2. Apply industry-standard methodologies (OWASP Testing Guide, PTES, NIST SP 800-115) to discover, validate, and exploit vulnerabilities.
-3. Assign severity ratings using the Common Vulnerability Scoring System (CVSS v3.1) for each finding.
-4. Demonstrate practical exploitation where ethically possible.
-5. Provide actionable remediation guidance for all findings.
-6. Contribute to the academic and practical body of knowledge around web application security.
+This internship directly addressed one such environment. The target system, neuralsh.com, exhibited multiple critical misconfigurations that, if left unaddressed, would have allowed an unauthenticated attacker to gain administrative control over the entire hosting infrastructure within minutes of discovering the origin IP address.
 
-## 1.4 Scope and Authorization
+## 3. Objectives
 
-This assessment was conducted with explicit written authorization from the owner of the target system. Penetration testing authorization constitutes a legal and ethical prerequisite; any testing activity without such authorization would constitute unauthorized computer access under applicable law.
+The internship set out to accomplish the following:
 
-**Authorized target:**
-- `neuralsh.com` and all subdomains
+- Perform a complete black-box external VAPT engagement against the authorized target, neuralsh.com, simulating the perspective of a real-world attacker with no prior knowledge of the system
+- Apply industry-recognized testing methodologies — including the OWASP Web Security Testing Guide (WSTG) v4.2, the Penetration Testing Execution Standard (PTES), and NIST SP 800-115 — to ensure thorough and structured coverage
+- Discover, validate, and classify all identified vulnerabilities using CVSS v3.1 severity scoring
+- Demonstrate practical, controlled exploitation of confirmed vulnerabilities to provide evidence of real-world impact rather than theoretical risk
+- Analyze post-exploitation exposure and lateral movement risk across the shared hosting infrastructure
+- Deliver a professional VAPT report with finding details, evidence, CVSS scores, and prioritized remediation guidance suitable for both technical teams and non-technical stakeholders
+- Build hands-on competency in penetration testing tools, techniques, and professional reporting practices through a structured real-world engagement
 
-**Out of scope:**
-- Physical access testing
-- Social engineering attacks against employees
-- Denial of Service (DoS) attacks
-- Third-party services not under target ownership (e.g., Cloudflare infrastructure itself)
-- Any system with IP addresses not belonging to the target organization
+## 4. Solutions
 
-**Testing window:** June 2026  
-**Testing type:** Black-box (no prior credentials or source code access)
+The core approach to addressing the security weaknesses identified in this project was to treat every vulnerability not as an isolated finding, but as part of a broader picture of the target's overall security posture. Rather than simply listing what was broken, the methodology aimed to understand how vulnerabilities connect — how one misconfiguration could be chained with another to produce an outcome far more severe than either finding alone.
 
-## 1.5 Thesis Organisation
+To find the weakness of the systems, penetration testing was performed following the OWASP TOP 10 framework as a baseline. For each finding, the following solution path was applied:
 
-This thesis is organized as follows. Chapter 2 reviews existing literature on web application penetration testing methodology and relevant vulnerability classes. Chapter 3 describes the research methodology and tools employed. Chapter 4 profiles the target system. Chapters 5 through 9 document each phase of the penetration testing lifecycle. Chapter 10 provides quantitative risk analysis across all findings. Chapter 11 describes complete attack chains. Chapter 12 presents the remediation roadmap. Chapter 13 concludes the thesis.
+1. **Identify** the vulnerability through active testing and passive reconnaissance
+2. **Validate** it with a controlled proof-of-concept to confirm exploitability
+3. **Score** it using CVSS v3.1 to communicate risk objectively
+4. **Recommend** a specific, actionable remediation step tailored to the technology stack in use
+
+The official penetration testing report produced at the end of this engagement documents all findings in a format designed to help the stakeholder understand both the technical detail and the business impact — making it straightforward to prioritize and act on remediation without requiring deep security expertise.
+
+## 5. Project Scope
+
+This internship project focused on conducting penetration testing and vulnerability assessment on the external web application and supporting infrastructure of **neuralsh.com**, authorized by **Prestige Alliance Co., Ltd.**
+
+| **Responsibility** | **Description** |
+|---|---|
+| **Target Web Application** | neuralsh.com — a live AI-powered web application, publicly accessible, tested with written authorization from the platform owner via Prestige Alliance Co., Ltd. |
+| **Testing Technique** | Black-box external penetration testing — no prior credentials, source code, or internal network access were provided |
+| **Preparation** | Defined scope, confirmed written authorization, prepared tools and environment before any testing activity began |
+| **Information Gathering** | Collected technical intelligence including subdomains, open ports, running services, technology stack, exposed APIs, and DNS records using both passive and active reconnaissance methods |
+| **Vulnerability Discovery** | Conducted manual and automated testing to identify vulnerabilities aligned with OWASP TOP 10 and PTES phases |
+| **Reporting** | Produced a formal VAPT report documenting all 17 findings with methodology, CVSS severity scores, exploitation evidence, and prioritized remediation recommendations |
+
+*Table 1: Planning Scope*
+
+The project operated across two environments:
+
+- **Production Environment**: The live neuralsh.com platform — all testing was non-destructive and read-only where exploitation was demonstrated
+- **Exploitation Lab Environment**: Controlled local environment used for technique validation before any production testing
+
+Sensitive data encountered incidentally during testing was not recorded, stored, or disclosed beyond this report. Any information that could identify third parties has been redacted.
+
+## 6. Action Plan
+
+To make the internship progress go as planned, the activities below were organized into a weekly timeline spanning the full engagement period. The plan covers two periods: February to March (vulnerability assessment and lab training) and April to May (production penetration testing, report creation, and remediation).
+
+*[Table 2: Action plan from February to March — see ACTION_PLAN.pdf]*
+
+*[Table 3: Action plan from April to May — see ACTION_PLAN.pdf]*
+
+## 7. Organization Description
+
+**Prestige Alliance Co., Ltd.** is an information technology and cybersecurity solutions company operating in Cambodia. The company provides a range of services including network infrastructure design, system integration, software development, and cybersecurity consulting — supporting both private sector clients and government-linked organizations across the country.
+
+*[Figure 1: Prestige Alliance logo — prestige_logo.png]*
+
+Prestige Alliance is committed to helping organizations in the region build and maintain secure, reliable digital systems. With a team of experienced engineers and security practitioners, the company bridges the gap between technical security expertise and business-level risk management — making professional security services accessible to organizations that might otherwise lack the internal capacity to address cyber threats effectively.
+
+As a cybersecurity-oriented firm, Prestige Alliance recognizes the importance of developing the next generation of security talent. This internship was conducted under the company's technical team, providing a structured environment for hands-on penetration testing work on an authorized real-world target.
+
+*[Figure 2: Prestige Alliance office location — map.png]*
+
+**Address:** [Company Address], Phnom Penh, Cambodia
+
+**Website:** [Company Website]  
+**Email:** [Company Email]  
+**Telephone:** [Company Phone]
 
 ---
 
