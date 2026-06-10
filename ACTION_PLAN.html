@@ -33,18 +33,15 @@
     padding: 3px 2px;
   }
 
-  /* Column widths */
-  col.c-no       { width: 28px; }
-  col.c-act      { width: 160px; }
-  col.c-week     { width: 42px; }
+  col.c-no   { width: 28px; }
+  col.c-act  { width: 160px; }
+  col.c-week { width: 42px; }
 
-  /* Month header row */
-  .h-feb  { background: #4f9fd6; color: #fff; font-weight: bold; }
-  .h-mar  { background: #ffe600; color: #000; font-weight: bold; }
-  .h-apr  { background: #ffb84d; color: #000; font-weight: bold; }
-  .h-may  { background: #ffb3c6; color: #000; font-weight: bold; }
+  .h-feb { background: #4f9fd6; color: #fff; font-weight: bold; }
+  .h-mar { background: #ffe600; color: #000; font-weight: bold; }
+  .h-apr { background: #ffb84d; color: #000; font-weight: bold; }
+  .h-may { background: #ffb3c6; color: #000; font-weight: bold; }
 
-  /* Week sub-headers */
   th.wk {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
@@ -58,7 +55,6 @@
   th.wk.h-apr { background: #ffb84d; color: #000; }
   th.wk.h-may { background: #ffb3c6; color: #000; }
 
-  /* Top-left header cells */
   th.hd-no, th.hd-act {
     background: #3a3a3a;
     color: #fff;
@@ -67,14 +63,12 @@
   }
   th.hd-act { text-align: left; padding-left: 6px; }
 
-  /* No column cells */
   td.no {
     background: #92d050;
     font-weight: bold;
     font-size: 12px;
   }
 
-  /* Section label row (spans all columns) */
   td.sec {
     background: #d9d9d9;
     font-weight: bold;
@@ -83,16 +77,12 @@
     letter-spacing: 0.3px;
   }
 
-  /* Activity cell */
   td.act {
     text-align: left;
     padding-left: 10px;
     font-size: 11px;
-    white-space: normal;
-    word-break: break-word;
   }
 
-  /* Duration cells */
   td.on  { background: #92d050; }
   td.off { background: #ffffff; }
 
@@ -103,8 +93,9 @@
 
 <h2>6. Action plan</h2>
 <p class="intro">
-  To make the internship progress go as we planned, we set a timeline for the duration and
-  the date we were going to complete the project and each task.
+  To make the internship progress go as planned, the activities below were organized into a
+  weekly timeline covering the full engagement period — from initial environment setup and
+  reconnaissance through to exploitation, documentation, and final thesis submission.
 </p>
 
 <!-- ══════════════════════════════════════════
@@ -118,14 +109,12 @@
   </colgroup>
   <caption>Table 2: Action plan from February to March</caption>
 
-  <!-- Month header -->
   <tr>
     <th class="hd-no" rowspan="2">No</th>
     <th class="hd-act" rowspan="2">Activities</th>
     <th colspan="4" class="h-feb">February</th>
     <th colspan="4" class="h-mar">March</th>
   </tr>
-  <!-- Week sub-headers -->
   <tr>
     <th class="wk h-feb">Week 1</th><th class="wk h-feb">Week 2</th>
     <th class="wk h-feb">Week 3</th><th class="wk h-feb">Week 4</th>
@@ -133,57 +122,72 @@
     <th class="wk h-mar">Week 3</th><th class="wk h-mar">Week 4</th>
   </tr>
 
-  <!-- ── GROUP 1 : Vulnerability Assessment ── -->
+  <!-- GROUP 1: Environment Setup & Scope Definition -->
   <tr>
-    <td class="no" rowspan="5">1</td>
-    <td class="sec" colspan="9">Vulnerability Assessment</td>
+    <td class="no" rowspan="4">1</td>
+    <td class="sec" colspan="9">Environment Setup &amp; Scope Definition</td>
   </tr>
   <tr>
-    <td class="act">Scan neuralsh.com external IP (103.16.62.217)</td>
-    <td class="on"></td><td class="on"></td><td class="on"></td><td class="off"></td>
+    <td class="act">Set up Kali Linux testing environment and tools</td>
+    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
   <tr>
-    <td class="act">Analyze the weakness</td>
+    <td class="act">Define engagement scope with Prestige Alliance Co., Ltd.</td>
+    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+  </tr>
+  <tr>
+    <td class="act">Obtain written authorization for neuralsh.com testing</td>
     <td class="off"></td><td class="on"></td><td class="on"></td><td class="off"></td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
+
+  <!-- GROUP 2: Reconnaissance & Intelligence Gathering -->
   <tr>
-    <td class="act">Manual testing and finding weakness</td>
+    <td class="no" rowspan="5">2</td>
+    <td class="sec" colspan="9">Reconnaissance &amp; Intelligence Gathering</td>
+  </tr>
+  <tr>
+    <td class="act">WHOIS analysis and DNS enumeration (A, MX, TXT, NS records)</td>
     <td class="off"></td><td class="off"></td><td class="on"></td><td class="on"></td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
   <tr>
-    <td class="act">Export report</td>
+    <td class="act">Discover real origin IP via MX record and SSL certificate</td>
+    <td class="off"></td><td class="off"></td><td class="on"></td><td class="on"></td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+  </tr>
+  <tr>
+    <td class="act">Subdomain enumeration and wildcard DNS detection</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="on"></td>
     <td class="on"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
+  <tr>
+    <td class="act">JavaScript bundle analysis to extract API routes</td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
+  </tr>
 
-  <!-- ── GROUP 2 : Lab Training ── -->
+  <!-- GROUP 3: Active Scanning & Enumeration -->
   <tr>
-    <td class="no" rowspan="4">2</td>
-    <td class="sec" colspan="9">Lab Training</td>
+    <td class="no" rowspan="4">3</td>
+    <td class="sec" colspan="9">Active Scanning &amp; Enumeration</td>
   </tr>
   <tr>
-    <td class="act">Understanding the penetration testing tools</td>
-    <td class="on"></td><td class="on"></td><td class="on"></td><td class="on"></td>
-    <td class="on"></td><td class="on"></td><td class="on"></td><td class="on"></td>
-  </tr>
-  <tr>
-    <td class="act">Learning the process of pen testing</td>
-    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
+    <td class="act">Nmap port scan on origin server (103.16.62.217)</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+    <td class="off"></td><td class="on"></td><td class="on"></td><td class="off"></td>
   </tr>
   <tr>
-    <td class="act">Understand the scope</td>
-    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
+    <td class="act">Web directory enumeration with Dirb and Nikto</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+    <td class="off"></td><td class="off"></td><td class="on"></td><td class="on"></td>
   </tr>
   <tr>
-    <td class="off" style="background:#d9d9d9;"></td>
-    <td class="act">Perform exploitation on testing lab</td>
-    <td class="off"></td><td class="off"></td><td class="off"></td><td class="on"></td>
-    <td class="on"></td><td class="on"></td><td class="on"></td><td class="on"></td>
+    <td class="act">Service fingerprinting — MySQL, SMTP, MikroTik, WHM</td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+    <td class="off"></td><td class="off"></td><td class="on"></td><td class="on"></td>
   </tr>
 </table>
 
@@ -212,70 +216,70 @@
     <th class="wk h-may">Week 3</th><th class="wk h-may">Week 4</th>
   </tr>
 
-  <!-- ── GROUP 3 : Penetration Testing on Production ── -->
+  <!-- GROUP 4: Vulnerability Assessment & Manual Testing -->
   <tr>
-    <td class="no" rowspan="7">3</td>
-    <td class="sec" colspan="9">Penetration Testing on Production</td>
+    <td class="no" rowspan="5">4</td>
+    <td class="sec" colspan="9">Vulnerability Assessment &amp; Manual Testing</td>
   </tr>
   <tr>
-    <td class="act">Planning and preparation</td>
-    <td class="on"></td><td class="off"></td><td class="off"></td><td class="off"></td>
-    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
-  </tr>
-  <tr>
-    <td class="act">Reconnaissance</td>
+    <td class="act">Test authentication and rate limiting controls</td>
     <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
   <tr>
-    <td class="act">Scanning</td>
+    <td class="act">Analyze JWT token issuance and session management</td>
+    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+  </tr>
+  <tr>
+    <td class="act">Assess exposed admin panels (WHM, cPanel, MikroTik, MySQL)</td>
     <td class="off"></td><td class="on"></td><td class="on"></td><td class="off"></td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
   <tr>
-    <td class="act">Enumeration</td>
+    <td class="act">Assign CVSS v3.1 scores to all 17 identified findings</td>
     <td class="off"></td><td class="off"></td><td class="on"></td><td class="on"></td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
-  <tr>
-    <td class="act">Exploitation</td>
-    <td class="off"></td><td class="off"></td><td class="off"></td><td class="on"></td>
-    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
-  </tr>
-  <tr>
-    <td class="act">Post-exploitation</td>
-    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
-    <td class="on"></td><td class="on"></td><td class="on"></td><td class="off"></td>
-  </tr>
 
-  <!-- ── GROUP 4 : Report Creation ── -->
+  <!-- GROUP 5: Exploitation & Post-Exploitation -->
   <tr>
-    <td class="no" rowspan="3">4</td>
-    <td class="sec" colspan="9">Report Creation</td>
+    <td class="no" rowspan="4">5</td>
+    <td class="sec" colspan="9">Exploitation &amp; Post-Exploitation</td>
   </tr>
   <tr>
-    <td class="act">Understand and follow MPTC sample</td>
+    <td class="act">Rate limit bypass via X-Forwarded-For header spoofing</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="on"></td>
     <td class="on"></td><td class="off"></td><td class="off"></td><td class="off"></td>
   </tr>
   <tr>
-    <td class="act">Verification</td>
+    <td class="act">JWT token farming — 50 tokens, 0 rate-limit responses</td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="on"></td>
+    <td class="on"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+  </tr>
+  <tr>
+    <td class="act">Attack chain mapping and lateral movement risk analysis</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
-    <td class="off"></td><td class="on"></td><td class="off"></td><td class="off"></td>
+    <td class="on"></td><td class="on"></td><td class="off"></td><td class="off"></td>
   </tr>
 
-  <!-- ── GROUP 5 ── -->
+  <!-- GROUP 6: Report Writing & Thesis Documentation -->
   <tr>
-    <td class="no">5</td>
-    <td class="act">Remediation and follow up</td>
+    <td class="no" rowspan="4">6</td>
+    <td class="sec" colspan="9">Report Writing &amp; Thesis Documentation</td>
+  </tr>
+  <tr>
+    <td class="act">Write professional VAPT report with all findings and evidence</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
     <td class="off"></td><td class="on"></td><td class="on"></td><td class="off"></td>
   </tr>
-
-  <!-- ── GROUP 6 ── -->
   <tr>
-    <td class="no">6</td>
-    <td class="act">Perform exploitation on alternative running web application</td>
+    <td class="act">Design attack chain diagrams and infrastructure map</td>
+    <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
+    <td class="off"></td><td class="on"></td><td class="on"></td><td class="off"></td>
+  </tr>
+  <tr>
+    <td class="act">Write thesis document and prepare for submission</td>
     <td class="off"></td><td class="off"></td><td class="off"></td><td class="off"></td>
     <td class="off"></td><td class="off"></td><td class="on"></td><td class="on"></td>
   </tr>
