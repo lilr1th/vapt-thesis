@@ -109,25 +109,81 @@ The official penetration testing report produced at the end of this engagement d
 
 ## 5. Project Scope
 
-This internship project focused on conducting penetration testing and vulnerability assessment on the external web application and supporting infrastructure of **neuralsh.com**, authorized by **Prestige Alliance Co., Ltd.**
+### Engaging Organization
 
-| **Responsibility** | **Description** |
+**Prestige Alliance Co., Ltd.** is the authorizing organization for this Vulnerability Assessment and Penetration Testing engagement. Prestige Alliance owns and operates **neuralsh.com**, an AI-powered neural search platform, and has granted explicit written authorization for the assessor to conduct security testing against the platform and its supporting infrastructure for the purposes of this graduation thesis.
+
+### Engagement Type
+
+This engagement is a **black-box external penetration test**, simulating the perspective of an unauthenticated internet-based attacker with no prior knowledge of the target's internal architecture, source code, credentials, or network topology. All findings were derived solely through direct interaction with publicly reachable systems and open-source intelligence gathering.
+
+### Target Systems
+
+| **Asset** | **Description** |
 |---|---|
-| **Target Web Application** | neuralsh.com — a live AI-powered web application, publicly accessible, tested with written authorization from the platform owner via Prestige Alliance Co., Ltd. |
-| **Testing Technique** | Black-box external penetration testing — no prior credentials, source code, or internal network access were provided |
-| **Preparation** | Defined scope, confirmed written authorization, prepared tools and environment before any testing activity began |
-| **Information Gathering** | Collected technical intelligence including subdomains, open ports, running services, technology stack, exposed APIs, and DNS records using both passive and active reconnaissance methods |
-| **Vulnerability Discovery** | Conducted manual and automated testing to identify vulnerabilities aligned with OWASP TOP 10 and PTES phases |
-| **Reporting** | Produced a formal VAPT report documenting all 17 findings with methodology, CVSS severity scores, exploitation evidence, and prioritized remediation recommendations |
+| `neuralsh.com` | Primary web application — Nuxt.js frontend, Cloudflare-protected |
+| `*.neuralsh.com` | All subdomains discoverable via DNS, certificate transparency, or wildcard resolution |
+| `mail.neuralsh.com` | Mail and backend infrastructure (origin server) |
+| `103.16.62.217` | Origin server hosting the application backend, mail stack, database, and administrative panels |
 
-*Table 1: Planning Scope*
+*Table 1: Target Systems*
 
-The project operated across two environments:
+### Objectives
 
-- **Production Environment**: The live neuralsh.com platform — all testing was non-destructive and read-only where exploitation was demonstrated
-- **Exploitation Lab Environment**: Controlled local environment used for technique validation before any production testing
+The engagement was conducted to:
 
-Sensitive data encountered incidentally during testing was not recorded, stored, or disclosed beyond this report. Any information that could identify third parties has been redacted.
+- Identify exploitable vulnerabilities across the application, network, and infrastructure layers of the neuralsh.com environment
+- Assess the real-world exploitability and business impact of identified vulnerabilities through controlled, non-destructive proof-of-concept exploitation
+- Provide Prestige Alliance Co., Ltd. with a prioritized, actionable remediation roadmap
+- Produce a formal assessment report suitable for academic submission and internal security review
+
+### Methodology
+
+Testing followed the **Penetration Testing Execution Standard (PTES)** lifecycle, supplemented by test cases from the **OWASP Web Security Testing Guide (WSTG) v4.2** and guidance from **NIST SP 800-115**. The engagement progressed through five phases: Reconnaissance, Scanning and Enumeration, Vulnerability Assessment, Exploitation, and Post-Exploitation — each documented with command-level evidence, CVSS v3.1 scoring, and remediation guidance.
+
+### Authorization
+
+Prestige Alliance Co., Ltd. has provided written confirmation that:
+
+- The assessor is authorized to perform the testing activities described in this scope against the listed target systems
+- Testing may proceed during the agreed engagement window without requiring case-by-case approval for each activity within the defined boundaries
+- Findings will be reported directly and exclusively to Prestige Alliance's designated point of contact
+- No third party has been granted visibility into the assessment results without Prestige Alliance's consent
+
+### Engagement Window
+
+**Testing Period:** June 2026  
+**Reporting Deadline:** Aligned with academic thesis submission schedule
+
+### Rules of Engagement — Permitted Activities
+
+- Passive and active reconnaissance (OSINT, DNS enumeration, certificate transparency analysis)
+- Port scanning and service fingerprinting
+- Web application enumeration (directory discovery, parameter analysis, API mapping)
+- Authentication and session management testing
+- Controlled proof-of-concept exploitation of identified vulnerabilities
+- Post-exploitation impact analysis conducted in a read-only, non-destructive manner
+
+### Rules of Engagement — Prohibited Activities
+
+- Denial of Service (DoS/DDoS) attacks against any in-scope or adjacent system
+- Modification, deletion, or exfiltration of production data
+- Social engineering directed at Prestige Alliance employees, contractors, or customers
+- Testing of any system, IP range, or third-party service not explicitly listed as in-scope
+- Persistent access mechanisms, backdoors, or any action extending beyond proof-of-concept validation
+
+### Boundaries and Constraints
+
+To prevent operational disruption, the assessor applied the following self-imposed limits throughout testing:
+
+- Exploitation of rate-limiting controls was capped at 50 requests per test scenario
+- Credential testing against any service was limited to a bounded, pre-defined wordlist
+- No attempt was made to establish persistent access to any system, even where technically feasible
+- Any indicator suggesting an active third-party compromise would be reported immediately and testing in that area would cease
+
+### Confidentiality
+
+All information obtained during this engagement — including but not limited to system configurations, vulnerability details, and any data incidentally observed — is treated as **confidential** and is disclosed only within this report, submitted exclusively to Prestige Alliance Co., Ltd. and the academic institution overseeing the thesis.
 
 ## 6. Action Plan
 
