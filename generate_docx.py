@@ -437,6 +437,9 @@ SHOT_FIGURES = {
     "4.20": (os.path.join(SHOTS, "fig415_ratelimit_30requests.png"),     "Figure 4.20: Terminal showing thirty consecutive HTTP 200 responses — rate limiting not triggered"),
     "4.21": (os.path.join(SHOTS, "fig415_jwt_token_burp.png"),           "Figure 4.21: Burp Suite showing live JWT token response from /web/v1/init/token"),
     "4.22": (os.path.join(SHOTS, "fig422_attack_chains.png"),            "Figure 4.22: Attack chain diagram — four confirmed attack vectors"),
+    # Chapter 5 figures
+    "5.1":  (os.path.join(SHOTS, "fig51_firewall_rules.png"),            "Figure 5.1: Cloudways IP Whitelist firewall rules configuration"),
+    "5.2":  (os.path.join(IMGS,  "recommended_architecture.png"),        "Figure 5.2: Recommended network security architecture"),
 }
 
 # Appendix screenshots
@@ -937,14 +940,25 @@ def process_md(doc):
                 add_img(doc, path, f"Figure {num}: {desc}", w=8.0)
             i+=1; continue
 
-        # Screenshot figures: *[Figure 4.N: description ... — screenshot]*
-        # Use greedy .+ so descriptions containing — still match (e.g. fig 4.14, 4.15, 4.22)
-        m_shot = re.match(r'\*\[Figure (4\.\d+): (.+) — screenshot\]\*', stripped)
+        # Screenshot figures: *[Figure N.N: description ... — screenshot]*
+        m_shot = re.match(r'\*\[Figure (\d+\.\d+): (.+) — screenshot\]\*', stripped)
         if m_shot:
             num = m_shot.group(1)
             if num in SHOT_FIGURES:
                 path, cap = SHOT_FIGURES[num]
                 add_img(doc, path, cap, w=14.0)
+            i+=1; continue
+
+        # Image figures: *[Figure N.N: description — filename.png]*  (non-screenshot)
+        m_img5 = re.match(r'\*\[Figure (\d+\.\d+): ([^—\]]+) — ([^\]]+\.(?:png|jpg|jpeg))\]\*', stripped)
+        if m_img5:
+            num = m_img5.group(1); desc = m_img5.group(2).strip(); fname = m_img5.group(3).strip()
+            if num in SHOT_FIGURES:
+                path, cap = SHOT_FIGURES[num]
+                add_img(doc, path, cap, w=14.0)
+            else:
+                path = os.path.join(IMGS, fname)
+                add_img(doc, path, f"Figure {num}: {desc}", w=13.0)
             i+=1; continue
 
         # headings
@@ -988,12 +1002,17 @@ def process_md(doc):
             add_inline_md(p, m_b.group(1).strip())
             i+=1; continue
 
-        # numbered list  (1. item)
+        # numbered list — render as body paragraph with number prefix (same font as body)
         m_num = re.match(r'^(\d+)\.\s+(.+)', stripped)
         if m_num and not in_53:
-            p = doc.add_paragraph(style='List Number')
-            p.paragraph_format.left_indent=Cm(1.27); p.paragraph_format.first_line_indent=Cm(0)
-            p.paragraph_format.space_after = Pt(3)
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            p.paragraph_format.left_indent = Cm(1.27)
+            p.paragraph_format.first_line_indent = Cm(0)
+            p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+            p.paragraph_format.space_after = Pt(4)
+            num_run = p.add_run(f"{m_num.group(1)}.  ")
+            fmt(num_run, size=12)
             add_inline_md(p, m_num.group(2).strip())
             i+=1; continue
 

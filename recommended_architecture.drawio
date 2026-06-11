@@ -1,0 +1,261 @@
+<mxfile host="app.diagrams.net" modified="2026-06-12T00:00:00.000Z" agent="Claude" version="21.0.0" type="device">
+  <diagram name="Recommended Network Architecture" id="neuralsh-arch">
+    <mxGraphModel dx="1200" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════
+             TITLE
+        ════════════════════════════════════════════════ -->
+        <mxCell id="title" value="Recommended Network Security Architecture — neuralsh.com"
+          style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="200" y="10" width="760" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             INTERNET
+        ════════════════════════════════════════════════ -->
+        <mxCell id="internet" value="Internet / External Users"
+          style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="380" y="55" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             CLOUDFLARE WAF LAYER
+        ════════════════════════════════════════════════ -->
+        <mxCell id="cf_box" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;dashed=1;dashPattern=8 4;strokeWidth=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="300" y="200" width="360" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="cf_label" value="Cloudflare WAF / CDN Layer"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=9;fontColor=#996600;fontStyle=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="305" y="203" width="200" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="cloudflare" value="☁ Cloudflare WAF&#xa;Ports 80 &amp; 443 only"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#ffffff;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="380" y="218" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             DMZ ZONE
+        ════════════════════════════════════════════════ -->
+        <mxCell id="dmz_box" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;dashPattern=8 4;strokeWidth=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="300" y="345" width="360" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="dmz_label" value="DMZ — Web Tier"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=9;fontColor=#00618A;fontStyle=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="305" y="348" width="150" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="webserver" value="🌐 Web / API Server&#xa;neuralsh.com  (Nuxt.js)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="380" y="363" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             FIREWALL 1
+        ════════════════════════════════════════════════ -->
+        <mxCell id="fw1" value="🔥 Internal Firewall&#xa;Block all except App traffic"
+          style="shape=mxgraph.cisco.firewalls.firewall;html=1;dashed=0;outline=0;labelPosition=right;align=left;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;fontStyle=1;verticalLabelPosition=middle;verticalAlign=middle;"
+          vertex="1" parent="1">
+          <mxGeometry x="430" y="480" width="100" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             APPLICATION ZONE
+        ════════════════════════════════════════════════ -->
+        <mxCell id="app_box" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=1;dashPattern=8 4;strokeWidth=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="300" y="590" width="360" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="app_label" value="Application Tier (Internal only)"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=9;fontColor=#3a6b35;fontStyle=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="305" y="593" width="220" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="appserver" value="⚙ Application Logic&#xa;API Gateway  •  Auth Service"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="380" y="608" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             FIREWALL 2
+        ════════════════════════════════════════════════ -->
+        <mxCell id="fw2" value="🔥 Strict Firewall&#xa;DB access: localhost ONLY"
+          style="shape=mxgraph.cisco.firewalls.firewall;html=1;dashed=0;outline=0;labelPosition=right;align=left;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;fontStyle=1;verticalLabelPosition=middle;verticalAlign=middle;"
+          vertex="1" parent="1">
+          <mxGeometry x="430" y="725" width="100" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             DATA ZONE
+        ════════════════════════════════════════════════ -->
+        <mxCell id="data_box" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;dashPattern=8 4;strokeWidth=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="300" y="835" width="360" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="data_label" value="Data Tier — No Internet Access"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=9;fontColor=#7a5700;fontStyle=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="305" y="838" width="220" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="mysql" value="🗄 MySQL Database&#xa;Port 3306 — localhost only"
+          style="shape=cylinder;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;aspect=fixed;"
+          vertex="1" parent="1">
+          <mxGeometry x="400" y="853" width="160" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             MANAGEMENT SIDE — VPN ONLY
+        ════════════════════════════════════════════════ -->
+        <mxCell id="mgmt_box" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;dashPattern=8 4;strokeWidth=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="750" y="345" width="320" height="280" as="geometry"/>
+        </mxCell>
+        <mxCell id="mgmt_label" value="Management Zone — Trusted IP / VPN ONLY"
+          style="text;html=1;align=left;verticalAlign=top;fontSize=9;fontColor=#6028aa;fontStyle=2;"
+          vertex="1" parent="1">
+          <mxGeometry x="755" y="348" width="280" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="whm" value="🔑 WHM Root Panel&#xa;Port 2087 — IP restricted"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="770" y="375" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="cpanel" value="🔑 cPanel&#xa;Port 2083 — IP restricted"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="770" y="445" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="mikrotik" value="🔑 MikroTik RouterOS&#xa;Port 9001 — IP restricted"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="770" y="515" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="admin" value="👤 Administrator&#xa;Trusted IP Only"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=11;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="790" y="200" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             BLOCKED ZONE — CURRENT PROBLEM
+        ════════════════════════════════════════════════ -->
+        <mxCell id="blocked_label" value="⚠ CURRENTLY EXPOSED (to be blocked)"
+          style="text;html=1;align=center;fontColor=#b85450;fontSize=9;fontStyle=3;"
+          vertex="1" parent="1">
+          <mxGeometry x="750" y="760" width="280" height="16" as="geometry"/>
+        </mxCell>
+        <mxCell id="mysql_blocked" value="✘ MySQL port 3306&#xa;Public internet — BLOCK"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=0;"
+          vertex="1" parent="1">
+          <mxGeometry x="760" y="785" width="160" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="ssh_blocked" value="✘ SSH port 22&#xa;Restrict to VPN only"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=0;"
+          vertex="1" parent="1">
+          <mxGeometry x="940" y="785" width="130" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             CONNECTIONS — MAIN FLOW
+        ════════════════════════════════════════════════ -->
+        <!-- Internet → Cloudflare -->
+        <mxCell id="e1" value="HTTPS only&#xa;(80, 443)"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#00618A;strokeWidth=2;fontColor=#00618A;fontSize=9;"
+          edge="1" source="internet" target="cloudflare" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- Cloudflare → Web Server -->
+        <mxCell id="e2" value="Filtered HTTP"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#00618A;strokeWidth=2;fontColor=#00618A;fontSize=9;"
+          edge="1" source="cloudflare" target="webserver" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- Web Server → Firewall 1 -->
+        <mxCell id="e3" value=""
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#b85450;strokeWidth=2;"
+          edge="1" source="webserver" target="fw1" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- Firewall 1 → App Server -->
+        <mxCell id="e4" value=""
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#82b366;strokeWidth=2;"
+          edge="1" source="fw1" target="appserver" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- App Server → Firewall 2 -->
+        <mxCell id="e5" value=""
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#b85450;strokeWidth=2;"
+          edge="1" source="appserver" target="fw2" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- Firewall 2 → MySQL -->
+        <mxCell id="e6" value=""
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#82b366;strokeWidth=2;"
+          edge="1" source="fw2" target="mysql" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <!-- Admin → Management zone (VPN) -->
+        <mxCell id="e7" value="VPN / Trusted IP"
+          style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#9673a6;strokeWidth=2;dashed=1;fontColor=#9673a6;fontSize=9;"
+          edge="1" source="admin" target="whm" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════
+             LEGEND
+        ════════════════════════════════════════════════ -->
+        <mxCell id="legend_box" value=""
+          style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="30" y="200" width="220" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend_title" value="Legend"
+          style="text;html=1;align=left;fontStyle=1;fontSize=11;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="208" width="200" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="l1" value="DMZ — Web-facing tier"
+          style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="234" width="200" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="l2" value="App Tier — Internal only"
+          style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="265" width="200" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="l3" value="Data Tier — No internet access"
+          style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="296" width="200" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="l4" value="Mgmt — Trusted IP / VPN only"
+          style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="327" width="200" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="l5" value="✘ Currently exposed — to block"
+          style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;"
+          vertex="1" parent="1">
+          <mxGeometry x="40" y="358" width="200" height="25" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
