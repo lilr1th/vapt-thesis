@@ -130,15 +130,39 @@ def fmt(run, size=12, bold=False, italic=False, color=None):
     run.font.bold = bold; run.font.italic = italic
     if color: run.font.color.rgb = hex2rgb(color)
 
-def body(doc, text, align=WD_ALIGN_PARAGRAPH.JUSTIFY, indent=1.27, size=12, bold=False):
+# Inline markdown → properly formatted runs (**bold**, *italic*, `code`, [link](url))
+_INLINE_MD = re.compile(r'\*\*([^*]+)\*\*|\*([^*\[]+)\*|`([^`]+)`|\[([^\]]+)\]\([^)]+\)')
+def add_inline_md(para, text, size=12):
+    last = 0
+    for m in _INLINE_MD.finditer(text):
+        if m.start() > last:
+            r = para.add_run(text[last:m.start()])
+            r.font.name = 'Times New Roman'; r.font.size = Pt(size)
+        if m.group(1):   # **bold**
+            r = para.add_run(m.group(1))
+            r.font.name = 'Times New Roman'; r.font.size = Pt(size); r.font.bold = True
+        elif m.group(2): # *italic*
+            r = para.add_run(m.group(2))
+            r.font.name = 'Times New Roman'; r.font.size = Pt(size); r.font.italic = True
+        elif m.group(3): # `code`
+            r = para.add_run(m.group(3))
+            r.font.name = 'Courier New'; r.font.size = Pt(size - 1)
+        elif m.group(4): # [link text](url)
+            r = para.add_run(m.group(4))
+            r.font.name = 'Times New Roman'; r.font.size = Pt(size); r.font.underline = True
+        last = m.end()
+    if last < len(text):
+        r = para.add_run(text[last:])
+        r.font.name = 'Times New Roman'; r.font.size = Pt(size)
+
+def body(doc, text, align=WD_ALIGN_PARAGRAPH.JUSTIFY, indent=1.27, size=12):
     if not text or not text.strip(): return
     p = doc.add_paragraph()
     p.alignment = align
     p.paragraph_format.first_line_indent = Cm(indent)
     p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
     p.paragraph_format.space_after = Pt(6)
-    r = p.add_run(text.strip())
-    fmt(r, size=size, bold=bold)
+    add_inline_md(p, text.strip(), size=size)
     return p
 
 def ch_head(doc, text):
@@ -878,10 +902,11 @@ def process_md(doc):
                 add_img(doc, path, f"Figure {num}: {desc}", w=8.0)
             i+=1; continue
 
-        # Screenshot figures: *[Figure 4.N: description — screenshot]*
-        m_shot = re.match(r'\*\[Figure (4\.\d+): ([^—\]]+) — screenshot\]\*', stripped)
+        # Screenshot figures: *[Figure 4.N: description ... — screenshot]*
+        # Use greedy .+ so descriptions containing — still match (e.g. fig 4.14, 4.15, 4.22)
+        m_shot = re.match(r'\*\[Figure (4\.\d+): (.+) — screenshot\]\*', stripped)
         if m_shot:
-            num = m_shot.group(1); desc = m_shot.group(2).strip()
+            num = m_shot.group(1)
             if num in SHOT_FIGURES:
                 path, cap = SHOT_FIGURES[num]
                 add_img(doc, path, cap, w=14.0)
@@ -919,27 +944,38 @@ def process_md(doc):
 
         if stripped.startswith('# '): ch_head(doc, stripped[2:]); i+=1; continue
 
-        # bullet list
+        # bullet list  (- item  or  * item)
         m_b = re.match(r'^[-*]\s+(.+)', stripped)
         if m_b and not in_53:
             p = doc.add_paragraph(style='List Bullet')
             p.paragraph_format.left_indent=Cm(1.27); p.paragraph_format.first_line_indent=Cm(0)
-            fmt(p.add_run(m_b.group(1).strip()), size=12); i+=1; continue
+            p.paragraph_format.space_after = Pt(3)
+            add_inline_md(p, m_b.group(1).strip())
+            i+=1; continue
 
-        # skip front-matter meta lines
+        # numbered list  (1. item)
+        m_num = re.match(r'^(\d+)\.\s+(.+)', stripped)
+        if m_num and not in_53:
+            p = doc.add_paragraph(style='List Number')
+            p.paragraph_format.left_indent=Cm(1.27); p.paragraph_format.first_line_indent=Cm(0)
+            p.paragraph_format.space_after = Pt(3)
+            add_inline_md(p, m_num.group(2).strip())
+            i+=1; continue
+
+        # skip front-matter meta lines and blockquotes
         if any(stripped.startswith(x) for x in ['**Student','**Submission','**Program',
-           '**Institution','**Supervisor','> ','## Declaration','## Abstract','## Table']):
+           '**Institution','**Supervisor','> ','## Declaration','## Abstract','## Table',
+           '**Address','**Website','**Email','**Telephone','**Keywords']):
             i+=1; continue
 
         if not stripped: i+=1; continue
         if in_53: i+=1; continue
 
-        # normal paragraph
-        clean = re.sub(r'\*\*([^*]+)\*\*',r'\1',stripped)
-        clean = re.sub(r'\*([^*]+)\*',r'\1',clean)
-        clean = re.sub(r'`([^`]+)`',r'\1',clean)
-        clean = re.sub(r'\[([^\]]+)\]\([^)]+\)',r'\1',clean)
-        if clean.strip(): body(doc, clean)
+        # normal paragraph — render with inline markdown formatting
+        if stripped.startswith('*[') or stripped.startswith('['):
+            # unmatched figure/table reference — skip silently
+            i+=1; continue
+        body(doc, stripped)
         i+=1
 
 # ── Build ─────────────────────────────────────────────────────────────────────
