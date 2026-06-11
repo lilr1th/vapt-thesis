@@ -438,8 +438,7 @@ SHOT_FIGURES = {
     "4.21": (os.path.join(SHOTS, "fig415_jwt_token_burp.png"),           "Figure 4.21: Burp Suite showing live JWT token response from /web/v1/init/token"),
     "4.22": (os.path.join(SHOTS, "fig422_attack_chains.png"),            "Figure 4.22: Attack chain diagram — four confirmed attack vectors"),
     # Chapter 5 figures
-    "5.1":  (os.path.join(SHOTS, "fig51_firewall_rules.png"),            "Figure 5.1: Cloudways IP Whitelist firewall rules configuration"),
-    "5.2":  (os.path.join(IMGS,  "recommended_architecture.png"),        "Figure 5.2: Recommended network security architecture"),
+    "5.1":  (os.path.join(IMGS,  "recommended_architecture.png"),        "Figure 5.1: Recommended network security architecture"),
 }
 
 # Appendix screenshots

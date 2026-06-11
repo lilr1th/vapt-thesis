@@ -1263,8 +1263,6 @@ ufw enable
 
 This single configuration change eliminates findings N-001, N-002, N-013, N-014, and N-015 in approximately 30 minutes.
 
-*[Figure 5.1: Cloudways IP Whitelist firewall rules configuration — screenshot]*
-
 ### 5.5.3 Rate Limiting Fix (P1 — Critical Within 24 Hours)
 
 The root cause of N-005 is using `X-Forwarded-For` for rate limiting instead of `CF-Connecting-IP`:
@@ -1285,7 +1283,7 @@ In the Cloudflare dashboard, under Rate Limiting rules, select **"True Client IP
 
 The underlying cause of 59% of findings in this engagement is a network architecture where database and administrative services are exposed on the same public IP as web services, with no network-level segregation:
 
-*[Figure 5.2: Recommended network security architecture — recommended_architecture.png]*
+*[Figure 5.1: Recommended network security architecture — recommended_architecture.png]*
 
 Moving to dedicated hosting with proper network segmentation would eliminate the shared hosting lateral movement risk, the exposed admin panels, and the publicly accessible database in a single infrastructure change.
 
