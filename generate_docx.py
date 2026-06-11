@@ -295,75 +295,98 @@ GANTT_T3 = {
 }
 
 def gantt_table(doc, data):
-    """Build a Gantt table in Word matching ACTION_PLAN.html layout."""
-    from docx.oxml.ns import qn as _qn
+    """Gantt table with vertical week headers, matching reference image style."""
+    MONTH_COLORS = {"feb":"4472C4","mar":"FFC000","apr":"ED7D31","may":"FF99CC"}
+    MONTH_TXT    = {"feb":"ffffff","mar":"000000","apr":"ffffff","may":"000000"}
+    ACT_ON  = "70AD47"   # green for active weeks
+    ACT_OFF = "ffffff"
+    SEC_BG  = "D9D9D9"
+    HDR_BG  = "1F3864"   # dark navy for No/Activities header
+
     months = data["months"]
     groups = data["groups"]
-    # count total rows: 2 header rows + per group: 1 section + N activities
     total_rows = 2 + sum(1 + len(acts) for _,_,acts in groups)
     tbl = doc.add_table(rows=total_rows, cols=10)
     tbl.style = 'Table Grid'
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
 
-    # column widths: No=0.8, Activities=5.8, 8 week cols=1.175 each
-    widths = [Cm(0.8), Cm(5.8)] + [Cm(1.175)]*8
-    for ri in range(total_rows):
-        for ci, w in enumerate(widths):
-            tbl.cell(ri, ci).width = w
+    # Widths: No=0.7cm, Activities=6.0cm, 8 week cols=1.06cm each (≈16cm total)
+    col_w = [Cm(0.7), Cm(6.0)] + [Cm(1.06)]*8
+    for row in tbl.rows:
+        for ci, w in enumerate(col_w):
+            row.cells[ci].width = w
 
-    def gcell(ri, ci, text, bg=None, txt_color="000000", bold=False,
-               align=WD_ALIGN_PARAGRAPH.CENTER, size=9):
-        c = tbl.cell(ri, ci)
-        p = c.paragraphs[0]
+    def _write(cell, text, bg=None, txt_color="000000", bold=False,
+                align=WD_ALIGN_PARAGRAPH.CENTER, size=9, vertical=False):
+        """Clear cell, set background, write text with optional vertical rotation."""
+        if bg:
+            set_bg(cell, bg)
+        set_cell_vert(cell, 'center')
+        if vertical:
+            tc = cell._tc; tcPr = tc.get_or_add_tcPr()
+            td = OxmlElement('w:textDirection'); td.set(qn('w:val'), 'btLr')
+            tcPr.append(td)
+        for p in cell.paragraphs:   # clear any existing content
+            for r in p.runs: r.clear()
+        p = cell.paragraphs[0]
         p.alignment = align
         p.paragraph_format.first_line_indent = Cm(0)
-        p.paragraph_format.space_before = Pt(2)
-        p.paragraph_format.space_after  = Pt(2)
-        r2 = p.add_run(text)
-        r2.font.name = 'Times New Roman'; r2.font.size = Pt(size)
-        r2.font.bold = bold
-        if txt_color != "000000": r2.font.color.rgb = hex2rgb(txt_color)
-        if bg: set_bg(c, bg)
-        set_cell_vert(c)
+        p.paragraph_format.space_before = Pt(1)
+        p.paragraph_format.space_after  = Pt(1)
+        if text:
+            r = p.add_run(text)
+            r.font.name = 'Times New Roman'; r.font.size = Pt(size); r.font.bold = bold
+            if txt_color != "000000": r.font.color.rgb = hex2rgb(txt_color)
 
-    def merge_h(ri, c1, c2):
-        tbl.cell(ri, c1).merge(tbl.cell(ri, c2))
+    def _set_row_height(row, cm):
+        tr = row._tr; trPr = tr.get_or_add_trPr()
+        for x in trPr.findall(qn('w:trHeight')): trPr.remove(x)
+        h = OxmlElement('w:trHeight')
+        h.set(qn('w:val'), str(int(cm / 2.54 * 1440)))
+        h.set(qn('w:hRule'), 'atLeast')
+        trPr.append(h)
 
-    # Row 0: No | Activities | Month1 (span 4) | Month2 (span 4)
-    gcell(0, 0, "No",         bg="2E74B5", txt_color="ffffff", bold=True)
-    gcell(0, 1, "Activities", bg="2E74B5", txt_color="ffffff", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
-    merge_h(0, 2, 5)
-    merge_h(0, 6, 9)
-    MONTH_COLORS = {"feb":"4f9fd6","mar":"ffe600","apr":"ffb84d","may":"ffb3c6"}
-    m1, tc1, fc1 = months[0]; m2, tc2, fc2 = months[1]
-    m1bg = MONTH_COLORS.get(m1.lower()[:3], "4f9fd6")
-    m2bg = MONTH_COLORS.get(m2.lower()[:3], "ffe600")
-    gcell(0, 2, m1, bg=m1bg, txt_color=tc1, bold=True)
-    gcell(0, 6, m2, bg=m2bg, txt_color=tc2, bold=True)
+    m1, tc1, _ = months[0]; m2, tc2, _ = months[1]
+    m1k = m1.lower()[:3]; m2k = m2.lower()[:3]
+    m1bg = MONTH_COLORS.get(m1k, "4472C4"); m1tc = MONTH_TXT.get(m1k, "ffffff")
+    m2bg = MONTH_COLORS.get(m2k, "FFC000"); m2tc = MONTH_TXT.get(m2k, "000000")
 
-    # Row 1: week sub-headers
-    gcell(1, 0, "",  bg="D9D9D9")
-    gcell(1, 1, "",  bg="D9D9D9")
+    # ── Row 0: No | Activities | Month1 (cols 2-5 merged) | Month2 (cols 6-9 merged)
+    _write(tbl.cell(0,0), "No",         bg=HDR_BG, txt_color="ffffff", bold=True, size=10)
+    _write(tbl.cell(0,1), "Activities", bg=HDR_BG, txt_color="ffffff", bold=True,
+           align=WD_ALIGN_PARAGRAPH.LEFT, size=10)
+    tbl.cell(0,2).merge(tbl.cell(0,5))
+    _write(tbl.cell(0,2), m1, bg=m1bg, txt_color=m1tc, bold=True, size=11)
+    tbl.cell(0,6).merge(tbl.cell(0,9))
+    _write(tbl.cell(0,6), m2, bg=m2bg, txt_color=m2tc, bold=True, size=11)
+
+    # ── Row 1: blank | blank | Week 1–4 (vertical) | Week 1–4 (vertical)
+    _write(tbl.cell(1,0), "", bg=HDR_BG)
+    _write(tbl.cell(1,1), "", bg=HDR_BG)
     for wi in range(4):
-        gcell(1, 2+wi, f"W{wi+1}", bg=m1bg, txt_color=tc1, bold=True)
-        gcell(1, 6+wi, f"W{wi+1}", bg=m2bg, txt_color=tc2, bold=True)
+        _write(tbl.cell(1, 2+wi), f"Week {wi+1}", bg=m1bg, txt_color=m1tc,
+               bold=True, size=8, vertical=True)
+        _write(tbl.cell(1, 6+wi), f"Week {wi+1}", bg=m2bg, txt_color=m2tc,
+               bold=True, size=8, vertical=True)
+    _set_row_height(tbl.rows[1], 2.2)   # tall enough for rotated "Week N" text
 
-    # Data rows
+    # ── Data rows
     ri = 2
     for grp_no, grp_title, activities in groups:
-        # Section header row — merge cols 1-9, leave col 0 for group number
-        merge_h(ri, 1, 9)
-        gcell(ri, 0, grp_no, bg="D9D9D9", bold=True)
-        gcell(ri, 1, grp_title, bg="D9D9D9", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
+        # Section header: number | title spanning remaining 9 cols
+        _write(tbl.cell(ri,0), grp_no, bg=SEC_BG, bold=True, size=10)
+        tbl.cell(ri,1).merge(tbl.cell(ri,9))
+        _write(tbl.cell(ri,1), grp_title, bg=SEC_BG, bold=True,
+               align=WD_ALIGN_PARAGRAPH.LEFT, size=10)
         ri += 1
         for act_text, weeks in activities:
-            gcell(ri, 0, "", bg="f2f2f2")
-            gcell(ri, 1, act_text, align=WD_ALIGN_PARAGRAPH.LEFT, size=9)
+            _write(tbl.cell(ri,0), "", bg="F2F2F2")
+            _write(tbl.cell(ri,1), act_text, align=WD_ALIGN_PARAGRAPH.LEFT, size=9)
             for wi, on in enumerate(weeks):
-                gcell(ri, 2+wi, "", bg="92d050" if on else "ffffff")
+                _write(tbl.cell(ri, 2+wi), "", bg=ACT_ON if on else ACT_OFF)
             ri += 1
 
-    # Caption below
+    # Caption
     cap = doc.add_paragraph()
     cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
     cap.paragraph_format.first_line_indent = Cm(0)
