@@ -228,14 +228,21 @@ def md_table(doc, rows_data):
             p = cell.paragraphs[0]
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p.paragraph_format.first_line_indent = Cm(0)
-            r = p.add_run(ct)
-            fmt(r, size=11, bold=(ri == 0))
             lo = ct.lower()
-            if ri == 0: set_bg(cell, C['blue'][0]); r.font.color.rgb = hex2rgb(C['blue'][1])
-            elif lo == 'critical': set_bg(cell, C['critical'][0]); r.font.color.rgb = hex2rgb(C['critical'][1]); r.font.bold = True
-            elif lo == 'high':     set_bg(cell, C['high'][0]);     r.font.color.rgb = hex2rgb(C['high'][1]);     r.font.bold = True
-            elif lo == 'medium':   set_bg(cell, C['medium'][0]);   r.font.bold = True
-            elif lo == 'low':      set_bg(cell, C['low'][0]);      r.font.color.rgb = hex2rgb(C['low'][1]);      r.font.bold = True
+            is_hdr = (ri == 0)
+            # determine cell color first so we can apply to runs
+            if is_hdr:
+                set_bg(cell, C['blue'][0]); txt_clr = C['blue'][1]
+            elif lo == 'critical': set_bg(cell, C['critical'][0]); txt_clr = C['critical'][1]
+            elif lo == 'high':     set_bg(cell, C['high'][0]);     txt_clr = C['high'][1]
+            elif lo == 'medium':   set_bg(cell, C['medium'][0]);   txt_clr = None
+            elif lo == 'low':      set_bg(cell, C['low'][0]);      txt_clr = C['low'][1]
+            else:                                                   txt_clr = None
+            add_inline_md(p, ct, size=11)
+            for r in p.runs:
+                r.font.size = Pt(11)
+                if is_hdr or lo in ('critical','high','low'): r.font.bold = True
+                if txt_clr: r.font.color.rgb = hex2rgb(txt_clr)
     doc.add_paragraph()
 
 # ── Complete figure maps ──────────────────────────────────────────────────────
