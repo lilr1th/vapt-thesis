@@ -1,0 +1,146 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Attack Chain Analysis">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="title" value="Attack Chain Analysis — neuralsh.com (103.16.62.217)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="1250" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- CHAIN 1 HEADER -->
+        <mxCell id="c1h" value="Chain 1 — WHM Server Takeover" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c1_1" value="Attacker (Internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c1_2" value="DNS MX Lookup&#xa;→ mail.neuralsh.com&#xa;→ 103.16.62.217 (Origin IP)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="230" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c1_3" value="Nmap Scan&#xa;Port 2087 Open (WHM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="320" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c1_4" value="WHM Login Page&#xa;No IP Restriction&#xa;No 2FA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="405" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c1_5" value="Brute Force / Password Reset&#xa;via Email Compromise" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="495" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c1_6" value="WHM Root Access&#xa;Terminal → Root Shell&#xa;ALL hosted domains compromised" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="580" width="200" height="60" as="geometry" />
+        </mxCell>
+        <!-- Chain 1 arrows -->
+        <mxCell id="a1_1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c1_1" target="c1_2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a1_2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c1_2" target="c1_3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a1_3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c1_3" target="c1_4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a1_4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c1_4" target="c1_5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a1_5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c1_5" target="c1_6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- CHAIN 2 HEADER -->
+        <mxCell id="c2h" value="Chain 2 — Rate Limit Bypass ✓ EXPLOITED" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="80" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c2_1" value="Attacker (Internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="150" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c2_2" value="Load neuralsh.com&#xa;Extract JS Bundle&#xa;→ /web/v1/init/token found" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="230" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c2_3" value="Send requests with&#xa;rotating X-Forwarded-For headers&#xa;(spoofed IP per request)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="320" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c2_4" value="50/50 requests → HTTP 200&#xa;0 rate-limit responses&#xa;100% bypass confirmed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="420" y="410" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c2_5" value="50 valid JWT tokens farmed&#xa;in ~3 seconds&#xa;→ Unlimited API access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="500" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c2_6" value="Perpetual token refresh&#xa;→ Enumerate all API endpoints&#xa;→ Data exfiltration risk" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="590" width="220" height="55" as="geometry" />
+        </mxCell>
+        <!-- Chain 2 arrows -->
+        <mxCell id="a2_1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c2_1" target="c2_2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2_2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c2_2" target="c2_3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2_3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c2_3" target="c2_4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2_4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c2_4" target="c2_5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2_5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c2_5" target="c2_6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- CHAIN 3 HEADER -->
+        <mxCell id="c3h" value="Chain 3 — MikroTik Network Takeover" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="80" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c3_1" value="Attacker (Internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="780" y="150" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c3_2" value="Nmap Scan&#xa;Port 9001 Open&#xa;MikroTik WebFig detected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="780" y="230" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c3_3" value="Navigate to port 9001&#xa;RouterOS v6.49.18 login page&#xa;Username: admin (pre-filled)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="780" y="320" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c3_4" value="Default credentials&#xa;admin / (blank password)&#xa;→ Full RouterOS access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="780" y="415" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c3_5" value="Packet Sniffer → intercept all traffic&#xa;Modify routing tables&#xa;Remove firewall rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="505" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c3_6" value="Persistent backdoor account&#xa;Full network infrastructure control" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="600" width="200" height="50" as="geometry" />
+        </mxCell>
+        <!-- Chain 3 arrows -->
+        <mxCell id="a3_1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c3_1" target="c3_2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3_2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c3_2" target="c3_3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3_3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c3_3" target="c3_4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3_4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c3_4" target="c3_5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3_5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c3_5" target="c3_6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- CHAIN 4 HEADER -->
+        <mxCell id="c4h" value="Chain 4 — MySQL Data Exfiltration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="80" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_1" value="Attacker (Internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="150" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_2" value="Nmap Scan&#xa;Port 3306 Open&#xa;MySQL 8.0.43 detected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="230" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_3" value="Direct MySQL connection&#xa;from public internet confirmed&#xa;(AUTH handshake accepted)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="320" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_4" value="Credential brute-force&#xa;via Hydra / custom script&#xa;No rate limiting on DB layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="415" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_5" value="Full DB access&#xa;→ Read all user data&#xa;→ API keys / secrets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="505" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_6" value="MySQL UDF abuse&#xa;→ Remote Code Execution&#xa;→ Full server compromise" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="595" width="200" height="55" as="geometry" />
+        </mxCell>
+        <!-- Chain 4 arrows -->
+        <mxCell id="a4_1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c4_1" target="c4_2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4_2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c4_2" target="c4_3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4_3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c4_3" target="c4_4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4_4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c4_4" target="c4_5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4_5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="c4_5" target="c4_6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- LEGEND -->
+        <mxCell id="leg1" value="Starting Point" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="690" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="Reconnaissance / Enumeration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="180" y="690" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="Vulnerability Exploited" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="690" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="Full Compromise / Impact" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AE4132;strokeColor=#6c1800;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="560" y="690" width="180" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
