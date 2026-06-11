@@ -216,6 +216,130 @@ def md_table(doc, rows_data):
 
 # ── Complete figure maps ──────────────────────────────────────────────────────
 
+# ── Gantt / Action Plan tables ───────────────────────────────────────────────
+#   on=1 → green cell (#92d050), off=0 → white
+GANTT_T2 = {
+    "caption": "Table 2: Action plan from February to March",
+    "months":  [("February","4f9fd6","ffffff"), ("March","ffe600","000000")],
+    "groups": [
+        ("1","Environment Setup & Scope Definition",[
+            ("Set up Kali Linux testing environment and tools",          [1,1,0,0,0,0,0,0]),
+            ("Define engagement scope with Prestige Alliance Co., Ltd.", [1,1,0,0,0,0,0,0]),
+            ("Obtain written authorization for neuralsh.com testing",    [0,1,1,0,0,0,0,0]),
+        ]),
+        ("2","Reconnaissance & Intelligence Gathering",[
+            ("WHOIS analysis and DNS enumeration (A, MX, TXT, NS records)", [0,0,1,1,0,0,0,0]),
+            ("Discover real origin IP via MX record and SSL certificate",    [0,0,1,1,0,0,0,0]),
+            ("Subdomain enumeration and wildcard DNS detection",             [0,0,0,1,1,0,0,0]),
+            ("JavaScript bundle analysis to extract API routes",             [0,0,0,0,1,1,0,0]),
+        ]),
+        ("3","Active Scanning & Enumeration",[
+            ("Nmap port scan on origin server (103.16.62.217)",          [0,0,0,0,0,1,1,0]),
+            ("Web directory enumeration with Dirb and Nikto",            [0,0,0,0,0,0,1,1]),
+            ("Service fingerprinting — MySQL, SMTP, MikroTik, WHM",     [0,0,0,0,0,0,1,1]),
+        ]),
+    ]
+}
+GANTT_T3 = {
+    "caption": "Table 3: Action plan from April to May",
+    "months":  [("April","ffb84d","000000"), ("May","ffb3c6","000000")],
+    "groups": [
+        ("4","Vulnerability Assessment & Manual Testing",[
+            ("Test authentication and rate limiting controls",              [1,1,0,0,0,0,0,0]),
+            ("Analyze JWT token issuance and session management",           [1,1,0,0,0,0,0,0]),
+            ("Assess exposed admin panels (WHM, cPanel, MikroTik, MySQL)", [0,1,1,0,0,0,0,0]),
+            ("Assign CVSS v3.1 scores to all identified findings",          [0,0,1,1,0,0,0,0]),
+        ]),
+        ("5","Exploitation & Post-Exploitation",[
+            ("Rate limit bypass via X-Forwarded-For header spoofing",      [0,0,0,1,1,0,0,0]),
+            ("JWT token farming — 50 tokens, 0 rate-limit responses",      [0,0,0,1,1,0,0,0]),
+            ("Attack chain mapping and lateral movement risk analysis",     [0,0,0,0,1,1,0,0]),
+        ]),
+        ("6","Report Writing & Thesis Documentation",[
+            ("Write professional VAPT report with all findings and evidence",[0,0,0,0,0,1,1,0]),
+            ("Design attack chain diagrams and infrastructure map",          [0,0,0,0,0,1,1,0]),
+            ("Write thesis document and prepare for submission",             [0,0,0,0,0,0,1,1]),
+        ]),
+    ]
+}
+
+def gantt_table(doc, data):
+    """Build a Gantt table in Word matching ACTION_PLAN.html layout."""
+    from docx.oxml.ns import qn as _qn
+    months = data["months"]
+    groups = data["groups"]
+    # count total rows: 2 header rows + per group: 1 section + N activities
+    total_rows = 2 + sum(1 + len(acts) for _,_,acts in groups)
+    tbl = doc.add_table(rows=total_rows, cols=10)
+    tbl.style = 'Table Grid'
+    tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+    # column widths: No=0.8, Activities=5.8, 8 week cols=1.175 each
+    widths = [Cm(0.8), Cm(5.8)] + [Cm(1.175)]*8
+    for ri in range(total_rows):
+        for ci, w in enumerate(widths):
+            tbl.cell(ri, ci).width = w
+
+    def gcell(ri, ci, text, bg=None, txt_color="000000", bold=False,
+               align=WD_ALIGN_PARAGRAPH.CENTER, size=9):
+        c = tbl.cell(ri, ci)
+        p = c.paragraphs[0]
+        p.alignment = align
+        p.paragraph_format.first_line_indent = Cm(0)
+        p.paragraph_format.space_before = Pt(2)
+        p.paragraph_format.space_after  = Pt(2)
+        r2 = p.add_run(text)
+        r2.font.name = 'Times New Roman'; r2.font.size = Pt(size)
+        r2.font.bold = bold
+        if txt_color != "000000": r2.font.color.rgb = hex2rgb(txt_color)
+        if bg: set_bg(c, bg)
+        set_cell_vert(c)
+
+    def merge_h(ri, c1, c2):
+        tbl.cell(ri, c1).merge(tbl.cell(ri, c2))
+
+    # Row 0: No | Activities | Month1 (span 4) | Month2 (span 4)
+    gcell(0, 0, "No",         bg="2E74B5", txt_color="ffffff", bold=True)
+    gcell(0, 1, "Activities", bg="2E74B5", txt_color="ffffff", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
+    merge_h(0, 2, 5)
+    merge_h(0, 6, 9)
+    MONTH_COLORS = {"feb":"4f9fd6","mar":"ffe600","apr":"ffb84d","may":"ffb3c6"}
+    m1, tc1, fc1 = months[0]; m2, tc2, fc2 = months[1]
+    m1bg = MONTH_COLORS.get(m1.lower()[:3], "4f9fd6")
+    m2bg = MONTH_COLORS.get(m2.lower()[:3], "ffe600")
+    gcell(0, 2, m1, bg=m1bg, txt_color=tc1, bold=True)
+    gcell(0, 6, m2, bg=m2bg, txt_color=tc2, bold=True)
+
+    # Row 1: week sub-headers
+    gcell(1, 0, "",  bg="D9D9D9")
+    gcell(1, 1, "",  bg="D9D9D9")
+    for wi in range(4):
+        gcell(1, 2+wi, f"W{wi+1}", bg=m1bg, txt_color=tc1, bold=True)
+        gcell(1, 6+wi, f"W{wi+1}", bg=m2bg, txt_color=tc2, bold=True)
+
+    # Data rows
+    ri = 2
+    for grp_no, grp_title, activities in groups:
+        # Section header row — merge cols 1-9, leave col 0 for group number
+        merge_h(ri, 1, 9)
+        gcell(ri, 0, grp_no, bg="D9D9D9", bold=True)
+        gcell(ri, 1, grp_title, bg="D9D9D9", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
+        ri += 1
+        for act_text, weeks in activities:
+            gcell(ri, 0, "", bg="f2f2f2")
+            gcell(ri, 1, act_text, align=WD_ALIGN_PARAGRAPH.LEFT, size=9)
+            for wi, on in enumerate(weeks):
+                gcell(ri, 2+wi, "", bg="92d050" if on else "ffffff")
+            ri += 1
+
+    # Caption below
+    cap = doc.add_paragraph()
+    cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cap.paragraph_format.first_line_indent = Cm(0)
+    cap.paragraph_format.space_after = Pt(12)
+    r3 = cap.add_run(data["caption"])
+    r3.font.name = 'Times New Roman'; r3.font.size = Pt(10); r3.font.italic = True
+
 # Logos / diagrams for Chapters 1–3 (key = figure number as string)
 LOGO_FIGURES = {
     "1":  (os.path.join(IMGS, "prestige_logo.png"),        "Figure 1: Prestige Alliance company logo"),
@@ -733,6 +857,12 @@ def process_md(doc):
             if in_table:
                 if not in_53: md_table(doc, table_rows)
                 table_rows=[]; in_table=False
+
+        # ── Action plan Gantt tables ──────────────────────────────────────
+        if re.match(r'\*\[Table 2:.*ACTION_PLAN', stripped):
+            gantt_table(doc, GANTT_T2); i+=1; continue
+        if re.match(r'\*\[Table 3:.*ACTION_PLAN', stripped):
+            gantt_table(doc, GANTT_T3); i+=1; continue
 
         # ── Figure insertions ──────────────────────────────────────────────
         # Logo figures: *[Figure N: description — filename.ext]*
