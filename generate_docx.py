@@ -671,6 +671,29 @@ def add_front_matter(doc):
     body(doc, "I am deeply grateful to the management and technical team at Prestige Alliance Co., Ltd. for providing the opportunity to conduct this vulnerability assessment and penetration testing engagement on neuralsh.com, and for their professional guidance during the internship period.")
     body(doc, "I also extend my appreciation to all colleagues and peers who provided feedback during the preparation of this report.")
 
+    # ── Khmer Abstract (មូលដ្ឋានទេច) ─────────────────────────────────────────
+    # ITC requires a Khmer-language summary as page II of front matter.
+    # The heading uses Khmer OS font; paste your Khmer text in place of the placeholder.
+    p_kh = doc.add_paragraph(style='Heading 1')
+    p_kh.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    rk = p_kh.add_run("មូលដ្ឋានទេច")
+    rk.font.name = "Khmer OS"          # requires Khmer OS or Khmer UI font
+    rk.font.size = Pt(16)
+    rk.font.bold = True
+    rk.font.color.rgb = RGBColor(0, 0, 0)
+
+    p_kh_body = doc.add_paragraph()
+    p_kh_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    p_kh_body.paragraph_format.first_line_indent = Cm(1.27)
+    p_kh_body.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+    p_kh_body.paragraph_format.space_after = Pt(6)
+    r_kh = p_kh_body.add_run(
+        "[បញ្ចូលសរុបខ្លឹមសារជាភាសាខ្មែររបស់អ្នកនៅទីនេះ។ "
+        "ចម្លងអត្ថបទខ្មែររបស់អ្នកហើយជំនួសអត្ថបទក្នុងតង្កៀបនេះ។]"
+    )
+    r_kh.font.name = "Khmer OS"
+    r_kh.font.size = Pt(12)
+
     # ── Abstract ────────────────────────────────────────────────────────────
     ch_head(doc, "ABSTRACT")
     body(doc, "This report presents a comprehensive Vulnerability Assessment and Penetration Testing (VAPT) engagement conducted on neuralsh.com, an AI-powered neural search platform, as part of an internship at Prestige Alliance Co., Ltd. The assessment was authorized in writing prior to testing, and all activities were conducted in accordance with the OWASP Testing Guide and established ethical hacking standards.")
