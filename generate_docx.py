@@ -405,7 +405,7 @@ SHOT_FIGURES = {
     "4.11": (os.path.join(SHOTS, "fig411_mikrotik.png"),                 "Figure 4.11: MikroTik RouterOS WebFig login page — publicly accessible"),
     "4.12": (os.path.join(SHOTS, "fig412_nikto.png"),                    "Figure 4.12: Nikto web scanner results against neuralsh.com"),
     "4.13": (os.path.join(SHOTS, "fig413_nuclei.png"),                   "Figure 4.13: Nuclei vulnerability scan — zero matches returned"),
-    "4.14": (os.path.join(SHOTS, "fig414_waf_bypass.png"),               "Figure 4.14: Burp Suite — Cloudflare WAF bypass confirmation (cloudflare vs Apache headers)"),
+    "4.14": (os.path.join(SHOTS, "fig414a_burp_cloudflare.png"),          "Figure 4.14: Burp Suite — Cloudflare WAF bypass confirmation (cloudflare vs Apache headers)"),
     "4.15": (os.path.join(SHOTS, "fig415b_ratelimit_bypass.png"),        "Figure 4.15: Rate limit bypass — fifty/fifty tokens, zero rate-limit responses"),
     "4.16": (os.path.join(SHOTS, "fig416_jwt_404.png"),                  "Figure 4.16: JWT endpoint confirmed live — HTTP 200 as of eleven June 2026"),
     "4.17": (os.path.join(SHOTS, "fig417_whm_browser.png"),              "Figure 4.17: WHM admin panel at 103.16.62.217:2087 — publicly accessible"),
@@ -422,7 +422,10 @@ APPENDIX_SHOTS = {
         (os.path.join(SHOTS, "fig49_nmap.png"),
          "Figure A.1: Nmap full port scan — 103.16.62.217 (twenty-three open ports confirmed)"),
     ],
-    "B": [],  # No screenshot — Dirb output shown as code
+    "B": [
+        (os.path.join(SHOTS, "fig48b_ssl_onesala.png"),
+         "Figure B.1: SSL certificate showing onesala.com on same origin server — shared hosting confirmed"),
+    ],
     "C": [
         (os.path.join(SHOTS, "fig415_ratelimit_30requests.png"),
          "Figure C.1: Thirty consecutive HTTP 200 responses — rate limiting not active"),
@@ -432,8 +435,10 @@ APPENDIX_SHOTS = {
     "D": [
         (os.path.join(SHOTS, "fig415_jwt_token_burp.png"),
          "Figure D.1: JWT token response in Burp Suite"),
+        (os.path.join(SHOTS, "fig415b_jwt_token.png"),
+         "Figure D.2: JWT token decoded — header and payload structure"),
         (os.path.join(SHOTS, "fig416_jwt_404.png"),
-         "Figure D.2: JWT endpoint returning HTTP 200 — confirmed unpatched as of eleven June 2026"),
+         "Figure D.3: JWT endpoint returning HTTP 200 — confirmed unpatched as of eleven June 2026"),
     ],
     "E": [],  # No dedicated follow-up scan screenshot
 }
