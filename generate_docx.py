@@ -831,9 +831,12 @@ def add_front_matter(doc):
 
     # ACKNOWLEDGMENT
     front_head(doc, "ACKNOWLEDGMENT")
-    body(doc, "I would like to express my sincere gratitude to the President of the Institution of Technology of Cambodia, the Head of the Department of General Studies and Natural Sciences, and my academic supervisor for their continuous guidance and support throughout this internship programme.")
-    body(doc, "I am deeply grateful to the management and technical team at Prestige Alliance Co., Ltd. for providing the opportunity to conduct this vulnerability assessment and penetration testing engagement on neuralsh.com, and for their professional guidance during the internship period.")
-    body(doc, "I also extend my appreciation to all colleagues and peers who provided feedback during the preparation of this report.")
+    body(doc, "Before I start this report, I would like to express my sincere gratitude to our school and to everyone who has contributed to the making of this report. Everyone has dedicated their hard work and efforts, without which it would not have been possible to achieve this accomplishment. I am very grateful for the opportunity and the guidance that allowed me to grow and enhance my knowledge in both hard and soft skills. I would like to extend my appreciation to the following individuals:")
+    body(doc, "First of all, I would like to offer my sincere thanks to **H.E. PO Kimtho, Director of the Institute of Technology of Cambodia, a.k.a (ITC)**. For his leadership and efforts that steer our institute to be one of the top universities in Cambodia. His cooperation with local and international enterprises has been instrumental in making this opportunity possible.")
+    body(doc, "Secondly, I would like to express my appreciation to **MR. LAY Heng, Head of Department of Information and Communication Engineering (DICE) at ITC**. His guidance and management have provided excellent education and courses within our department which are the foundation of this internship.")
+    body(doc, "Thirdly, I would like to give my deep gratitude to my supervisor, **DR. KUY Movsun, Lecturer at the Department of Information and Communication Engineering (DICE), ITC**. His kindness and dedication of time have guided this internship to achieve its goals. From the beginning of the internship to the final report, his thoughtful suggestions were invaluable.")
+    body(doc, "Finally, I would like to express my sincere thanks to my advisor, **MR. KIM Sereyvuth, Head of Red Team at Prestige Alliance Co., Ltd**. He has allowed me to conduct this vulnerability assessment and penetration testing engagement and generously dedicated his invaluable time to allow me to learn more in cybersecurity skills. He provided the incredible opportunity that enhanced my technical skills.")
+    body(doc, "Additionally, I would like to extend my deep appreciation to all others who have supported me during this internship. Your kindness and assistance have been essential to this accomplishment. I wish everyone all the best.")
 
     # KHMER ABSTRACT (មូលដ្ឋានទេច)
     p_kh = doc.add_paragraph(style='Heading 1')
