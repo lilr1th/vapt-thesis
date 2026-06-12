@@ -838,34 +838,40 @@ def add_front_matter(doc):
     body(doc, "Finally, I would like to express my sincere thanks to my advisor, **MR. KIM Sereyvuth, Head of Red Team at Prestige Alliance Co., Ltd**. He has allowed me to conduct this vulnerability assessment and penetration testing engagement and generously dedicated his invaluable time to allow me to learn more in cybersecurity skills. He provided the incredible opportunity that enhanced my technical skills.")
     body(doc, "Additionally, I would like to extend my deep appreciation to all others who have supported me during this internship. Your kindness and assistance have been essential to this accomplishment. I wish everyone all the best.")
 
-    # KHMER ABSTRACT (មូលដ្ឋានទេច)
+    # KHMER ABSTRACT
     p_kh = doc.add_paragraph(style='Heading 1')
     p_kh.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    rk = p_kh.add_run("មូលដ្ឋានទេច")
+    rk = p_kh.add_run("អក្គបទសង្ខេប")
     rk.font.name = "Khmer OS"; rk.font.size = Pt(12)
     rk.font.bold = True; rk.font.color.rgb = RGBColor(0,0,0)
-    p_kh_body = doc.add_paragraph()
-    p_kh_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p_kh_body.paragraph_format.first_line_indent = Cm(1.27)
-    p_kh_body.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
-    p_kh_body.paragraph_format.space_after = Pt(6)
-    r_kh = p_kh_body.add_run("[បញ្ចូលសរុបខ្លឹមសារជាភាសាខ្មែររបស់អ្នកនៅទីនេះ — paste your Khmer summary here]")
-    r_kh.font.name = "Khmer OS"; r_kh.font.size = Pt(12)
-    r_kh.font.italic = True; r_kh.font.color.rgb = RGBColor(0x80,0x80,0x80)
+
+    def kh_body(text):
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        p.paragraph_format.first_line_indent = Cm(1.27)
+        p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+        p.paragraph_format.space_after = Pt(6)
+        r = p.add_run(text)
+        r.font.name = "Khmer OS"; r.font.size = Pt(12)
+
+    kh_body("នេះគឺជាការហ្វឹកហ្វឺនការងាររយៈពេល ៤ ខែ នៅ Prestige Alliance Co., Ltd. ចាប់ពីខែកុម្ភៈ ដល់ ខែឧសភា ឆ្នាំ ២០២៦។ និស្សិតឆ្នាំទី ៥ ទាំងអស់ ត្រូវបានតម្រូវឱ្យដាក់ពាក្យសុំការហ្វឹកហ្វឺន ដើម្បីបញ្ចូលក្នុងការការពារអត្ថបទបញ្ចប់ការសិក្សា ដែលនឹងប្រព្រឹត្តទៅនៅខែកក្កដា ឆ្នាំ ២០២៦។ និស្សិតម្នាក់ៗ ត្រូវតែអនុវត្តជំនាញដែលបានរៀននៅ GIC ក្នុងស្ថានភាពជាក់ស្តែង ដូចជា ការងារ ឬ ការហ្វឹកហ្វឺន យ៉ាងតិច ៣.៥ ខែ។")
+    kh_body("គម្រោងហ្វឹកហ្វឺនរបស់ខ្ញុំ ដែលមានចំណងជើងថា «ការវាយតម្លៃភាពងាយរងគ្រោះ និង ការធ្វើតេស្តការជ្រៀតចូលលើ neuralsh.com» មានគោលបំណងពង្រឹងជំនាញបច្ចេកទេសសន្តិសុខតាមអ៊ីនធឺណិត ដែលខ្ញុំបានទទួលក្នុងអំឡុងឆ្នាំសិក្សានៅ GIC។ ជំនាញទាំងនេះ ត្រូវបានប្រើប្រាស់ ក្នុងការកំណត់អត្តសញ្ញាណ ការវាយតម្លៃ និង ការដោះស្រាយភាពងាយរងគ្រោះ នៃ neuralsh.com ដើម្បីការពារការវាយប្រហារតាមអ៊ីនធឺណិតពីអ្នកគំរាមកំហែងអនាមិក។")
+    kh_body("ក្នុងអំឡុងការវាយតម្លៃ ឧបករណ៍ជាច្រើនត្រូវបានពិនិត្យ ប៉ុន្តែមានតែឧបករណ៍ចាំបាច់ប៉ុណ្ណោះ ត្រូវបានជ្រើសរើស ដោយផ្អែកលើស្តង់ដារ OWASP TOP 10។ ភាពងាយរងគ្រោះចំនួន ១៧ ត្រូវបានកំណត់ ចែកចេញជា ៤ វិកល្ប ៤ ខ្ពស់ ៦ មធ្យម និង ៣ ទាប។ ក្នុងចំណោមការរកឃើញដ៏ធ្ងន់ធ្ងរ គឺមានការបញ្ជាក់ពីការរំលំប្រព័ន្ធគ្រប់គ្រងល្បឿនស្នើសុំ ដោយមានអត្រាជោគជ័យ ១០០ ភាគរយ ដែលបង្ហាញពីគ្មានការការពារការផ្ទៀងផ្ទាត់ភាពត្រឹមត្រូវ។")
+    kh_body("សរុបសេចក្តី ការហ្វឹកហ្វឺននេះ គឺជាបទពិសោធន៍សំខាន់ ដែលអនុញ្ញាតឱ្យខ្ញុំ អនុវត្តជំនាញ ក្នុងបរិយាកាសវិជ្ជាជីវៈពិតប្រាកដ។ វាបានពង្រីកចំណេះដឹង លើសពីអ្វីដែលខ្ញុំបានរៀននៅ ITC។ ខ្ញុំសូមថ្លែងអំណរគុណ ចំពោះ Prestige Alliance Co., Ltd. ចំពោះឱកាសសិក្សា ព្រមទាំងអំណរគុណ ITC ចំពោះការណែនាំ របស់គ្រូបង្គោល និង អ្នកត្រួតពិនិត្យ ដែលបានធ្វើឱ្យការហ្វឹកហ្វឺននេះ បញ្ចប់ដោយជោគជ័យ។")
 
     # RÉSUMÉ (French)
     front_head(doc, "RÉSUMÉ")
-    body(doc, "Ce rapport présente un engagement complet d'Évaluation des Vulnérabilités et de Tests de Pénétration (VAPT) réalisé sur neuralsh.com, une plateforme de recherche neurale alimentée par l'intelligence artificielle, dans le cadre d'un stage au sein de Prestige Alliance Co., Ltd. L'évaluation a été autorisée par écrit avant le début des tests, et toutes les activités ont été menées conformément au guide de test OWASP et aux normes éthiques établies.")
-    body(doc, "Une méthodologie boîte noire a été appliquée, simulant un attaquant externe sans connaissance préalable du système cible. L'engagement a suivi le cycle complet des tests d'intrusion : reconnaissance, analyse, énumération, exploitation, post-exploitation et rapport. Vingt vulnérabilités distinctes ont été découvertes : quatre Critiques, cinq Élevées, sept Moyennes et quatre Faibles. Les résultats critiques comprennent une base de données MySQL exposée publiquement, un panneau d'administration de routeur réseau MikroTik, un panneau de contrôle d'hébergement cPanel et un panneau d'administration de serveur racine WHM, tous accessibles depuis l'internet public sans restriction d'adresse IP.")
-    body(doc, "Un contrôle de limitation de débit a été contourné avec succès via la falsification d'en-têtes HTTP, permettant une génération illimitée de jetons API. Une analyse de vérification de suivi a confirmé que toutes les découvertes originales n'étaient pas corrigées et a identifié trois nouvelles vulnérabilités.")
-    body(doc, "Mots-clés : Tests de pénétration, VAPT, Sécurité des applications web, OWASP, Contournement de limitation de débit, Analyse JWT, Exposition cPanel, MikroTik, Tests boîte noire, CVSS v3.1")
+    body(doc, "Il s'agit d'un stage de 4 mois chez **Prestige Alliance Co., Ltd.**, de février à mai 2026. Tous les étudiants de cinquième année étaient tenus de postuler à un stage afin de l'intégrer dans leur soutenance de mémoire prévue en juillet 2026. Chaque étudiant devait appliquer les compétences acquises au cours de la formation à **GIC** dans des situations réelles, telles qu'un emploi ou un stage, d'une durée d'au moins 3,5 mois.")
+    body(doc, "Mon projet de stage, intitulé **« L'Évaluation des Vulnérabilités et les Tests de Pénétration sur neuralsh.com »**, avait pour objectif de renforcer les compétences techniques en cybersécurité acquises pendant mon cursus universitaire en tant qu'étudiant en informatique au sein du département **GIC**. Ces compétences ont été principalement mobilisées pour identifier, évaluer et corriger les failles de sécurité de la plateforme cible, neuralsh.com, afin de prévenir les cyberattaques menées par des acteurs malveillants anonymes.")
+    body(doc, "Au cours des tests et des investigations, plusieurs outils ont été examinés, mais seuls ceux jugés essentiels ont été retenus, en nous basant sur la norme **OWASP TOP 10**. Une approche boîte noire a été appliquée tout au long de l'engagement. Dix-sept vulnérabilités ont été identifiées et classées par niveau de gravité : faible, moyen, élevé et critique. Parmi les résultats critiques figuraient un panneau d'administration WHM, un port MySQL, un panneau d'administration MikroTik et un contournement du WAF Cloudflare via la divulgation de l'adresse IP d'origine. Un contournement de la limitation de débit a été confirmé avec un taux de réussite de 100 %.")
+    body(doc, "En résumé, ce stage a représenté une expérience précieuse qui m'a permis de mettre en pratique les compétences acquises dans un cadre professionnel réel. Il m'a permis d'approfondir mes connaissances au-delà de ce que j'avais appris à **l'ITC**. Je tiens à exprimer ma sincère gratitude à **Prestige Alliance Co., Ltd.** pour l'opportunité qu'ils m'ont offerte, ainsi qu'à **l'ITC** pour l'encadrement de mes superviseurs et professeurs, qui a été déterminant dans la réussite de ce stage.")
 
     # ABSTRACT
     front_head(doc, "ABSTRACT")
-    body(doc, "This report presents a comprehensive Vulnerability Assessment and Penetration Testing (VAPT) engagement conducted on neuralsh.com, an AI-powered neural search platform, as part of an internship at Prestige Alliance Co., Ltd. The assessment was authorized in writing prior to testing, and all activities were conducted in accordance with the OWASP Testing Guide and established ethical hacking standards.")
-    body(doc, "A black-box methodology was applied, simulating an external attacker with no prior knowledge of the target system. The engagement followed the complete penetration testing lifecycle: reconnaissance, scanning, enumeration, exploitation, post-exploitation, and reporting. Twenty distinct vulnerabilities were discovered: four Critical, five High, seven Medium, and four Low severity findings. Critical findings include a publicly exposed MySQL database, a MikroTik network router administration panel, a cPanel hosting control panel, and a WHM root server administration panel — all accessible from the public internet without IP restriction.")
-    body(doc, "A rate-limiting control was successfully bypassed via HTTP header spoofing, enabling unlimited API token generation. A follow-up verification scan conducted on ten June 2026 confirmed all original findings remained unpatched and identified three additional findings.")
-    body(doc, "Keywords: Penetration Testing, VAPT, Web Application Security, OWASP, Rate Limiting Bypass, JWT Analysis, cPanel Exposure, MikroTik, Black Box Testing, CVSS v3.1")
+    body(doc, "This is a 4-month internship at **Prestige Alliance Co., Ltd.** from **February to May 2026**. All fifth-year students were required to apply for the internship to incorporate it into their thesis defence, which takes place in **July 2026**. Each student must apply the skills they have learned from the course at **GIC** and put them into real-world scenarios such as employment or an internship for at least 3.5 months.")
+    body(doc, "For my internship project, titled **\"Vulnerability Assessment and Penetration Testing on neuralsh.com\"**, the purpose was to strengthen the technical cybersecurity skills acquired during my academic year as a Computer Science student in the department of **GIC**. The cybersecurity skills were primarily utilised during this internship for identifying, evaluating, and remediating the security weaknesses of the target web application, neuralsh.com, to prevent attacks by anonymous threat actors.")
+    body(doc, "During the assessment, various tools were evaluated, but only those deemed essential were selected, based on the **OWASP TOP 10** standard. Seventeen vulnerabilities were identified and classified by severity: Low, Medium, High, and Critical. Among the critical findings were a publicly exposed WHM root administration panel, MySQL database port, MikroTik network device panel, and a Cloudflare WAF bypass via origin IP disclosure. A rate-limiting bypass was confirmed with a 100 percent success rate, demonstrating a complete absence of authentication throttling.")
+    body(doc, "In summary, this internship has been a significant learning experience that allowed me to apply the skills I have acquired in a real professional environment. It enabled me to expand my knowledge beyond what I studied at **ITC**. I would like to express my sincere gratitude to **Prestige Alliance Co., Ltd.** for the opportunity they provided, and also to **ITC** for the guidance of my supervisors and professors, which was essential to the successful completion of this internship.")
 
     # TABLE OF CONTENTS
     front_head(doc, "TABLE OF CONTENTS")
