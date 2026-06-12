@@ -369,27 +369,24 @@ The network adapter was configured in **Bridged mode** rather than NAT. Bridged 
 
 Rather than working directly inside the Kali VM's graphical interface, all testing commands were issued from the host machine's terminal via SSH. This approach is standard in professional engagements and allows the assessor to copy commands, view output, and manage files without switching windows.
 
-After booting the Kali VM, SSH access was established as follows:
+After booting the Kali VM, SSH access was established as follows. The VM network adapter was configured to use NAT mode in VirtualBox, and a port forwarding rule was added (Host port 2222 → Guest port 22) to allow SSH from the host machine:
 
 ```bash
 # Start the Kali VM headlessly from host terminal
 VBoxManage startvm "Kali-Pentest" --type headless
 
-# Discover Kali's IP on the local network
-nmap -sn 192.168.18.0/24 | grep -A1 "Kali"
-
-# Connect via SSH
-ssh kali@192.168.18.152
+# Connect via SSH using the NAT port forwarding rule
+ssh -p 2222 kali@127.0.0.1
 ```
 
 *[Figure 4.2: SSH session from Linux Mint terminal connected to Kali VM — screenshot]*
 
-Once SSH was confirmed working, a static IP was assigned to the Kali VM to ensure the address did not change between sessions:
+Once SSH was confirmed working, a static IP was assigned to the Kali VM to prevent the address from changing between sessions:
 
 ```bash
 # On Kali — edit network config
 sudo nano /etc/network/interfaces
-# Set: address 192.168.18.152, netmask 255.255.255.0, gateway 192.168.18.1
+# Set: address 10.0.2.15, netmask 255.255.255.0, gateway 10.0.2.2
 ```
 
 ### 4.1.3 Tools Verification
