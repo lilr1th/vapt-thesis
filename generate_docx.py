@@ -445,7 +445,7 @@ SHOT_FIGURES = {
 APPENDIX_SHOTS = {
     "A": [
         (os.path.join(SHOTS, "fig49_nmap.png"),
-         "Figure A.1: Nmap full port scan — 103.16.62.217 (twenty-three open ports confirmed)"),
+         "Figure A.1: Nmap full port scan — origin server (twenty-three open ports confirmed)"),
     ],
     "B": [
         (os.path.join(SHOTS, "fig48b_ssl_onesala.png"),
@@ -459,13 +459,20 @@ APPENDIX_SHOTS = {
     ],
     "D": [
         (os.path.join(SHOTS, "fig415_jwt_token_burp.png"),
-         "Figure D.1: JWT token response in Burp Suite"),
+         "Figure D.1: JWT token response captured in Burp Suite"),
         (os.path.join(SHOTS, "fig415b_jwt_token.png"),
          "Figure D.2: JWT token decoded — header and payload structure"),
         (os.path.join(SHOTS, "fig416_jwt_404.png"),
-         "Figure D.3: JWT endpoint returning HTTP 200 — confirmed unpatched as of eleven June 2026"),
+         "Figure D.3: JWT endpoint returning HTTP 200 — confirmed live and unpatched"),
     ],
-    "E": [],  # No dedicated follow-up scan screenshot
+    "E": [
+        (os.path.join(SHOTS, "fig417_whm_browser.png"),
+         "Figure E.1: WHM root admin panel accessible from public internet — no authentication bypass required"),
+        (os.path.join(SHOTS, "fig418_mikrotik_browser.png"),
+         "Figure E.2: MikroTik RouterOS admin panel accessible from public internet"),
+        (os.path.join(SHOTS, "fig419_mysql_connect.png"),
+         "Figure E.3: MySQL port 3306 accepting remote connections from external host"),
+    ],
 }
 
 # ── Finding Card (SE_LYTHENG style) ──────────────────────────────────────────
