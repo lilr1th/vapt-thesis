@@ -332,7 +332,7 @@ It is important to note that all findings documented in this thesis were discove
 All testing activities were conducted with written authorization from Prestige Alliance Co., Ltd. The following self-imposed constraints were applied throughout the engagement:
 
 1. No production data was extracted, modified, or deleted at any point during testing
-2. Rate-limiting bypass demonstration was capped at 50 requests per test scenario
+2. Rate-limiting bypass demonstration was capped at fifty requests per test scenario
 3. No persistent access mechanisms or backdoors were installed on any system
 4. MySQL brute-force testing was limited to a bounded pre-defined wordlist only
 5. No Denial of Service testing was conducted against any in-scope or adjacent system
@@ -826,7 +826,7 @@ A compromised router enables traffic interception, NAT manipulation, firewall ru
 
 ### 4.7.3 Follow-Up Verification Scan (10 June 2026)
 
-A follow-up scan conducted four days after the initial assessment confirmed all 17 original findings remained unpatched. Three additional findings were discovered:
+A follow-up scan conducted four days after the initial assessment confirmed all seventeen original findings remained unpatched. Three additional findings were discovered:
 
 - **N-018:** Ports 2078 and 2091 were not present in the June 6 scan but were now open and returning HTTP 401 Basic Auth challenges
 - **N-019:** Port 25 (SMTP) transitioned from `filtered` to `open`, indicating a firewall rule was removed
@@ -1335,8 +1335,8 @@ The 20 individual findings do not exist in isolation. The following attack chain
 
 1. Load neuralsh.com — JavaScript bundle reveals /web/v1/init/token
 2. Send requests with rotating X-Forwarded-For values — rate limiter is bypassed
-3. Collect 50 valid JWT tokens in under three seconds (100% bypass, confirmed)
-4. Automate token refresh every 29 minutes — perpetual API access established
+3. Collect fifty valid JWT tokens in under three seconds (100% bypass, confirmed)
+4. Automate token refresh every twenty-nine minutes — perpetual API access established
 5. Enumerate /web/v1/text/search, /web/v1/image/search, /web/v1/category
 6. If JWT secret obtained via Chain 1 — forge token with type:admin claim
 
