@@ -73,41 +73,60 @@ def add_section_break(doc, restart_arabic=False):
     pPr.append(sectPr)
 
 def set_toc_styles(doc):
-    """Pre-define TOC 1/2/3 paragraph styles to match Se Lytheng ITC format."""
-    from docx.enum.style import WD_STYLE_TYPE
-    # Right-margin tab position: A4(21cm) - left(3cm) - right(2cm) = 16cm = 9072 twips
-    TAB_POS = "9072"
+    """Inject TOC1/TOC2/TOC3 style XML directly so Word recognises them on F9."""
+    # styleId must be 'TOC1' (no space) — python-docx add_style() uses wrong id
+    # Tab at 9072 twips = 16cm = full text width (A4 minus 3cm left + 2cm right)
+    styles_el = doc.part.styles._element
+
+    # Remove any previously injected TOC styles to avoid duplicates
+    for st in list(styles_el):
+        nm = st.find(qn('w:name'))
+        if nm is not None and nm.get(qn('w:val'), '').lower() in ('toc 1','toc 2','toc 3'):
+            styles_el.remove(st)
+
     configs = [
-        # (style name,  left indent cm, bold,  all caps)
-        ("TOC 1",       0,              True,  True),   # Chapter / front-matter level
-        ("TOC 2",       0.5,            True,  False),  # Section level
-        ("TOC 3",       1.5,            False, False),  # Subsection level
+        # (styleId, display name, left indent twips, bold, all-caps)
+        ('TOC1', 'toc 1',    0,   True,  True),
+        ('TOC2', 'toc 2',  284,   True,  False),
+        ('TOC3', 'toc 3',  851,   False, False),
     ]
-    for name, indent_cm, bold, caps in configs:
-        try:
-            st = doc.styles[name]
-        except KeyError:
-            st = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
-        st.font.name    = 'Times New Roman'
-        st.font.size    = Pt(12)
-        st.font.bold    = bold
-        st.font.all_caps = caps
-        pf = st.paragraph_format
-        pf.left_indent        = Cm(indent_cm)
-        pf.first_line_indent  = Cm(0)
-        pf.space_before       = Pt(0)
-        pf.space_after        = Pt(3)
-        # Dot-leader tab at right margin
-        pPr = st.element.get_or_add_pPr()
-        for old in pPr.findall(qn('w:tabs')):
-            pPr.remove(old)
+    for sid, sname, indent, bold, caps in configs:
+        st = OxmlElement('w:style')
+        st.set(qn('w:type'),    'paragraph')
+        st.set(qn('w:styleId'), sid)
+
+        nm = OxmlElement('w:name'); nm.set(qn('w:val'), sname); st.append(nm)
+        bo = OxmlElement('w:basedOn'); bo.set(qn('w:val'), 'Normal'); st.append(bo)
+
+        pPr = OxmlElement('w:pPr')
+        sp  = OxmlElement('w:spacing')
+        sp.set(qn('w:before'), '0'); sp.set(qn('w:after'), '60'); pPr.append(sp)
+        if indent:
+            ind = OxmlElement('w:ind')
+            ind.set(qn('w:left'), str(indent)); ind.set(qn('w:firstLine'), '0')
+            pPr.append(ind)
         tabs = OxmlElement('w:tabs')
         tab  = OxmlElement('w:tab')
-        tab.set(qn('w:val'),    'right')
-        tab.set(qn('w:leader'), 'dot')
-        tab.set(qn('w:pos'),    TAB_POS)
-        tabs.append(tab)
-        pPr.append(tabs)
+        tab.set(qn('w:val'), 'right'); tab.set(qn('w:leader'), 'dot')
+        tab.set(qn('w:pos'), '9072')
+        tabs.append(tab); pPr.append(tabs)
+        st.append(pPr)
+
+        rPr   = OxmlElement('w:rPr')
+        fonts = OxmlElement('w:rFonts')
+        fonts.set(qn('w:ascii'), 'Times New Roman')
+        fonts.set(qn('w:hAnsi'), 'Times New Roman')
+        rPr.append(fonts)
+        if bold:
+            rPr.append(OxmlElement('w:b'))
+            rPr.append(OxmlElement('w:bCs'))
+        if caps:
+            rPr.append(OxmlElement('w:caps'))
+        sz = OxmlElement('w:sz');   sz.set(qn('w:val'),   '24'); rPr.append(sz)
+        sc = OxmlElement('w:szCs'); sc.set(qn('w:val'),   '24'); rPr.append(sc)
+        st.append(rPr)
+
+        styles_el.append(st)
 
 def add_toc_field(doc):
     set_toc_styles(doc)
