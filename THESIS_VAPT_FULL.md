@@ -1309,73 +1309,67 @@ Investigate the firewall rule change and restore the port 25 block if direct SMT
 
 ## 5.4 Attack Chain Analysis
 
-The 20 individual findings do not exist in isolation. The following attack chains map how findings combine into multi-step compromise paths, each representing a realistic scenario that could be executed by an external attacker.
+The 20 individual findings do not exist in isolation. The following attack chains map how findings combine into multi-step compromise paths, each representing a realistic scenario executable by an external unauthenticated attacker. Figure 4.22 provides a visual overview of all four chains.
+
+*[Figure 4.22: Attack chain diagram — four confirmed attack vectors — screenshot]*
 
 ### 5.4.1 Attack Chain 1 — Server Takeover via Admin Panel
 
-```
-Starting point:  Any internet connection
-End result:      Full server root access — all hosted domains compromised
+**Starting point:** Any internet connection
+**End result:** Full server root access — all hosted domains compromised
 
-1. DNS MX lookup → mail.neuralsh.com → 103.16.xx.xxx (origin IP exposed)
-2. Nmap scan → Port 2087 open (WHM root panel)
-3. Navigate to https://103.16.xx.xxx:2087
-4. Brute force WHM credentials OR trigger password reset via email compromise
-5. Login to WHM → Terminal → root shell access
-6. Read all .env files, database credentials, API keys across all hosted accounts
-7. Access MySQL directly with extracted credentials → full data theft
+1. DNS MX lookup on mail.neuralsh.com reveals the origin IP address
+2. Nmap scan confirms port 2087 open — WHM root admin panel
+3. Navigate to WHM login page — no IP restriction, no 2FA, no lockout
+4. Brute force credentials or trigger password reset via email compromise
+5. Login to WHM Terminal — root shell access obtained
+6. Read all .env files, database credentials, and API keys across all hosted accounts
+7. Connect to MySQL directly with extracted credentials — full data theft
 
-Complexity: Medium | Likelihood: Medium | Severity: Maximum
-```
+**Complexity:** Medium | **Likelihood:** Medium | **Severity:** Maximum (CVSS 10.0)
 
 ### 5.4.2 Attack Chain 2 — API Abuse via Rate Limit Bypass
 
-```
-Starting point:  Any internet connection
-End result:      Unlimited API access, data enumeration, potential account takeover
+**Starting point:** Any internet connection
+**End result:** Unlimited API access, data enumeration, potential account takeover
 
-1. Load neuralsh.com in browser → JavaScript bundle reveals /web/v1/init/token
-2. Send 50 requests with rotating X-Forwarded-For headers
-3. Collect 50 valid JWT tokens — 0 rate limit responses (100% bypass)
-4. Automate token refresh every 29 minutes → perpetual API access
+1. Load neuralsh.com — JavaScript bundle reveals /web/v1/init/token
+2. Send requests with rotating X-Forwarded-For values — rate limiter is bypassed
+3. Collect 50 valid JWT tokens in under three seconds (100% bypass, confirmed)
+4. Automate token refresh every 29 minutes — perpetual API access established
 5. Enumerate /web/v1/text/search, /web/v1/image/search, /web/v1/category
-6. If JWT secret obtained via Chain 1 → forge token with type:admin
+6. If JWT secret obtained via Chain 1 — forge token with type:admin claim
 
-Complexity: Low | Likelihood: High (fully demonstrated) | Severity: High
-```
+**Complexity:** Low | **Likelihood:** High (fully demonstrated) | **Severity:** High
 
 ### 5.4.3 Attack Chain 3 — Network Infrastructure Takeover via MikroTik
 
-```
-Starting point:  Any internet connection
-End result:      Full network routing control — traffic interception possible
+**Starting point:** Any internet connection
+**End result:** Full network routing control — traffic interception possible
 
-1. Nmap scan → Port 9001 open (MikroTik WebFig)
-2. Navigate to http://103.16.xx.xxx:9001 in browser
-3. Attempt default credentials: admin / (blank)
-4. If successful → RouterOS Dashboard
-5. Tools → Packet Sniffer → capture all network traffic in plaintext
-6. IP → Routes → add malicious routing entries
-7. System → Users → create backdoor admin account (persistence)
+1. Nmap scan confirms port 9001 open — MikroTik RouterOS WebFig interface
+2. Navigate to the login page — pre-filled admin username, no IP restriction
+3. Attempt factory default credentials: admin / (blank password)
+4. If default credentials active — full RouterOS dashboard access
+5. Enable Packet Sniffer — capture all network traffic in plaintext
+6. Modify routing tables — redirect traffic to attacker-controlled endpoint
+7. Create backdoor admin account for persistent access
 
-Complexity: Low (if default creds active) | Likelihood: Medium-High | Severity: Critical
-```
+**Complexity:** Low (if default credentials active) | **Likelihood:** Medium-High | **Severity:** Critical
 
 ### 5.4.4 Attack Chain 4 — MySQL Brute Force to Data Exfiltration
 
-```
-Starting point:  Any internet connection
-End result:      Full database access, potential remote code execution
+**Starting point:** Any internet connection
+**End result:** Full database access, potential remote code execution
 
-1. Nmap scan → Port 3306 open (MySQL 8.0.43)
-2. Collect username candidates from JS bundle, error messages, cPanel redirects
-3. Targeted brute force: hydra -L users.txt -P passwords.txt mysql://103.16.xx.xxx
-4. Successful authentication → SHOW DATABASES → SELECT * FROM users
-5. Full data exfiltration: user records, search history, API credentials
-6. If FILE privilege granted → write PHP web shell to /var/www/html/ → RCE
+1. Nmap scan confirms port 3306 open — MySQL 8.0.43 accepting remote connections
+2. Gather username candidates from JS bundle, error messages, and cPanel redirects
+3. Run credential brute force: hydra -L users.txt -P passwords.txt mysql://[TARGET]
+4. Successful login — execute SHOW DATABASES and SELECT * FROM users
+5. Exfiltrate user records, search history, and API credentials
+6. If FILE privilege granted — write PHP web shell to document root for remote code execution
 
-Complexity: Medium | Likelihood: Medium | Severity: Critical
-```
+**Complexity:** Medium | **Likelihood:** Medium | **Severity:** Critical
 
 ---
 
