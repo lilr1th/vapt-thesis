@@ -52,7 +52,8 @@ def set_cell_vert(cell, val='center'):
     v.set(qn('w:val'), val)
     tcPr.append(v)
 
-def add_section_break(doc, restart_arabic=False):
+def add_section_break(doc, fmt=None, start=None):
+    """Insert a section break paragraph. fmt='upperRoman' or 'decimal', start=int."""
     p = doc.add_paragraph()
     pPr = p._p.get_or_add_pPr()
     sectPr = OxmlElement('w:sectPr')
@@ -65,10 +66,11 @@ def add_section_break(doc, restart_arabic=False):
         for k, v2 in val.items():
             el.set(qn(k), v2)
         sectPr.append(el)
-    if restart_arabic:
+    if fmt:
         pg = OxmlElement('w:pgNumType')
-        pg.set(qn('w:fmt'), 'decimal')
-        pg.set(qn('w:start'), '1')
+        pg.set(qn('w:fmt'), fmt)
+        if start is not None:
+            pg.set(qn('w:start'), str(start))
         sectPr.append(pg)
     pPr.append(sectPr)
 
@@ -158,6 +160,39 @@ def new_doc():
     sec.bottom_margin = Cm(2.0)
     _setup_styles(doc)
     return doc
+
+def _add_page_field_to_footer(section):
+    """Add a centered PAGE field to the section's footer, unlinked from previous."""
+    section.footer.is_linked_to_previous = False
+    p = section.footer.paragraphs[0] if section.footer.paragraphs else section.footer.add_paragraph()
+    p.clear()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run()
+    run.font.name = 'Times New Roman'; run.font.size = Pt(12)
+    fc1 = OxmlElement('w:fldChar'); fc1.set(qn('w:fldCharType'), 'begin'); run._r.append(fc1)
+    inst = OxmlElement('w:instrText'); inst.set(qn('xml:space'), 'preserve')
+    inst.text = ' PAGE '; run._r.append(inst)
+    fc2 = OxmlElement('w:fldChar'); fc2.set(qn('w:fldCharType'), 'end'); run._r.append(fc2)
+
+def setup_section_footers(doc):
+    """
+    Called after process_md(). Sets page number format per section:
+      sections[0] = title page  → no footer
+      sections[1] = front matter → Roman numerals I, II, III...  (pgNumType set by section break)
+      sections[2] = body chapters → Arabic 1, 2, 3...
+    """
+    secs = list(doc.sections)
+    if len(secs) >= 2:
+        _add_page_field_to_footer(secs[1])
+    if len(secs) >= 3:
+        # Patch the body sectPr (secs[2]) to start Arabic at 1
+        body_spr = secs[2]._sectPr
+        for pg in body_spr.findall(qn('w:pgNumType')):
+            body_spr.remove(pg)
+        pg = OxmlElement('w:pgNumType')
+        pg.set(qn('w:fmt'), 'decimal'); pg.set(qn('w:start'), '1')
+        body_spr.append(pg)
+        _add_page_field_to_footer(secs[2])
 
 def _setup_styles(doc):
     n = doc.styles['Normal']
@@ -828,6 +863,7 @@ def add_front_matter(doc):
             c = tbl.cell(ri,ci); c.paragraphs[0].paragraph_format.first_line_indent = Cm(0)
             fmt(c.paragraphs[0].add_run(txt), size=12, bold=bld)
     doc.add_paragraph()
+    add_section_break(doc)  # title section ends here; front matter section starts (Roman I)
 
     # ACKNOWLEDGMENT
     front_head(doc, "ACKNOWLEDGMENT")
@@ -973,7 +1009,12 @@ def add_front_matter(doc):
     for abbr, full in abbrevs:
         loa_entry(doc, abbr, full)
 
-    add_section_break(doc, restart_arabic=True)
+    add_section_break(doc, fmt='upperRoman', start=1)
+
+    # INTRODUCTION page (first Arabic-numbered page = 1)
+    ch_head(doc, "INTRODUCTION")
+    body(doc, "This report documents a Vulnerability Assessment and Penetration Testing (VAPT) engagement conducted on neuralsh.com, an AI-powered neural search platform developed and operated by Prestige Alliance Co., Ltd. The engagement was undertaken as part of a 4-month internship from February to May 2026, during which the author was embedded with the company's cybersecurity team under the supervision of the Head of Red Team, with written authorization from the organization prior to any testing activities.")
+    body(doc, "The report is organized into six chapters. Chapter 1 provides the project overview and organizational context, covering the project description, objectives, scope, action plan, and company description. Chapter 2 presents the conceptual foundations of penetration testing, including industry frameworks such as OWASP and NIST SP 800-115. Chapter 3 details the research methodology and tools used throughout the engagement. Chapter 4 covers the full implementation — the testing environment, reconnaissance, scanning, vulnerability assessment, exploitation, and post-exploitation phases. Chapter 5 presents the results, complete findings register, attack chain analysis, and remediation roadmap. Chapter 6 concludes with a summary of findings, lessons learned, and recommendations for future security improvements.")
 
 # ── Markdown → docx ───────────────────────────────────────────────────────────
 def process_md(doc):
@@ -1140,6 +1181,7 @@ def build():
     doc = new_doc()
     add_front_matter(doc)
     process_md(doc)
+    setup_section_footers(doc)
     doc.save(OUT)
     print(f"✓  Saved → {OUT}")
     print("   Open in Word → Ctrl+A → F9 to update Table of Contents")
