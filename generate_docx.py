@@ -167,12 +167,24 @@ def _add_page_field_to_footer(section):
     p = section.footer.paragraphs[0] if section.footer.paragraphs else section.footer.add_paragraph()
     p.clear()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run()
-    run.font.name = 'Times New Roman'; run.font.size = Pt(12)
-    fc1 = OxmlElement('w:fldChar'); fc1.set(qn('w:fldCharType'), 'begin'); run._r.append(fc1)
-    inst = OxmlElement('w:instrText'); inst.set(qn('xml:space'), 'preserve')
-    inst.text = ' PAGE '; run._r.append(inst)
-    fc2 = OxmlElement('w:fldChar'); fc2.set(qn('w:fldCharType'), 'end'); run._r.append(fc2)
+
+    def _fld_run(rpr_size=24):
+        r = OxmlElement('w:r')
+        rpr = OxmlElement('w:rPr')
+        fn = OxmlElement('w:rFonts')
+        fn.set(qn('w:ascii'), 'Times New Roman'); fn.set(qn('w:hAnsi'), 'Times New Roman')
+        sz = OxmlElement('w:sz'); sz.set(qn('w:val'), str(rpr_size))
+        rpr.append(fn); rpr.append(sz); r.append(rpr)
+        return r
+
+    # begin run
+    r1 = _fld_run(); fc1 = OxmlElement('w:fldChar'); fc1.set(qn('w:fldCharType'), 'begin'); r1.append(fc1)
+    # instrText run
+    r2 = _fld_run(); inst = OxmlElement('w:instrText'); inst.set(qn('xml:space'), 'preserve'); inst.text = ' PAGE '; r2.append(inst)
+    # end run
+    r3 = _fld_run(); fc2 = OxmlElement('w:fldChar'); fc2.set(qn('w:fldCharType'), 'end'); r3.append(fc2)
+
+    p._p.append(r1); p._p.append(r2); p._p.append(r3)
 
 def setup_section_footers(doc):
     """
