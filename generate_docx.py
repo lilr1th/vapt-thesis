@@ -223,10 +223,18 @@ def body(doc, text, align=WD_ALIGN_PARAGRAPH.JUSTIFY, indent=1.27, size=12):
     return p
 
 def ch_head(doc, text):
+    """Chapter heading — 16pt bold ALL CAPS (body chapters only)."""
     p = doc.add_paragraph(style='Heading 1')
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p.add_run(text.upper())
     fmt(run, size=16, bold=True)
+
+def front_head(doc, text):
+    """Front matter heading — 12pt bold ALL CAPS (List of Figures, Abstract, etc.)."""
+    p = doc.add_paragraph(style='Heading 1')
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run(text.upper())
+    fmt(run, size=12, bold=True)
 
 def sec_head(doc, text, level=1):
     style = {1:'Heading 2', 2:'Heading 3', 3:'Heading 4'}.get(level, 'Heading 3')
@@ -821,7 +829,7 @@ def add_front_matter(doc):
     doc.add_paragraph()
 
     # ACKNOWLEDGMENT
-    ch_head(doc, "ACKNOWLEDGMENT")
+    front_head(doc, "ACKNOWLEDGMENT")
     body(doc, "I would like to express my sincere gratitude to the President of the Institution of Technology of Cambodia, the Head of the Department of General Studies and Natural Sciences, and my academic supervisor for their continuous guidance and support throughout this internship programme.")
     body(doc, "I am deeply grateful to the management and technical team at Prestige Alliance Co., Ltd. for providing the opportunity to conduct this vulnerability assessment and penetration testing engagement on neuralsh.com, and for their professional guidance during the internship period.")
     body(doc, "I also extend my appreciation to all colleagues and peers who provided feedback during the preparation of this report.")
@@ -830,7 +838,7 @@ def add_front_matter(doc):
     p_kh = doc.add_paragraph(style='Heading 1')
     p_kh.alignment = WD_ALIGN_PARAGRAPH.CENTER
     rk = p_kh.add_run("មូលដ្ឋានទេច")
-    rk.font.name = "Khmer OS"; rk.font.size = Pt(16)
+    rk.font.name = "Khmer OS"; rk.font.size = Pt(12)
     rk.font.bold = True; rk.font.color.rgb = RGBColor(0,0,0)
     p_kh_body = doc.add_paragraph()
     p_kh_body.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -842,18 +850,18 @@ def add_front_matter(doc):
     r_kh.font.italic = True; r_kh.font.color.rgb = RGBColor(0x80,0x80,0x80)
 
     # ABSTRACT
-    ch_head(doc, "ABSTRACT")
+    front_head(doc, "ABSTRACT")
     body(doc, "This report presents a comprehensive Vulnerability Assessment and Penetration Testing (VAPT) engagement conducted on neuralsh.com, an AI-powered neural search platform, as part of an internship at Prestige Alliance Co., Ltd. The assessment was authorized in writing prior to testing, and all activities were conducted in accordance with the OWASP Testing Guide and established ethical hacking standards.")
     body(doc, "A black-box methodology was applied, simulating an external attacker with no prior knowledge of the target system. The engagement followed the complete penetration testing lifecycle: reconnaissance, scanning, enumeration, exploitation, post-exploitation, and reporting. Twenty distinct vulnerabilities were discovered: four Critical, five High, seven Medium, and four Low severity findings. Critical findings include a publicly exposed MySQL database, a MikroTik network router administration panel, a cPanel hosting control panel, and a WHM root server administration panel — all accessible from the public internet without IP restriction.")
     body(doc, "A rate-limiting control was successfully bypassed via HTTP header spoofing, enabling unlimited API token generation. A follow-up verification scan conducted on ten June 2026 confirmed all original findings remained unpatched and identified three additional findings.")
     body(doc, "Keywords: Penetration Testing, VAPT, Web Application Security, OWASP, Rate Limiting Bypass, JWT Analysis, cPanel Exposure, MikroTik, Black Box Testing, CVSS v3.1")
 
     # TABLE OF CONTENTS
-    ch_head(doc, "TABLE OF CONTENTS")
+    front_head(doc, "TABLE OF CONTENTS")
     add_toc_field(doc)
 
     # LIST OF FIGURES — plain text, no table
-    ch_head(doc, "LIST OF FIGURES")
+    front_head(doc, "LIST OF FIGURES")
     lof_entries = [
         ("1",    "Prestige Alliance company logo"),
         ("2",    "Prestige Alliance office location map"),
@@ -902,7 +910,7 @@ def add_front_matter(doc):
         lof_entry(doc, num, desc)
 
     # LIST OF TABLES — plain text
-    ch_head(doc, "LIST OF TABLES")
+    front_head(doc, "LIST OF TABLES")
     lot_entries = [
         ("4.1",  "Testing tools used in this engagement"),
         ("5.1",  "Complete findings register — twenty vulnerabilities"),
@@ -913,7 +921,7 @@ def add_front_matter(doc):
         lot_entry(doc, num, desc)
 
     # LIST OF ABBREVIATIONS — plain text sorted A–Z
-    ch_head(doc, "LIST OF ABBREVIATIONS")
+    front_head(doc, "LIST OF ABBREVIATIONS")
     abbrevs = [
         ("API",   "Application Programming Interface"),
         ("CDN",   "Content Delivery Network"),
