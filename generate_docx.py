@@ -1025,11 +1025,22 @@ def add_front_matter(doc):
 
     # INTRODUCTION page (first Arabic-numbered page = 1)
     ch_head(doc, "INTRODUCTION")
+    body(doc, "This report presents the findings and methodology of a Vulnerability Assessment and Penetration Testing (VAPT) engagement conducted on neuralsh.com, an AI-powered neural search platform operated by Prestige Alliance Co., Ltd. The engagement was carried out as part of a four-month internship from February to May 2026, with full written authorization from the organization prior to any testing activities.")
+    body(doc, "Chapter 1 provides the project overview, objectives, scope, and a description of the company. Chapter 2 presents the theoretical foundations of penetration testing, including the OWASP framework and CVSS scoring system. Chapter 3 details the research methodology and tools used throughout the engagement. Chapter 4 covers the full implementation across five testing phases: reconnaissance, scanning and enumeration, vulnerability assessment, exploitation, and post-exploitation. Chapter 5 presents the complete findings register, attack chain analysis, and remediation roadmap. Chapter 6 concludes with a summary, lessons learned, and recommendations for future security improvements.")
 
 # ── Markdown → docx ───────────────────────────────────────────────────────────
 def process_md(doc):
     with open(MD, encoding='utf-8') as fh:
         lines = fh.readlines()
+
+    # Skip the markdown's own front matter (title block, Declaration, Abstract,
+    # plain-text ToC) — those are handled by add_front_matter(). Start from the
+    # first "# Chapter" heading.
+    start = 0
+    for idx, ln in enumerate(lines):
+        if re.match(r'^#\s+Chapter\s+', ln):
+            start = idx; break
+    lines = lines[start:]
 
     in_code=False; code_buf=[]; in_table=False; table_rows=[]; in_53=False
     in_appendix=False; current_appendix=None
