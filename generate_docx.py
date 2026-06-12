@@ -72,7 +72,45 @@ def add_section_break(doc, restart_arabic=False):
         sectPr.append(pg)
     pPr.append(sectPr)
 
+def set_toc_styles(doc):
+    """Pre-define TOC 1/2/3 paragraph styles to match Se Lytheng ITC format."""
+    from docx.enum.style import WD_STYLE_TYPE
+    # Right-margin tab position: A4(21cm) - left(3cm) - right(2cm) = 16cm = 9072 twips
+    TAB_POS = "9072"
+    configs = [
+        # (style name,  left indent cm, bold,  all caps)
+        ("TOC 1",       0,              True,  True),   # Chapter / front-matter level
+        ("TOC 2",       0.5,            True,  False),  # Section level
+        ("TOC 3",       1.5,            False, False),  # Subsection level
+    ]
+    for name, indent_cm, bold, caps in configs:
+        try:
+            st = doc.styles[name]
+        except KeyError:
+            st = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+        st.font.name    = 'Times New Roman'
+        st.font.size    = Pt(12)
+        st.font.bold    = bold
+        st.font.all_caps = caps
+        pf = st.paragraph_format
+        pf.left_indent        = Cm(indent_cm)
+        pf.first_line_indent  = Cm(0)
+        pf.space_before       = Pt(0)
+        pf.space_after        = Pt(3)
+        # Dot-leader tab at right margin
+        pPr = st.element.get_or_add_pPr()
+        for old in pPr.findall(qn('w:tabs')):
+            pPr.remove(old)
+        tabs = OxmlElement('w:tabs')
+        tab  = OxmlElement('w:tab')
+        tab.set(qn('w:val'),    'right')
+        tab.set(qn('w:leader'), 'dot')
+        tab.set(qn('w:pos'),    TAB_POS)
+        tabs.append(tab)
+        pPr.append(tabs)
+
 def add_toc_field(doc):
+    set_toc_styles(doc)
     p = doc.add_paragraph()
     p.paragraph_format.first_line_indent = Cm(0)
     run = p.add_run()
