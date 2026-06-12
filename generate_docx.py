@@ -1013,8 +1013,6 @@ def add_front_matter(doc):
 
     # INTRODUCTION page (first Arabic-numbered page = 1)
     ch_head(doc, "INTRODUCTION")
-    body(doc, "This report documents a Vulnerability Assessment and Penetration Testing (VAPT) engagement conducted on neuralsh.com, an AI-powered neural search platform developed and operated by Prestige Alliance Co., Ltd. The engagement was undertaken as part of a 4-month internship from February to May 2026, during which the author was embedded with the company's cybersecurity team under the supervision of the Head of Red Team, with written authorization from the organization prior to any testing activities.")
-    body(doc, "The report is organized into six chapters. Chapter 1 provides the project overview and organizational context, covering the project description, objectives, scope, action plan, and company description. Chapter 2 presents the conceptual foundations of penetration testing, including industry frameworks such as OWASP and NIST SP 800-115. Chapter 3 details the research methodology and tools used throughout the engagement. Chapter 4 covers the full implementation — the testing environment, reconnaissance, scanning, vulnerability assessment, exploitation, and post-exploitation phases. Chapter 5 presents the results, complete findings register, attack chain analysis, and remediation roadmap. Chapter 6 concludes with a summary of findings, lessons learned, and recommendations for future security improvements.")
 
 # ── Markdown → docx ───────────────────────────────────────────────────────────
 def process_md(doc):
