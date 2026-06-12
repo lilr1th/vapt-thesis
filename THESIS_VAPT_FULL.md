@@ -110,8 +110,8 @@ The table below defines the systems that were in scope for this engagement:
 |-----------|----------|-----------------|
 | `neuralsh.com` | Web Application | Primary target — Nuxt.js frontend, protected by Cloudflare WAF |
 | `*.neuralsh.com` | Subdomains | All subdomains discoverable via DNS enumeration or certificate transparency |
-| `mail.neuralsh.com` | Mail Server | Origin server entry point — resolves directly to 103.16.62.xxx |
-| `103.16.62.xxx` | Origin Server | Backend infrastructure hosting the application, database, mail stack, and admin panels |
+| `mail.neuralsh.com` | Mail Server | Origin server entry point — resolves directly to 103.16.xx.xxx |
+| `103.16.xx.xxx` | Origin Server | Backend infrastructure hosting the application, database, mail stack, and admin panels |
 
 *Table 1: Engagement scope — in-scope systems*
 
@@ -192,11 +192,11 @@ This internship followed the **Penetration Testing Execution Standard (PTES)** �
 
 Reconnaissance was the first and most time-intensive phase of the engagement. The goal was to map the entire publicly accessible attack surface of neuralsh.com before any active probing began. This phase used only passive and semi-passive techniques — primarily querying public records and observing what the target broadcast about itself.
 
-Key activities included WHOIS registration lookups, DNS record enumeration (A, MX, TXT, NS, and CNAME records), and SSL certificate transparency log analysis. The most impactful discovery in this phase was the **origin IP address (103.16.62.xxx)**, obtained by resolving the MX record for the mail server. JavaScript bundle analysis of the Nuxt.js frontend also revealed internal API route structures, including the unauthenticated token endpoint that was later exploited.
+Key activities included WHOIS registration lookups, DNS record enumeration (A, MX, TXT, NS, and CNAME records), and SSL certificate transparency log analysis. The most impactful discovery in this phase was the **origin IP address (103.16.xx.xxx)**, obtained by resolving the MX record for the mail server. JavaScript bundle analysis of the Nuxt.js frontend also revealed internal API route structures, including the unauthenticated token endpoint that was later exploited.
 
 ### 3.2 Phase 2 — Scanning and Enumeration
 
-With the origin IP identified, active scanning was conducted against 103.16.62.xxx to determine which services were reachable from the internet. Nmap was used to perform a full TCP port scan, revealing a large number of open ports that should not have been publicly accessible — including port 2087 (WHM admin panel), port 3306 (MySQL), port 2083 (cPanel), port 9001 (MikroTik), and port 25 (SMTP). Web application enumeration using Dirb and Nikto identified accessible admin interfaces, exposed directory listings, and additional administrative endpoints.
+With the origin IP identified, active scanning was conducted against 103.16.xx.xxx to determine which services were reachable from the internet. Nmap was used to perform a full TCP port scan, revealing a large number of open ports that should not have been publicly accessible — including port 2087 (WHM admin panel), port 3306 (MySQL), port 2083 (cPanel), port 9001 (MikroTik), and port 25 (SMTP). Web application enumeration using Dirb and Nikto identified accessible admin interfaces, exposed directory listings, and additional administrative endpoints.
 
 ### 3.3 Phase 3 — Vulnerability Assessment
 
@@ -272,7 +272,7 @@ Automated tools were used to perform broad, repeatable scans against the target 
 
 | **Tool** | **Type** | **Role in This Engagement** |
 |----------|----------|-----------------------------|
-| **Nmap** | Network scanner | Full TCP port scan on 103.16.62.xxx — discovered 23 open ports |
+| **Nmap** | Network scanner | Full TCP port scan on 103.16.xx.xxx — discovered 23 open ports |
 | **Nikto** | Web scanner | Automated web server scan — flagged missing headers, server version disclosure, directory listing |
 | **Dirb** | Directory fuzzer | Enumerated hidden directories and files on the web application |
 | **Nuclei** | Template scanner | Identified known vulnerability patterns across web services |
@@ -283,7 +283,7 @@ Automated tools were used to perform broad, repeatable scans against the target 
 
 *[Figure 10: Nmap logo — nmap_logo.png]*
 
-**Nmap** (Network Mapper) is the industry-standard open-source tool for network discovery and service fingerprinting. A full TCP scan with service version detection against the origin server revealed that 103.16.62.xxx had 23 ports open and reachable from the public internet — including administrative interfaces that should never be exposed. This single scan produced the evidence base for Critical findings N-001, N-002, N-013, and N-014.
+**Nmap** (Network Mapper) is the industry-standard open-source tool for network discovery and service fingerprinting. A full TCP scan with service version detection against the origin server revealed that 103.16.xx.xxx had 23 ports open and reachable from the public internet — including administrative interfaces that should never be exposed. This single scan produced the evidence base for Critical findings N-001, N-002, N-013, and N-014.
 
 *[Figure 11: Nikto logo — nikto_logo.png]*
 
@@ -439,12 +439,12 @@ burpsuite             # Burp Suite Community (GUI)
 | Host | IP Address | Role |
 |------|-----------|------|
 | neuralsh.com | 104.21.91.198 | Main application — Cloudflare CDN edge |
-| mail.neuralsh.com | 103.16.62.xxx | Mail + backend server — cPanel shared hosting |
-| 103.16.62.xxx (direct) | Same | Admin panels, database, MikroTik — 20+ exposed services |
+| mail.neuralsh.com | 103.16.xx.xxx | Mail + backend server — cPanel shared hosting |
+| 103.16.xx.xxx (direct) | Same | Admin panels, database, MikroTik — 20+ exposed services |
 
 *Table 9: Infrastructure map*
 
-The main site resolves to Cloudflare's anycast network. The real origin server IP (103.16.62.xxx) was discovered via the MX record for `mail.neuralsh.com` — a discovery that bypassed the entire WAF and directly exposed the backend infrastructure.
+The main site resolves to Cloudflare's anycast network. The real origin server IP (103.16.xx.xxx) was discovered via the MX record for `mail.neuralsh.com` — a discovery that bypassed the entire WAF and directly exposed the backend infrastructure.
 
 ---
 
@@ -477,38 +477,38 @@ dig MX neuralsh.com
 
 # Step 3 — Resolve mail server: reveals REAL origin IP
 dig A mail.neuralsh.com
-# 103.16.62.xxx — the backend server that Cloudflare is meant to protect
+# 103.16.xx.xxx — the backend server that Cloudflare is meant to protect
 ```
 
 *[Figure 4.6: dig MX neuralsh.com and dig A mail.neuralsh.com showing origin IP discovery — screenshot]*
 
-This three-step DNS chain revealed 103.16.62.xxx as the origin server behind the Cloudflare WAF. The MX record is a common oversight — organizations often configure the main domain to proxy through Cloudflare but leave the mail server record pointing directly at the origin. This single lookup rendered the Cloudflare WAF irrelevant for the remainder of the engagement.
+This three-step DNS chain revealed 103.16.xx.xxx as the origin server behind the Cloudflare WAF. The MX record is a common oversight — organizations often configure the main domain to proxy through Cloudflare but leave the mail server record pointing directly at the origin. This single lookup rendered the Cloudflare WAF irrelevant for the remainder of the engagement.
 
 Additional DNS records were analyzed for further intelligence:
 
 ```bash
 # TXT record — email security posture
 dig TXT neuralsh.com
-# v=spf1 +mx +a +ip4:103.16.62.xxx ~all   (SPF softfail — N-012)
+# v=spf1 +mx +a +ip4:103.16.xx.xxx ~all   (SPF softfail — N-012)
 # v=DMARC1; p=quarantine                   (DMARC not enforcing — N-012)
 
 # Wildcard DNS — any subdomain resolves
 dig randomxyz123.neuralsh.com
-# Returns: 103.16.62.xxx   (wildcard DNS active — N-010)
+# Returns: 103.16.xx.xxx   (wildcard DNS active — N-010)
 
 # Zone transfer — blocked (positive control)
 dig axfr @ns1.cloudflare.com neuralsh.com
 # Connection refused
 ```
 
-*[Figure 4.7: dig randomxyz123.neuralsh.com showing wildcard DNS returns 103.16.62.xxx — screenshot]*
+*[Figure 4.7: dig randomxyz123.neuralsh.com showing wildcard DNS returns 103.16.xx.xxx — screenshot]*
 
 ### 4.3.3 SSL Certificate Analysis
 
 The SSL certificate on the origin server disclosed infrastructure details that confirmed the server's hosting environment and identified a co-tenant.
 
 ```bash
-openssl s_client -connect 103.16.62.xxx:443 2>/dev/null | openssl x509 -noout -subject -issuer
+openssl s_client -connect 103.16.xx.xxx:443 2>/dev/null | openssl x509 -noout -subject -issuer
 ```
 
 *[Figure 4.8: openssl s_client output showing SSL cert issued to endoncambodia.com / onesala.com — screenshot]*
@@ -540,15 +540,15 @@ The `/web/v1/init/token` endpoint — which was later exploited — was discover
 
 ## 4.4 Scanning and Enumeration
 
-With the origin IP confirmed, active scanning was conducted against 103.16.62.xxx to identify all exposed services and their versions. Scanning was performed from the Kali VM via SSH.
+With the origin IP confirmed, active scanning was conducted against 103.16.xx.xxx to identify all exposed services and their versions. Scanning was performed from the Kali VM via SSH.
 
 ### 4.4.1 Nmap Port and Service Scan
 
 ```bash
-sudo nmap -sV -sC -p 22,25,53,80,110,111,143,443,465,587,993,995,2000,2083,2087,2096,3306,5060,8899,9001 103.16.62.xxx
+sudo nmap -sV -sC -p 22,25,53,80,110,111,143,443,465,587,993,995,2000,2083,2087,2096,3306,5060,8899,9001 103.16.xx.xxx
 ```
 
-*[Figure 4.9: Nmap scan output showing all open ports on 103.16.62.xxx — screenshot]*
+*[Figure 4.9: Nmap scan output showing all open ports on 103.16.xx.xxx — screenshot]*
 
 **Open ports discovered:**
 
@@ -580,20 +580,20 @@ Following the Nmap scan, each high-risk service was probed directly to confirm i
 
 ```bash
 # WHM root administration panel
-curl -sk https://103.16.62.xxx:2087/ | grep "<title>"
+curl -sk https://103.16.xx.xxx:2087/ | grep "<title>"
 # <title>WHM Login</title>
 
 # cPanel user panel
-curl -sk https://103.16.62.xxx:2083/ | grep "<title>"
+curl -sk https://103.16.xx.xxx:2083/ | grep "<title>"
 # <title>cPanel Login</title>
 
 # MikroTik admin interface
-curl -v http://103.16.62.xxx:9001/ 2>&1 | grep -E "HTTP|title"
+curl -v http://103.16.xx.xxx:9001/ 2>&1 | grep -E "HTTP|title"
 # HTTP/1.1 200 OK
 # <title>RouterOS router configuration page</title>
 
 # Directory listing on origin
-curl -H "Host: neuralsh.com" http://103.16.62.xxx/
+curl -H "Host: neuralsh.com" http://103.16.xx.xxx/
 # <title>Index of /</title>   (Apache directory listing enabled)
 ```
 
@@ -616,10 +616,10 @@ Key findings from Nikto included missing `X-Frame-Options` headers at the initia
 Nuclei was used to run template-based checks covering common web vulnerabilities, exposed admin panels, and misconfiguration patterns. It was run against both the Cloudflare-fronted domain and the origin IP directly.
 
 ```bash
-nuclei -u https://neuralsh.com -u http://103.16.62.xxx -severity critical,high,medium -o /home/rith/thesis/nuclei_results.txt
+nuclei -u https://neuralsh.com -u http://103.16.xx.xxx -severity critical,high,medium -o /home/rith/thesis/nuclei_results.txt
 ```
 
-*[Figure 4.13: Nuclei scan running against 103.16.62.xxx — screenshot]*
+*[Figure 4.13: Nuclei scan running against 103.16.xx.xxx — screenshot]*
 
 The Nuclei scan ran 6,221 templates against both the Cloudflare-fronted domain and the origin IP. Both scans returned zero template matches. The Cloudflare WAF absorbed and filtered the majority of probe requests against the main domain, while the origin IP scan completed without triggering any template signatures. This outcome is consistent with the nature of the vulnerabilities discovered: exposed admin panels, database ports, and authentication logic flaws are not detectable by template-based scanners — they require manual enumeration and targeted testing. The zero-match result reinforces that automated tooling alone would have missed all 20 findings in this engagement.
 
@@ -627,7 +627,7 @@ The Nuclei scan ran 6,221 templates against both the Cloudflare-fronted domain a
 
 ```bash
 # Confirm MySQL accepts connections from public internet
-mysql -h 103.16.62.xxx -P 3306 -u root 2>&1
+mysql -h 103.16.xx.xxx -P 3306 -u root 2>&1
 # ERROR 1045 (28000): Access denied for user 'root'@'[your-ip]' (using password: NO)
 ```
 
@@ -703,9 +703,9 @@ The `unsafe-inline` directive in the CSP weakens XSS protection by allowing exec
 
 A critical test was confirming that direct connections to the origin IP bypass the Cloudflare WAF entirely. This was demonstrated using Burp Suite by sending the same request through Cloudflare and then directly to the origin.
 
-*[Figure 4.14: Burp Suite showing request to neuralsh.com returns Server: cloudflare, while direct request to 103.16.62.xxx returns Server: Apache — WAF bypass confirmed — screenshot]*
+*[Figure 4.14: Burp Suite showing request to neuralsh.com returns Server: cloudflare, while direct request to 103.16.xx.xxx returns Server: Apache — WAF bypass confirmed — screenshot]*
 
-The WAF bypass was complete — any request sent to 103.16.62.xxx directly is processed by the Apache web server without any Cloudflare filtering, logging, or protection.
+The WAF bypass was complete — any request sent to 103.16.xx.xxx directly is processed by the Apache web server without any Cloudflare filtering, logging, or protection.
 
 ---
 
@@ -772,19 +772,19 @@ All four critical admin panels were confirmed accessible without authentication:
 
 ```bash
 # WHM — root server administration
-curl -sk https://103.16.62.xxx:2087/ | grep -i title
+curl -sk https://103.16.xx.xxx:2087/ | grep -i title
 # <title>WHM Login</title>
 
 # cPanel — hosting account control
-curl -sk https://103.16.62.xxx:2083/ | grep -i title
+curl -sk https://103.16.xx.xxx:2083/ | grep -i title
 # <title>cPanel Login</title>
 
 # MikroTik — network device management
-curl -v http://103.16.62.xxx:9001/ 2>&1 | grep "title"
+curl -v http://103.16.xx.xxx:9001/ 2>&1 | grep "title"
 # <title>RouterOS router configuration page</title>
 
 # MySQL — direct database access
-mysql -h 103.16.62.xxx -P 3306 -u root 2>&1 | head -1
+mysql -h 103.16.xx.xxx -P 3306 -u root 2>&1 | head -1
 # ERROR 1045 (28000): Access denied (confirms port accepts public connections)
 ```
 
@@ -816,9 +816,9 @@ The exposed MikroTik RouterOS panel (port 9001) has implications beyond the web 
 ```
 Internet
   ↓
-MikroTik Router (103.16.62.xxx:9001) — exposed publicly
+MikroTik Router (103.16.xx.xxx:9001) — exposed publicly
   ↓ [controls all traffic routing]
-Backend Server (103.16.62.xxx)
+Backend Server (103.16.xx.xxx)
   ├── Apache Web Server (80/443)
   ├── MySQL Database (3306)
   ├── cPanel/WHM Admin (2083/2087)
@@ -839,17 +839,17 @@ A follow-up scan conducted four days after the initial assessment confirmed all 
 
 ## 4.8 Exploitation Evidence — Live Target Confirmation
 
-This section documents direct confirmation of the four critical attack vectors identified against neuralsh.com. All evidence was collected against the live target (103.16.62.xxx) within the authorized scope of the engagement.
+This section documents direct confirmation of the four critical attack vectors identified against neuralsh.com. All evidence was collected against the live target (103.16.xx.xxx) within the authorized scope of the engagement.
 
 ### 4.8.1 WHM Root Administration Panel — Publicly Accessible
 
-Navigation to `https://103.16.62.xxx:2087/` from a standard internet connection confirmed that the WHM (Web Host Manager) root administration panel is publicly accessible with no IP restriction. The browser SSL warning confirms the certificate mismatch finding (N-008) — clicking through reveals the full WHM login page. No firewall, no IP allowlist, and no two-factor authentication prompt was present.
+Navigation to `https://103.16.xx.xxx:2087/` from a standard internet connection confirmed that the WHM (Web Host Manager) root administration panel is publicly accessible with no IP restriction. The browser SSL warning confirms the certificate mismatch finding (N-008) — clicking through reveals the full WHM login page. No firewall, no IP allowlist, and no two-factor authentication prompt was present.
 
-*[Figure 4.17: Browser showing WHM login page at 103.16.62.xxx:2087 — publicly accessible with no IP restriction — screenshot]*
+*[Figure 4.17: Browser showing WHM login page at 103.16.xx.xxx:2087 — publicly accessible with no IP restriction — screenshot]*
 
 ### 4.8.2 MikroTik RouterOS Administration Panel — Default Credentials Pre-filled
 
-Navigation to `http://103.16.62.xxx:9001/` confirmed that the MikroTik RouterOS v6.49.18 WebFig administration interface is publicly accessible. The login form pre-fills `admin` as the username — the factory default. If the default blank password has not been changed, full network device control is available without any credential knowledge.
+Navigation to `http://103.16.xx.xxx:9001/` confirmed that the MikroTik RouterOS v6.49.18 WebFig administration interface is publicly accessible. The login form pre-fills `admin` as the username — the factory default. If the default blank password has not been changed, full network device control is available without any credential knowledge.
 
 *[Figure 4.18: Browser showing MikroTik RouterOS v6.49.18 WebFig login page with admin pre-filled — screenshot]*
 
@@ -858,7 +858,7 @@ Navigation to `http://103.16.62.xxx:9001/` confirmed that the MikroTik RouterOS 
 A direct MySQL connection attempt from the public internet confirmed that port 3306 accepts full authentication handshakes from external IP addresses:
 
 ```bash
-mysql -h 103.16.62.xxx -P 3306 -u root 2>&1
+mysql -h 103.16.xx.xxx -P 3306 -u root 2>&1
 # ERROR 1045 (28000): Access denied for user 'root'@'58.97.216.203' (using password: NO)
 ```
 
@@ -956,7 +956,7 @@ Each finding is presented in a standardised format: a summary table showing seve
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Critical | 9.8 | 103.16.62.xxx:3306 | Nmap, mysql-client |
+| Critical | 9.8 | 103.16.xx.xxx:3306 | Nmap, mysql-client |
 
 **Description**
 
@@ -974,7 +974,7 @@ Restrict port 3306 to `localhost` or a trusted VPN only. Database ports must nev
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Critical | 9.1 | 103.16.62.xxx:9001 | Nmap, curl |
+| Critical | 9.1 | 103.16.xx.xxx:9001 | Nmap, curl |
 
 **Description**
 
@@ -992,7 +992,7 @@ Restrict port 9001 to a trusted management IP. Change MikroTik default credentia
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Critical | 9.8 | 103.16.62.xxx:2083 | Nmap, curl |
+| Critical | 9.8 | 103.16.xx.xxx:2083 | Nmap, curl |
 
 **Description**
 
@@ -1010,7 +1010,7 @@ Restrict port 2083 to trusted management IPs via Cloudways firewall and enable t
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Critical | 10.0 | 103.16.62.xxx:2087 | Nmap, curl |
+| Critical | 10.0 | 103.16.xx.xxx:2087 | Nmap, curl |
 
 **Description**
 
@@ -1028,7 +1028,7 @@ Restrict port 2087 to trusted IPs via Cloudways firewall and enable two-factor a
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| High | 7.2 | 103.16.62.xxx:22 | Nmap, ssh |
+| High | 7.2 | 103.16.xx.xxx:22 | Nmap, ssh |
 
 **Description**
 
@@ -1046,7 +1046,7 @@ Enforce `PasswordAuthentication no` in `/etc/ssh/sshd_config`, install fail2ban,
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| High | 7.5 | 103.16.62.xxx (shared) | openssl, curl |
+| High | 7.5 | 103.16.xx.xxx (shared) | openssl, curl |
 
 **Description**
 
@@ -1118,7 +1118,7 @@ Minimise route exposure in the compiled bundle and implement an API gateway with
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Medium | 5.9 | 103.16.62.xxx:443, :110, :143, :465 | openssl |
+| Medium | 5.9 | 103.16.xx.xxx:443, :110, :143, :465 | openssl |
 
 **Description**
 
@@ -1158,13 +1158,13 @@ Replace `'unsafe-inline'` with per-request nonces using Nuxt.js's built-in CSP n
 
 **Description**
 
-A wildcard DNS record routes any subdomain of neuralsh.com to 103.16.62.xxx. Attackers can use convincing subdomains such as `login.neuralsh.com` in phishing campaigns that resolve to a real IP address, increasing their credibility.
+A wildcard DNS record routes any subdomain of neuralsh.com to 103.16.xx.xxx. Attackers can use convincing subdomains such as `login.neuralsh.com` in phishing campaigns that resolve to a real IP address, increasing their credibility.
 
 **Remediation**
 
 Remove the wildcard DNS record from Cloudflare and define only explicit records for legitimate subdomains such as `mail.neuralsh.com`.
 
-**Evidence:** Figure 4.7 — dig confirming randomxyz123.neuralsh.com resolves to 103.16.62.xxx
+**Evidence:** Figure 4.7 — dig confirming randomxyz123.neuralsh.com resolves to 103.16.xx.xxx
 
 ---
 
@@ -1172,7 +1172,7 @@ Remove the wildcard DNS record from Cloudflare and define only explicit records 
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Medium | 5.3 | 103.16.62.xxx | curl |
+| Medium | 5.3 | 103.16.xx.xxx | curl |
 
 **Description**
 
@@ -1182,7 +1182,7 @@ Apache directory listing is enabled on the origin server, returning an `Index of
 
 Add `Options -Indexes` to the Apache configuration or a `.htaccess` file in the document root.
 
-**Evidence:** curl response from 103.16.62.xxx returning `Index of /` page
+**Evidence:** curl response from 103.16.xx.xxx returning `Index of /` page
 
 ---
 
@@ -1190,7 +1190,7 @@ Add `Options -Indexes` to the Apache configuration or a `.htaccess` file in the 
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Medium | 6.1 | 103.16.62.xxx | curl, openssl |
+| Medium | 6.1 | 103.16.xx.xxx | curl, openssl |
 
 **Description**
 
@@ -1200,7 +1200,7 @@ HTTP redirects from ports 2077 and 2082 explicitly name `www.onesala.com` as a c
 
 No application-level fix is available. Migrate to isolated infrastructure and restrict WHM access immediately to prevent exploitation of the co-tenancy risk.
 
-**Evidence:** curl response showing redirect from 103.16.62.xxx:2077 to www.onesala.com:2078
+**Evidence:** curl response showing redirect from 103.16.xx.xxx:2077 to www.onesala.com:2078
 
 ---
 
@@ -1208,7 +1208,7 @@ No application-level fix is available. Migrate to isolated infrastructure and re
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| High | 7.5 | 103.16.62.xxx:2096 | Nmap, curl |
+| High | 7.5 | 103.16.xx.xxx:2096 | Nmap, curl |
 
 **Description**
 
@@ -1226,7 +1226,7 @@ Restrict port 2096 to trusted IPs via firewall and implement an account lockout 
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| High | 7.5 | 103.16.62.xxx:2078, :2091 | Nmap, curl |
+| High | 7.5 | 103.16.xx.xxx:2078, :2091 | Nmap, curl |
 
 **Description**
 
@@ -1280,7 +1280,7 @@ Change SPF to `-all` (hardfail) and update DMARC to `p=reject; rua=mailto:dmarc@
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Low | 3.1 | 103.16.62.xxx:2083 | curl |
+| Low | 3.1 | 103.16.xx.xxx:2083 | curl |
 
 **Description**
 
@@ -1298,7 +1298,7 @@ Update cPanel to the latest supported release and suppress magic revision number
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
-| Low | 3.5 | 103.16.62.xxx:25 | Nmap, nc |
+| Low | 3.5 | 103.16.xx.xxx:25 | Nmap, nc |
 
 **Description**
 
@@ -1320,9 +1320,9 @@ The 20 individual findings do not exist in isolation. The following attack chain
 Starting point:  Any internet connection
 End result:      Full server root access — all hosted domains compromised
 
-1. DNS MX lookup → mail.neuralsh.com → 103.16.62.xxx (origin IP exposed)
+1. DNS MX lookup → mail.neuralsh.com → 103.16.xx.xxx (origin IP exposed)
 2. Nmap scan → Port 2087 open (WHM root panel)
-3. Navigate to https://103.16.62.xxx:2087
+3. Navigate to https://103.16.xx.xxx:2087
 4. Brute force WHM credentials OR trigger password reset via email compromise
 5. Login to WHM → Terminal → root shell access
 6. Read all .env files, database credentials, API keys across all hosted accounts
@@ -1354,7 +1354,7 @@ Starting point:  Any internet connection
 End result:      Full network routing control — traffic interception possible
 
 1. Nmap scan → Port 9001 open (MikroTik WebFig)
-2. Navigate to http://103.16.62.xxx:9001 in browser
+2. Navigate to http://103.16.xx.xxx:9001 in browser
 3. Attempt default credentials: admin / (blank)
 4. If successful → RouterOS Dashboard
 5. Tools → Packet Sniffer → capture all network traffic in plaintext
@@ -1372,7 +1372,7 @@ End result:      Full database access, potential remote code execution
 
 1. Nmap scan → Port 3306 open (MySQL 8.0.43)
 2. Collect username candidates from JS bundle, error messages, cPanel redirects
-3. Targeted brute force: hydra -L users.txt -P passwords.txt mysql://103.16.62.xxx
+3. Targeted brute force: hydra -L users.txt -P passwords.txt mysql://103.16.xx.xxx
 4. Successful authentication → SHOW DATABASES → SELECT * FROM users
 5. Full data exfiltration: user records, search history, API credentials
 6. If FILE privilege granted → write PHP web shell to /var/www/html/ → RCE
@@ -1572,11 +1572,11 @@ The finding that well-implemented application security controls (Cloudflare WAF,
 
 # Appendices
 
-## Appendix A: Nmap Scan Output — Origin Server (103.16.62.xxx)
+## Appendix A: Nmap Scan Output — Origin Server (103.16.xx.xxx)
 
 ```
 # Nmap 7.94SVN scan — 2026-06-06
-# Command: nmap -sV -p 22,25,53,80,110,111,143,443,465,587,993,995,2000,2083,2087,2096,3306,5060,8899,9001 103.16.62.xxx
+# Command: nmap -sV -p 22,25,53,80,110,111,143,443,465,587,993,995,2000,2083,2087,2096,3306,5060,8899,9001 103.16.xx.xxx
 
 22/tcp   open  ssh         OpenSSH 8.9p1 Ubuntu
 25/tcp   open  smtp        Exim smtpd 4.99.2
