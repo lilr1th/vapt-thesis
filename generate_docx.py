@@ -85,12 +85,12 @@ def set_toc_styles(doc):
             styles_el.remove(st)
 
     configs = [
-        # (styleId, display name, left indent twips, bold, all-caps)
-        ('TOC1', 'toc 1',    0,   True,  True),
-        ('TOC2', 'toc 2',  284,   True,  False),
-        ('TOC3', 'toc 3',  851,   False, False),
+        # (styleId, display name, left indent twips, bold, all-caps, font size pt)
+        ('TOC1', 'toc 1',    0,   True,  True,  16),
+        ('TOC2', 'toc 2',  284,   True,  False, 14),
+        ('TOC3', 'toc 3',  851,   True,  False, 12),
     ]
-    for sid, sname, indent, bold, caps in configs:
+    for sid, sname, indent, bold, caps, size in configs:
         st = OxmlElement('w:style')
         st.set(qn('w:type'),    'paragraph')
         st.set(qn('w:styleId'), sid)
@@ -112,6 +112,7 @@ def set_toc_styles(doc):
         tabs.append(tab); pPr.append(tabs)
         st.append(pPr)
 
+        sz_val = str(size * 2)  # half-points
         rPr   = OxmlElement('w:rPr')
         fonts = OxmlElement('w:rFonts')
         fonts.set(qn('w:ascii'), 'Times New Roman')
@@ -122,8 +123,8 @@ def set_toc_styles(doc):
             rPr.append(OxmlElement('w:bCs'))
         if caps:
             rPr.append(OxmlElement('w:caps'))
-        sz = OxmlElement('w:sz');   sz.set(qn('w:val'),   '24'); rPr.append(sz)
-        sc = OxmlElement('w:szCs'); sc.set(qn('w:val'),   '24'); rPr.append(sc)
+        sz = OxmlElement('w:sz');   sz.set(qn('w:val'),   sz_val); rPr.append(sz)
+        sc = OxmlElement('w:szCs'); sc.set(qn('w:val'),   sz_val); rPr.append(sc)
         st.append(rPr)
 
         styles_el.append(st)
@@ -848,6 +849,13 @@ def add_front_matter(doc):
     r_kh = p_kh_body.add_run("[បញ្ចូលសរុបខ្លឹមសារជាភាសាខ្មែររបស់អ្នកនៅទីនេះ — paste your Khmer summary here]")
     r_kh.font.name = "Khmer OS"; r_kh.font.size = Pt(12)
     r_kh.font.italic = True; r_kh.font.color.rgb = RGBColor(0x80,0x80,0x80)
+
+    # RÉSUMÉ (French)
+    front_head(doc, "RÉSUMÉ")
+    body(doc, "Ce rapport présente un engagement complet d'Évaluation des Vulnérabilités et de Tests de Pénétration (VAPT) réalisé sur neuralsh.com, une plateforme de recherche neurale alimentée par l'intelligence artificielle, dans le cadre d'un stage au sein de Prestige Alliance Co., Ltd. L'évaluation a été autorisée par écrit avant le début des tests, et toutes les activités ont été menées conformément au guide de test OWASP et aux normes éthiques établies.")
+    body(doc, "Une méthodologie boîte noire a été appliquée, simulant un attaquant externe sans connaissance préalable du système cible. L'engagement a suivi le cycle complet des tests d'intrusion : reconnaissance, analyse, énumération, exploitation, post-exploitation et rapport. Vingt vulnérabilités distinctes ont été découvertes : quatre Critiques, cinq Élevées, sept Moyennes et quatre Faibles. Les résultats critiques comprennent une base de données MySQL exposée publiquement, un panneau d'administration de routeur réseau MikroTik, un panneau de contrôle d'hébergement cPanel et un panneau d'administration de serveur racine WHM, tous accessibles depuis l'internet public sans restriction d'adresse IP.")
+    body(doc, "Un contrôle de limitation de débit a été contourné avec succès via la falsification d'en-têtes HTTP, permettant une génération illimitée de jetons API. Une analyse de vérification de suivi a confirmé que toutes les découvertes originales n'étaient pas corrigées et a identifié trois nouvelles vulnérabilités.")
+    body(doc, "Mots-clés : Tests de pénétration, VAPT, Sécurité des applications web, OWASP, Contournement de limitation de débit, Analyse JWT, Exposition cPanel, MikroTik, Tests boîte noire, CVSS v3.1")
 
     # ABSTRACT
     front_head(doc, "ABSTRACT")
