@@ -849,7 +849,8 @@ def add_front_matter(doc):
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p.paragraph_format.first_line_indent = Cm(0)
-        p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+        p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
+        p.paragraph_format.line_spacing = 1.0
         p.paragraph_format.space_after = Pt(8)
         r = p.add_run(text)
         r.font.name = "Khmer OS"; r.font.size = Pt(12)
