@@ -88,7 +88,7 @@ def set_toc_styles(doc):
         # (styleId, display name, left indent twips, bold, all-caps, font size pt)
         ('TOC1', 'toc 1',    0,   True,  True,  16),
         ('TOC2', 'toc 2',  284,   True,  False, 14),
-        ('TOC3', 'toc 3',  851,   True,  False, 12),
+        ('TOC3', 'toc 3',  851,   False, False, 12),
     ]
     for sid, sname, indent, bold, caps, size in configs:
         st = OxmlElement('w:style')
