@@ -948,7 +948,7 @@ The following positive security controls were also identified during the assessm
 
 ## 5.3 Finding Details
 
-Each finding is presented in a standardised format: a summary table showing severity, CVSS score, affected host, and tool used; a description of the vulnerability and its potential impact; a remediation recommendation; and an evidence reference.
+Each finding is presented in a standardised format: a summary table showing severity, CVSS score, affected host, and tool used; a description of the vulnerability and its impact; a remediation recommendation; and an evidence reference.
 
 ---
 
@@ -960,13 +960,13 @@ Each finding is presented in a standardised format: a summary table showing seve
 
 **Description**
 
-The MySQL 8.0.43 database server is directly accessible from the public internet on port 3306, accepting full TCP connections from any external IP address. An attacker does not need to compromise the web application to reach the database — they can attempt authentication directly at the database layer, bypassing all application-level controls. Brute-force or credential-stuffing attacks against this port are possible with no rate limiting or IP-based blocking. If credentials are obtained, an attacker gains full read and write access to all application databases, potentially including user records, session data, and API secrets. MySQL's User Defined Function (UDF) feature could further be abused for remote command execution on the underlying server.
+Port 3306 is open to the internet, allowing direct authentication attempts against MySQL without going through the web application. Successful credential guessing grants full read and write access to all databases, including user records, session data, and API secrets.
 
 **Remediation**
 
-Restrict port 3306 to `localhost` or a trusted management VPN via firewall rules. Database ports must never be exposed to the public internet under any circumstances.
+Restrict port 3306 to `localhost` or a trusted VPN only. Database ports must never be internet-facing.
 
-**Evidence:** Figure 4.9 — Nmap scan output confirming 3306/tcp open mysql MySQL 8.0.43
+**Evidence:** Figure 4.9 — Nmap scan confirming 3306/tcp open mysql MySQL 8.0.43
 
 ---
 
@@ -978,13 +978,13 @@ Restrict port 3306 to `localhost` or a trusted management VPN via firewall rules
 
 **Description**
 
-The MikroTik RouterOS web configuration interface is publicly accessible on port 9001, returning HTTP 200 with a fully rendered login page. The login form pre-fills `admin` as the default username. MikroTik devices ship with a factory default of `admin` / blank password — if this default has not been changed, full network device control is available without any credential knowledge. An attacker with RouterOS access can modify routing tables, capture all network traffic in promiscuous mode, create persistent backdoor accounts, remove firewall rules, and disrupt all hosted services on the network.
+The MikroTik RouterOS admin interface is accessible from any IP on port 9001, pre-filling `admin` as the default username. If the factory default blank password has not been changed, an attacker gains full network device control — routing tables, firewall rules, and live traffic capture.
 
 **Remediation**
 
-Restrict port 9001 to a trusted management IP via firewall. Change MikroTik default credentials immediately. Disable all unused RouterOS services including telnet, FTP, and the API service.
+Restrict port 9001 to a trusted management IP. Change MikroTik default credentials and disable unused services (telnet, FTP, API).
 
-**Evidence:** Figure 4.11 — curl response showing RouterOS router configuration page
+**Evidence:** Figure 4.11 — curl response confirming RouterOS login page on port 9001
 
 ---
 
@@ -996,11 +996,11 @@ Restrict port 9001 to a trusted management IP via firewall. Change MikroTik defa
 
 **Description**
 
-The cPanel web hosting control panel is publicly accessible on port 2083 with no IP restriction and no two-factor authentication prompt. cPanel provides complete management of the hosting account: a file manager with read and write access to all web application files, database management via phpMyAdmin, email account control, FTP credential creation, and subdomain configuration. A password reset link is present on the login page — if an attacker can compromise the registered email account, they can reset the cPanel password and gain full hosting access without brute force.
+The cPanel hosting panel is accessible on port 2083 with no IP restriction or two-factor authentication. Access grants full control of hosted files, databases, email accounts, and FTP credentials.
 
 **Remediation**
 
-Restrict port 2083 to trusted management IPs via Cloudways firewall. Enable two-factor authentication on cPanel immediately.
+Restrict port 2083 to trusted management IPs via Cloudways firewall and enable two-factor authentication on cPanel immediately.
 
 **Evidence:** Figure 4.10 — curl response confirming cPanel Login page on port 2083
 
@@ -1014,11 +1014,11 @@ Restrict port 2083 to trusted management IPs via Cloudways firewall. Enable two-
 
 **Description**
 
-WHM (Web Host Manager) is the root-level server administration panel for cPanel-based servers. It is publicly accessible on port 2087 with no IP restriction, no two-factor authentication, and no account lockout policy. WHM access is functionally equivalent to root shell access: it provides a built-in Terminal feature, the ability to create and manage all cPanel accounts on the server, root-level database access, and full server configuration control. An attacker who gains WHM access compromises not only neuralsh.com but every other domain hosted on the shared server simultaneously. This is the highest-severity finding in the engagement, receiving the maximum CVSS score of 10.0.
+WHM (Web Host Manager) is the root-level server admin panel, accessible on port 2087 with no IP restriction, no two-factor authentication, and no lockout. WHM provides a built-in terminal (root shell), full cPanel account management, and database access — a single compromise exposes every domain hosted on the server. This is the highest-severity finding in the engagement (CVSS 10.0).
 
 **Remediation**
 
-Immediately restrict port 2087 to trusted management IPs only via Cloudways firewall. Enable two-factor authentication on the WHM root account. This single configuration change eliminates the highest-risk attack vector in the entire engagement.
+Restrict port 2087 to trusted IPs via Cloudways firewall and enable two-factor authentication. This single change eliminates the highest-risk attack vector in the engagement.
 
 **Evidence:** Figure 4.10 — curl response confirming WHM Login page on port 2087
 
@@ -1032,11 +1032,11 @@ Immediately restrict port 2087 to trusted management IPs only via Cloudways fire
 
 **Description**
 
-OpenSSH 8.9p1 is publicly accessible on port 22. SSH key-based authentication was confirmed as the enforced method for tested usernames, which reduces the immediate risk. However, the port remains exposed to brute-force attempts for any account that may have password authentication enabled. The server banner (`163-47-172-131.cprapid.com`) identified this as a cPanel shared hosting server where the primary user typically holds sudo privileges, making successful SSH compromise equivalent to root access.
+OpenSSH 8.9p1 is accessible on port 22. Key-based authentication was confirmed for tested accounts, reducing immediate brute-force risk. However, any account with password authentication enabled remains vulnerable, and successful SSH access on a shared cPanel server is equivalent to root.
 
 **Remediation**
 
-Enforce `PasswordAuthentication no` in `/etc/ssh/sshd_config`. Install fail2ban with aggressive lockout thresholds. Restrict SSH access to a trusted management IP via firewall. Change the default SSH port to reduce automated scanning noise.
+Enforce `PasswordAuthentication no` in `/etc/ssh/sshd_config`, install fail2ban, and restrict port 22 to a trusted management IP.
 
 **Evidence:** Figure 4.9 — Nmap scan confirming 22/tcp open OpenSSH 8.9p1
 
@@ -1050,17 +1050,17 @@ Enforce `PasswordAuthentication no` in `/etc/ssh/sshd_config`. Install fail2ban 
 
 **Description**
 
-The origin server is a shared cPanel hosting environment (Cloudways / cprapid.com) that hosts multiple client accounts on the same physical server. SSL certificates issued to `*.onesala.com` and `www.endoncambodia.com` confirmed the presence of other tenants. On shared cPanel hosting, a single WHM-level compromise grants an attacker access to the files, databases, and email of every co-hosted account simultaneously. A compromise of neuralsh.com's hosting account could therefore constitute a data breach affecting third-party organisations that have no relationship with neuralsh.com and no visibility into its security posture.
+The origin server is a shared cPanel environment (Cloudways / cprapid.com) hosting multiple tenants, confirmed by SSL certificates issued to `*.onesala.com` and `www.endoncambodia.com`. A single WHM-level compromise exposes all co-hosted accounts — their files, databases, and email — simultaneously.
 
 **Remediation**
 
-Migrate neuralsh.com to a dedicated server or isolated cloud instance. As an immediate interim measure, restrict WHM access to trusted IPs to remove the most direct lateral movement path.
+Migrate neuralsh.com to dedicated or isolated hosting. As an immediate step, restrict WHM to trusted IPs to eliminate the direct lateral movement path.
 
-**Evidence:** Figure 4.8 — SSL certificate disclosing onesala.com and endoncambodia.com on the same origin server
+**Evidence:** Figure 4.8 — SSL certificate disclosing co-tenant domains on the same origin server
 
 ---
 
-### N-005: Rate Limit Bypass via X-Forwarded-For Header Spoofing
+### N-005: Rate Limit Bypass via X-Forwarded-For Spoofing
 
 | Severity | CVSS Score | Affected Host | Tool(s) Used |
 |----------|-----------|----------------|--------------|
@@ -1068,13 +1068,13 @@ Migrate neuralsh.com to a dedicated server or isolated cloud instance. As an imm
 
 **Description**
 
-The application's rate-limiting mechanism uses the client-supplied `X-Forwarded-For` header as the identifier for tracking request rates per source IP. Because `X-Forwarded-For` is fully controllable by the client, an attacker can supply a different random IP value on each request, making every request appear to originate from a unique source. Exploitation was confirmed with a 100% success rate: 50 consecutive requests were sent with rotating `X-Forwarded-For` values and all 50 received HTTP 200 responses — not a single rate-limit response was returned. This bypass applies to any endpoint on the platform that relies on the same IP-tracking logic, not only the token endpoint.
+The rate limiter uses the client-controlled `X-Forwarded-For` header as the source IP identifier. By rotating a different IP value on each request, all 50 test requests received HTTP 200 — a 100% bypass rate with zero rate-limit responses returned.
 
 **Remediation**
 
-Replace `X-Forwarded-For` with Cloudflare's `CF-Connecting-IP` header for all rate-limiting logic. The `CF-Connecting-IP` header is set by Cloudflare at the edge and cannot be modified by the client.
+Replace `X-Forwarded-For` with Cloudflare's `CF-Connecting-IP` header for all rate-limiting logic. Unlike `X-Forwarded-For`, this header is set by Cloudflare and cannot be spoofed by the client.
 
-**Evidence:** Figure 4.15 — Rate limit bypass results showing 50/50 successful token requests with zero rate-limit responses
+**Evidence:** Figure 4.15 — 50/50 requests bypassed rate limiting successfully
 
 ---
 
@@ -1086,13 +1086,13 @@ Replace `X-Forwarded-For` with Cloudflare's `CF-Connecting-IP` header for all ra
 
 **Description**
 
-The token endpoint issues a valid signed JWT token to any unauthenticated caller with no credentials, API key, device fingerprint, or identifying information required. Tokens carry a `type: guest` claim and a 30-minute validity window. Using the rate-limit bypass from N-005, 50 valid tokens were farmed in approximately three seconds. Each token granted real API access to search and category endpoints. JWT secret brute-force was attempted against the rockyou.txt wordlist (14,344,391 candidates) — the secret was not recovered, indicating adequate entropy. However, the token farming capability is independent of the secret strength.
+The `/web/v1/init/token` endpoint issues a signed JWT to any caller — no credentials, API key, or fingerprint required. Combined with the N-005 rate-limit bypass, 50 valid tokens were farmed in approximately three seconds, each granting real API access.
 
 **Remediation**
 
-Require a browser-computed fingerprint, Cloudflare Turnstile challenge, or strict origin header validation before issuing guest tokens. Implement token binding to prevent tokens from being replayed outside the originating browser session.
+Require a Cloudflare Turnstile challenge or browser fingerprint before issuing tokens, and implement token binding to the originating session.
 
-**Evidence:** Figure 4.15 — 50 tokens farmed via rate-limit bypass; Figure 4.16 — JWT endpoint confirmed live (HTTP 200)
+**Evidence:** Figure 4.15 — 50 tokens farmed; Figure 4.16 — endpoint confirmed live (HTTP 200)
 
 ---
 
@@ -1104,13 +1104,13 @@ Require a browser-computed fingerprint, Cloudflare Turnstile challenge, or stric
 
 **Description**
 
-The complete API route structure of the application is disclosed in the compiled Nuxt.js JavaScript bundle, which is publicly accessible without authentication. Routes including `/web/v1/init/token`, `/web/v1/text/search`, `/web/v1/image/search`, `/web/v1/report/save`, and `/api/geocode` were extracted directly from the bundle. This reconnaissance eliminated the need for directory brute-force and directly enabled the targeted exploitation of the token endpoint described in N-005 and N-007.
+All API routes are embedded in the public Nuxt.js JavaScript bundle. Routes including `/web/v1/init/token`, `/web/v1/text/search`, and `/web/v1/report/save` were extracted without authentication, eliminating the need for directory brute-force and enabling targeted exploitation of N-005 and N-007.
 
 **Remediation**
 
-Minimise unnecessary route exposure within the compiled bundle. Implement an API gateway with strict allowlisting for permitted routes and methods. All API endpoints should be secured at the application layer rather than treated as hidden.
+Minimise route exposure in the compiled bundle and implement an API gateway with strict allowlisting. Treat all API endpoints as publicly known and secure them at the application layer.
 
-**Evidence:** API route extraction from `/_nuxt/Bpuv52g-.js` via curl
+**Evidence:** API routes extracted from `/_nuxt/Bpuv52g-.js` via curl
 
 ---
 
@@ -1122,13 +1122,13 @@ Minimise unnecessary route exposure within the compiled bundle. Implement an API
 
 **Description**
 
-The SSL certificate served on the backend server's HTTPS port is issued to `www.endoncambodia.com`, not to neuralsh.com. Mail service certificates are issued to `*.onesala.com`. Any client connecting directly to the origin IP receives a certificate mismatch warning, confirming that infrastructure-level SSL management has not been maintained. This finding corroborates N-004 (Shared Hosting Lateral Movement Risk) and provides additional evidence that multiple tenants share this origin server.
+The origin server's HTTPS certificate is issued to `www.endoncambodia.com`, not neuralsh.com, and mail certificates belong to `*.onesala.com`. Clients connecting directly to the origin IP receive a certificate mismatch warning, confirming SSL management has not been maintained for this shared hosting environment.
 
 **Remediation**
 
-Issue a dedicated SSL certificate for the neuralsh.com domain at the origin server level. Ensure each hosted domain has its own certificate or that the shared server certificate covers all hosted domains as Subject Alternative Names (SANs).
+Issue a dedicated SSL certificate for neuralsh.com at the origin server level, or ensure the server certificate covers all hosted domains as Subject Alternative Names (SANs).
 
-**Evidence:** Figure 4.8 — openssl output showing certificate subject mismatch on origin IP
+**Evidence:** Figure 4.8 — openssl output showing certificate subject mismatch
 
 ---
 
@@ -1140,13 +1140,13 @@ Issue a dedicated SSL certificate for the neuralsh.com domain at the origin serv
 
 **Description**
 
-The Content-Security-Policy header on the main application includes `'unsafe-inline'` in the `script-src` directive. This instructs the browser to permit execution of all inline JavaScript, including dynamically injected `<script>` blocks and event handler attributes. If a Cross-Site Scripting (XSS) vulnerability exists anywhere in the application, the CSP provides no meaningful barrier against inline script injection attacks.
+The Content-Security-Policy header includes `'unsafe-inline'` in `script-src`, allowing execution of any inline JavaScript. If an XSS vulnerability exists anywhere in the application, this CSP setting provides no protection against inline script injection.
 
 **Remediation**
 
-Replace `'unsafe-inline'` with per-request cryptographic nonces (`'nonce-{nonce}'`). Nuxt.js provides built-in CSP nonce support through its security plugin, making this change straightforward to implement.
+Replace `'unsafe-inline'` with per-request nonces using Nuxt.js's built-in CSP nonce support.
 
-**Evidence:** curl response headers confirming `Content-Security-Policy: script-src 'self' 'unsafe-inline'`
+**Evidence:** curl response headers confirming `script-src 'self' 'unsafe-inline'`
 
 ---
 
@@ -1158,11 +1158,11 @@ Replace `'unsafe-inline'` with per-request cryptographic nonces (`'nonce-{nonce}
 
 **Description**
 
-A wildcard DNS record is configured for `*.neuralsh.com`, causing any arbitrary subdomain to resolve to 103.16.62.217. This allows an attacker or phishing actor to construct convincing subdomain URLs such as `login.neuralsh.com` or `secure.neuralsh.com` — subdomains that resolve to a real, registered IP address and thereby increase the credibility of phishing campaigns targeting neuralsh.com users.
+A wildcard DNS record routes any subdomain of neuralsh.com to 103.16.62.217. Attackers can use convincing subdomains such as `login.neuralsh.com` in phishing campaigns that resolve to a real IP address, increasing their credibility.
 
 **Remediation**
 
-Remove the wildcard DNS record from Cloudflare. Replace it with explicit A records for only the legitimate subdomains required by the business (`mail.neuralsh.com`, `www.neuralsh.com`).
+Remove the wildcard DNS record from Cloudflare and define only explicit records for legitimate subdomains such as `mail.neuralsh.com`.
 
 **Evidence:** Figure 4.7 — dig confirming randomxyz123.neuralsh.com resolves to 103.16.62.217
 
@@ -1176,11 +1176,11 @@ Remove the wildcard DNS record from Cloudflare. Replace it with explicit A recor
 
 **Description**
 
-Apache's directory listing feature is enabled at the document root for the neuralsh.com virtual host. A direct HTTP request to the origin IP returns an `Index of /` page, listing all files present in the web root along with modification timestamps. While the directory was empty at the time of testing, any deployed application files would be enumerated, providing a full directory map to an attacker without any scanning.
+Apache directory listing is enabled on the origin server, returning an `Index of /` page for direct HTTP requests. Any deployed application files would be listed with filenames and modification timestamps, providing a full directory map without scanning.
 
 **Remediation**
 
-Add `Options -Indexes` to the Apache virtual host configuration or to a `.htaccess` file in the document root. Verify that this directive is applied to all virtual hosts on the server.
+Add `Options -Indexes` to the Apache configuration or a `.htaccess` file in the document root.
 
 **Evidence:** curl response from 103.16.62.217 returning `Index of /` page
 
@@ -1194,13 +1194,13 @@ Add `Options -Indexes` to the Apache virtual host configuration or to a `.htacce
 
 **Description**
 
-HTTP redirects from ports 2077 and 2082 on the origin server redirect explicitly to `www.onesala.com:2078` and `www.onesala.com:2083`, confirming onesala.com as a named, verifiable co-tenant on the same physical server as neuralsh.com. This elevates N-004 (Shared Hosting Lateral Movement Risk) from a theoretical risk to a confirmed scenario with an identified third-party victim. A successful compromise of neuralsh.com's hosting infrastructure now carries documented third-party data protection and legal implications.
+HTTP redirects from ports 2077 and 2082 explicitly name `www.onesala.com` as a co-tenant on the same physical server. This confirms N-004 with an identified third-party victim — a compromise of neuralsh.com's server now has documented data protection implications for onesala.com.
 
 **Remediation**
 
-No direct fix is available at the application level. Long-term remediation requires migration to isolated dedicated infrastructure. As an immediate measure, restrict WHM access to prevent the co-tenancy relationship from being exploited.
+No application-level fix is available. Migrate to isolated infrastructure and restrict WHM access immediately to prevent exploitation of the co-tenancy risk.
 
-**Evidence:** curl response showing HTTP redirect from 103.16.62.217:2077 to www.onesala.com:2078
+**Evidence:** curl response showing redirect from 103.16.62.217:2077 to www.onesala.com:2078
 
 ---
 
@@ -1212,11 +1212,11 @@ No direct fix is available at the application level. Long-term remediation requi
 
 **Description**
 
-The cPanel Webmail login interface is publicly accessible on port 2096 without IP restriction, account lockout, or CAPTCHA. This interface accepts authentication attempts against all email accounts hosted on the server, including `@neuralsh.com` addresses. A compromised email account can be used to trigger password reset flows for linked services including cPanel and application accounts, and to send phishing emails from a legitimate neuralsh.com address.
+The cPanel Webmail login page is accessible on port 2096 with no IP restriction or account lockout. It allows brute-force attempts against all hosted email accounts, and a compromised email address can be used to reset passwords on cPanel and linked services.
 
 **Remediation**
 
-Restrict port 2096 to trusted management IPs via firewall. Enforce strong, unique passwords on all hosted email accounts. Implement CAPTCHA or an account lockout policy on the webmail login page.
+Restrict port 2096 to trusted IPs via firewall and implement an account lockout policy on the webmail login.
 
 **Evidence:** Nmap scan confirming 2096/tcp open — cPanel Webmail
 
@@ -1230,13 +1230,13 @@ Restrict port 2096 to trusted management IPs via firewall. Enforce strong, uniqu
 
 **Description**
 
-Ports 2078 and 2091 were not present in the June 6 baseline scan but appeared open in the June 10 follow-up scan, both returning HTTP 401 with `WWW-Authenticate: Basic realm="Restricted Area"`. These are additional cPanel management service ports that expand the credential brute-force attack surface. Their appearance after the initial scan indicates that infrastructure changes are occurring on the server without a security review process in place.
+Ports 2078 and 2091 were absent in the June 6 baseline but appeared open in the June 10 follow-up, both returning HTTP 401 Basic Auth challenges. Their undocumented addition indicates infrastructure changes are occurring without a security review process.
 
 **Remediation**
 
-Restrict ports 2078 and 2091 via firewall immediately. Conduct a full port audit of 103.16.62.217 and close all ports that lack a documented business purpose. Establish a change management process for firewall rule modifications.
+Restrict ports 2078 and 2091 via firewall and conduct a full port audit to close all ports without a documented business purpose.
 
-**Evidence:** Follow-up Nmap scan (10 June 2026) confirming 2078/tcp and 2091/tcp open with HTTP 401 response
+**Evidence:** Follow-up Nmap scan (10 June 2026) confirming 2078/tcp and 2091/tcp open
 
 ---
 
@@ -1248,13 +1248,13 @@ Restrict ports 2078 and 2091 via firewall immediately. Conduct a full port audit
 
 **Description**
 
-API error responses disclose internal details including the full request URL, internal status messages, expected parameter names, and backend framework identification strings. An example error response observed during testing: `{"error":true,"url":"https://neuralsh.com/api/geocode","statusCode":400,"message":"Latitude and longitude are required"}`. This information reduces the reconnaissance effort required to map and target the API.
+API errors return the full request URL, expected parameter names, and framework identifiers. Example: `{"error":true,"url":"https://neuralsh.com/api/geocode","message":"Latitude and longitude are required"}`. This reduces the reconnaissance effort needed to map and attack the API.
 
 **Remediation**
 
-Return generic, user-facing error messages to clients. Log detailed diagnostic information server-side only. Remove all parameter names, internal paths, and framework identifiers from client-facing error responses.
+Return generic error messages to clients and log detailed diagnostics server-side only.
 
-**Evidence:** curl request to /api/geocode returning verbose error message with internal details
+**Evidence:** curl request to /api/geocode returning verbose internal error response
 
 ---
 
@@ -1266,13 +1266,13 @@ Return generic, user-facing error messages to clients. Log detailed diagnostic i
 
 **Description**
 
-The SPF record uses `~all` (softfail) rather than `-all` (hardfail), and the DMARC policy is set to `p=quarantine` rather than `p=reject`. Emails sent by unauthorised sources spoofing `@neuralsh.com` addresses are flagged but not rejected outright. On receiving mail servers that do not enforce strict SPF checking, phishing emails using the neuralsh.com brand identity may be delivered to recipients.
+SPF is set to softfail (`~all`) and DMARC to `p=quarantine`, meaning spoofed emails from `@neuralsh.com` are flagged but not rejected. Some mail servers may still deliver phishing emails using the neuralsh.com domain identity.
 
 **Remediation**
 
-Update the SPF record to `v=spf1 +mx +a +ip4:103.16.62.217 -all`. Update the DMARC record to `v=DMARC1; p=reject; rua=mailto:dmarc@neuralsh.com` to reject all unauthorised mail.
+Change SPF to `-all` (hardfail) and update DMARC to `p=reject; rua=mailto:dmarc@neuralsh.com`.
 
-**Evidence:** dig output confirming SPF softfail (~all) and DMARC p=quarantine policy
+**Evidence:** dig output confirming SPF ~all and DMARC p=quarantine
 
 ---
 
@@ -1284,13 +1284,13 @@ Update the SPF record to `v=spf1 +mx +a +ip4:103.16.62.217 -all`. Update the DMA
 
 **Description**
 
-The cPanel version is indirectly disclosed through timestamp-based magic revision numbers embedded in static asset paths, for example `cPanel_magic_revision_1698766296`. This timestamp can be cross-referenced against cPanel release changelogs to identify the exact installed version, enabling targeted CVE lookup and version-specific exploit research against the identified version.
+Static asset paths include a timestamp-based revision number (e.g. `cPanel_magic_revision_1698766296`) that can be cross-referenced to identify the exact cPanel version, enabling targeted CVE research.
 
 **Remediation**
 
-Update cPanel to the current supported release. Configure cPanel to suppress magic revision identifiers in static asset paths where possible.
+Update cPanel to the latest supported release and suppress magic revision numbers in static asset paths.
 
-**Evidence:** curl response from port 2083 showing cPanel_magic_revision timestamp in asset path
+**Evidence:** curl response from port 2083 showing cPanel_magic_revision in asset URL
 
 ---
 
@@ -1302,11 +1302,11 @@ Update cPanel to the current supported release. Configure cPanel to suppress mag
 
 **Description**
 
-Port 25 appeared as `filtered` in the June 6 baseline scan and as `open` in the June 10 follow-up scan, accepting full TCP connections. The unexplained state change indicates that a firewall rule was removed between the two scans without a documented change control process. An open SMTP port enables direct mail relay testing, SMTP user enumeration via VRFY and EXPN commands, and potential open relay abuse if the Exim configuration allows unauthenticated mail submission.
+Port 25 was filtered in the June 6 baseline and open in the June 10 follow-up, indicating a firewall rule was removed without documented change control. An open SMTP port exposes the server to mail relay testing and SMTP user enumeration.
 
 **Remediation**
 
-Investigate the cause of the port 25 firewall rule removal. If direct SMTP delivery is not required — mail submission on port 587 is the current standard — restore the firewall block on port 25 immediately and document the change.
+Investigate the firewall rule change and restore the port 25 block if direct SMTP delivery is not required.
 
 ---
 
