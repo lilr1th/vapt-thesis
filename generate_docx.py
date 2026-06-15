@@ -1169,10 +1169,9 @@ def process_md(doc):
             add_inline_md(p, m_num.group(2).strip())
             i+=1; continue
 
-        # skip front-matter meta lines and blockquotes
+        # skip residual front-matter meta lines and blockquotes
         if any(stripped.startswith(x) for x in ['**Student','**Submission','**Program',
-           '**Institution','**Supervisor','> ','## Declaration','## Abstract','## Table',
-           '**Address','**Website','**Email','**Telephone','**Keywords']):
+           '**Institution','**Supervisor','> ','**Keywords']):
             i+=1; continue
 
         if not stripped: i+=1; continue
