@@ -858,10 +858,10 @@ A direct MySQL connection attempt from the public internet confirmed that port 3
 
 ```bash
 mysql -h 103.16.xx.xxx -P 3306 -u root 2>&1
-# ERROR 1045 (28000): Access denied for user 'root'@'58.97.216.203' (using password: NO)
+# ERROR 1045 (28000): Access denied for user 'root'@'[REDACTED]' (using password: NO)
 ```
 
-The error message itself is the critical evidence: it reveals the tester's public IP address (58.97.216.203), confirming that the MySQL server performed a full TCP connection and authentication handshake with an external internet host. The server is not passively listening — it actively engages with every connection attempt from anywhere on the internet.
+The error message itself is the critical evidence: it reveals the tester's public IP address (redacted for privacy), confirming that the MySQL server performed a full TCP connection and authentication handshake with an external internet host. The server is not passively listening — it actively engages with every connection attempt from anywhere on the internet.
 
 *[Figure 4.19: Terminal showing MySQL ERROR 1045 with public IP — confirming internet-facing database — screenshot]*
 
