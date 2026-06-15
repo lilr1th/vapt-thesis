@@ -527,6 +527,13 @@ LOGO_FIGURES = {
     "16": (os.path.join(IMGS, "claude_logo.png"),               "Figure 16: Claude (Anthropic) AI assistant logo"),
 }
 
+# Per-figure width overrides (cm). Diagrams/maps get full text width; logos stay small.
+LOGO_WIDTHS = {
+    "2":  15.0,   # org chart — full width so text is readable
+    "3":  14.0,   # office map
+    "7":  15.0,   # pentest flow diagram — full width
+}
+
 # Chapter 4 screenshots (key = "4.N")
 SHOT_FIGURES = {
     "4.1":  (os.path.join(SHOTS, "fig41_virtualbox.png"),                "Figure 4.1: VirtualBox showing Kali Linux VM running"),
@@ -1087,10 +1094,10 @@ def process_md(doc):
             fname = m_logo.group(3).strip()
             if num in LOGO_FIGURES:
                 path, cap = LOGO_FIGURES[num]
-                add_img(doc, path, cap, w=8.0)
+                add_img(doc, path, cap, w=LOGO_WIDTHS.get(num, 8.0))
             else:
                 path = os.path.join(IMGS, fname)
-                add_img(doc, path, f"Figure {num}: {desc}", w=8.0)
+                add_img(doc, path, f"Figure {num}: {desc}", w=LOGO_WIDTHS.get(num, 8.0))
             i+=1; continue
 
         # Screenshot figures: *[Figure N.N: description ... — screenshot]*
