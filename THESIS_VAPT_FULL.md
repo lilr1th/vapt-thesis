@@ -873,12 +873,6 @@ The rate-limiting bypass via X-Forwarded-For header spoofing was confirmed explo
 
 *[Figure 4.21: Burp Suite showing live JWT token response from /web/v1/init/token — screenshot]*
 
-### 4.8.5 Attack Chain Visualization
-
-The four attack chains identified in this engagement are visualized in the diagram below, mapping each step from initial internet access to full compromise outcome.
-
-*[Figure 4.22: Attack chain diagram — 4 chains, color-coded by exploitation stage — screenshot]*
-
 ---
 
 # Chapter 5: Results, Analysis and Remediation
