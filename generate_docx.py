@@ -510,12 +510,12 @@ def gantt_table(doc, data):
 # Logos / diagrams for Chapters 1–3 (key = figure number as string)
 LOGO_FIGURES = {
     "1":  (os.path.join(IMGS, "prestige_logo.png"),             "Figure 1: Prestige Alliance company logo"),
-    "2":  (os.path.join(IMGS, "PrestigeAlliance_OrgChart.png"), "Figure 2: Prestige Alliance organisational structure"),
+    "2":  (os.path.join(IMGS, "org_chart_new.png"),              "Figure 2: Prestige Alliance organisational structure"),
     "3":  (os.path.join(IMGS, "map.png"),                       "Figure 3: Prestige Alliance office location"),
     "4":  (os.path.join(IMGS, "htb_logo_fixed.png"),            "Figure 4: Hack The Box platform logo"),
     "5":  (os.path.join(IMGS, "cpts_logo.png"),                 "Figure 5: HTB Certified Penetration Testing Specialist (CPTS) logo"),
     "6":  (os.path.join(IMGS, "cwes_logo.png"),                 "Figure 6: HTB Certified Web Exploitation Specialist (CWES) logo"),
-    "7":  (os.path.join(IMGS, "pentest_flow.drawio.png"),       "Figure 7: Penetration testing process diagram"),
+    "7":  (os.path.join(IMGS, "pentest_flow_new.png"),           "Figure 7: Penetration testing process diagram"),
     "8":  (os.path.join(IMGS, "owasp_logo.png"),                "Figure 8: OWASP (Open Web Application Security Project) logo"),
     "9":  (os.path.join(IMGS, "nist_logo.png"),                 "Figure 9: NIST SP 800-115 logo"),
     "10": (os.path.join(IMGS, "cvss_logo.png"),                 "Figure 10: CVSS v3.1 scoring system logo"),
@@ -559,7 +559,7 @@ SHOT_FIGURES = {
     "4.21": (os.path.join(SHOTS, "fig415_jwt_token_burp.png"),           "Figure 4.21: Burp Suite showing live JWT token response from /web/v1/init/token"),
     "4.22": (os.path.join(SHOTS, "fig422_attack_chains.png"),            "Figure 4.22: Attack chain diagram — four confirmed attack vectors"),
     # Chapter 5 figures
-    "5.1":  (os.path.join(IMGS,  "recommended_architecture.png"),        "Figure 5.1: Recommended network security architecture"),
+    "5.1":  (os.path.join(IMGS,  "recommended_architecture_new.png"),    "Figure 5.1: Recommended network security architecture"),
 }
 
 # Appendix screenshots
