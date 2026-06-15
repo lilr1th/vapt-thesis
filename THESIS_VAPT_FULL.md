@@ -137,7 +137,9 @@ Prestige Alliance is committed to helping organizations in the region build and 
 
 As a cybersecurity-oriented firm, Prestige Alliance recognizes the importance of developing the next generation of security talent. This internship was conducted under the company's technical team, providing a structured environment for hands-on penetration testing work on an authorized real-world target.
 
-*[Figure 2: Prestige Alliance office location — map.png]*
+*[Figure 2: Prestige Alliance organisational structure — PrestigeAlliance_OrgChart.png]*
+
+*[Figure 3: Prestige Alliance office location — map.png]*
 
 **Email:** info@prestigealliance.co  
 **Website:** https://www.prestigealliance.co/  
@@ -160,7 +162,7 @@ Modern penetration testing spans several domains: web application testing, netwo
 
 ## 2. Learning Penetration Testing via Hack The Box
 
-*[Figure 3: Hack The Box logo — htb_logo.png]*
+*[Figure 4: Hack The Box logo — htb_logo.png]*
 
 Practical penetration testing skills cannot be developed from theory alone. Before engaging real-world targets, testers must build hands-on experience in controlled environments. **Hack The Box (HTB)** is one of the most widely recognized platforms for this purpose. It provides a constantly updated library of deliberately vulnerable machines, web applications, and challenge scenarios that simulate real vulnerabilities found in production environments.
 
@@ -168,7 +170,7 @@ HTB offers two certification pathways that were directly relevant to this intern
 
 ### 2.1 Certified Penetration Testing Specialist (CPTS)
 
-*[Figure 4: HTB CPTS certification logo — cpts_logo.png]*
+*[Figure 5: HTB CPTS certification logo — cpts_logo.png]*
 
 The **Certified Penetration Testing Specialist (CPTS)** pathway covers the full penetration testing engagement lifecycle — from information gathering and reconnaissance through network enumeration, web application attacks, privilege escalation, Active Directory exploitation, and professional reporting. The curriculum is structured around real-world methodology rather than abstract theory, covering every phase of the PTES framework applied in this internship.
 
@@ -176,7 +178,7 @@ Skills developed through CPTS — including DNS enumeration, port scanning inter
 
 ### 2.2 Certified Web Exploitation Specialist (CWES)
 
-*[Figure 5: HTB CWES certification logo — cwes_logo.png]*
+*[Figure 6: HTB CWES certification logo — cwes_logo.png]*
 
 The **Certified Web Exploitation Specialist (CWES)** is an HTB certification focused specifically on web application security and exploitation. It covers the full OWASP Top 10 attack categories in depth, including broken access control, authentication failures, injection vulnerabilities, insecure design, and API security testing — all of which appeared as findings in this engagement.
 
@@ -186,7 +188,7 @@ CWES is particularly relevant to the neuralsh.com assessment because the target 
 
 This internship followed the **Penetration Testing Execution Standard (PTES)** — a six-phase lifecycle that structures the engagement from initial information gathering through final reporting. Unlike an ad-hoc approach where tools are run without direction, PTES ensures that every phase produces evidence that feeds the next, and that nothing is tested without a defined reason. The six phases applied in this engagement are described below.
 
-*[Figure 6: Penetration Testing Process Diagram — pentest_flow.drawio.png]*
+*[Figure 7: Penetration Testing Process Diagram — pentest_flow.drawio.png]*
 
 ### 3.1 Phase 1 — Reconnaissance
 
@@ -216,7 +218,7 @@ The reporting phase produced all deliverables: a full professional VAPT report, 
 
 ## 4. OWASP Top 10
 
-*[Figure 7: OWASP logo — owasp_logo.png]*
+*[Figure 8: OWASP logo — owasp_logo.png]*
 
 The **Open Web Application Security Project (OWASP)** is a nonprofit foundation dedicated to improving software security. Its most widely referenced publication is the **OWASP Top 10** — a consensus-based list of the ten most critical web application security risks.
 
@@ -239,13 +241,13 @@ Security Misconfiguration (A05) accounts for the majority of the 20 findings in 
 
 ## 5. NIST SP 800-115
 
-*[Figure 8: NIST logo — nist_logo.png]*
+*[Figure 9: NIST logo — nist_logo.png]*
 
 **NIST Special Publication 800-115: Technical Guide to Information Security Testing and Assessment** provides a government-aligned methodology for security testing that emphasizes documentation, risk minimization, and traceability. It organizes security assessment activities into four phases: Planning (defining scope and rules of engagement), Discovery (information gathering and service enumeration), Attack (active exploitation under controlled conditions), and Reporting (documenting findings and recommendations). NIST SP 800-115 was used alongside PTES and OWASP WSTG during this internship to ensure the assessment approach met both academic rigor and industry practice expectations.
 
 ## 6. Common Vulnerability Scoring System (CVSS)
 
-*[Figure 9: CVSS logo — cvss_logo.png]*
+*[Figure 10: CVSS logo — cvss_logo.png]*
 
 The **Common Vulnerability Scoring System (CVSS)** is the industry-standard framework for communicating the severity of security vulnerabilities. CVSS v3.1 was used throughout this engagement to assign an objective numeric severity score to each of the 20 findings.
 
@@ -281,15 +283,15 @@ Automated tools were used to perform broad, repeatable scans against the target 
 
 *Table 6: Automated testing tools used in this engagement*
 
-*[Figure 10: Nmap logo — nmap_logo.png]*
+*[Figure 11: Nmap logo — nmap_logo.png]*
 
 **Nmap** (Network Mapper) is the industry-standard open-source tool for network discovery and service fingerprinting. A full TCP scan with service version detection against the origin server revealed that 103.16.xx.xxx had 23 ports open and reachable from the public internet — including administrative interfaces that should never be exposed. This single scan produced the evidence base for Critical findings N-001, N-002, N-013, and N-014.
 
-*[Figure 11: Nikto logo — nikto_logo.png]*
+*[Figure 12: Nikto logo — nikto_logo.png]*
 
 **Nikto** is an open-source web server scanner that checks for thousands of known misconfigurations, outdated software versions, and missing security controls. In this engagement, Nikto was run against both the Cloudflare-protected frontend and directly against the origin IP, contributing to findings N-003 (Missing Security Headers), N-012 (Server Version Disclosure), and N-017 (Directory Listing Enabled).
 
-*[Figure 12: Shodan logo — shodan_logo.png]*
+*[Figure 13: Shodan logo — shodan_logo.png]*
 
 **Shodan** was used as a passive intelligence source to verify that the services discovered by Nmap were also visible to external internet scanners — confirming these exposures were not local network artifacts.
 
@@ -309,11 +311,11 @@ Manual tools require the assessor to actively craft, send, and interpret request
 
 *Table 7: Manual testing tools used in this engagement*
 
-*[Figure 13: Burp Suite logo — burpsuite_logo.png]*
+*[Figure 14: Burp Suite logo — burpsuite_logo.png]*
 
 **Burp Suite Community Edition** served as the primary web application testing proxy throughout the engagement. All HTTP traffic between the testing machine and neuralsh.com was routed through Burp Suite's intercepting proxy, allowing every request and response to be inspected, modified, and replayed. The two confirmed exploited findings — Rate Limiting Bypass (N-005) and JWT Token Farming (N-007) — were both demonstrated using Burp Suite's Repeater tool.
 
-*[Figure 14: CyberChef logo — cyberchef_logo.png]*
+*[Figure 15: CyberChef logo — cyberchef_logo.png]*
 
 **CyberChef**, developed by GCHQ, was used to decode Base64url-encoded JWT tokens issued by the `/web/v1/init/token` endpoint. By splitting the token into its three components (header, payload, signature) and decoding each, it was possible to inspect the token's signing algorithm, timestamps, expiry window, and embedded user claims without needing to crack the secret.
 
@@ -321,7 +323,7 @@ Manual tools require the assessor to actively craft, send, and interpret request
 
 Artificial intelligence tools represented a supporting layer in this engagement — used to assist with specific technical analysis tasks during the testing process.
 
-*[Figure 15: Claude (Anthropic) logo — claude_logo.png]*
+*[Figure 16: Claude (Anthropic) logo — claude_logo.png]*
 
 **Claude** by Anthropic was used during this engagement in the following technical capacities: proof-of-concept script generation for the rate-limiting bypass and JWT token farming tests; scan output analysis to cross-reference open ports against known service vulnerabilities; and CVSS scoring verification to ensure metric selections were consistent and defensible across all 20 findings.
 
